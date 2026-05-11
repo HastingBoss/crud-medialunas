@@ -150,7 +150,37 @@ export default function AdminDashboard() {
 
       <div className="content">
         <div className="filters">
-          <input className="date-input" type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)} />
+          <div style={{display: 'flex', gap: '8px'}}>
+            <button 
+              onClick={() => setFilterDate('')}
+              style={{
+                background: filterDate === '' ? 'var(--brown)' : '#fff',
+                color: filterDate === '' ? '#fff' : 'inherit',
+                border: filterDate === '' ? '1px solid var(--brown)' : '1px solid var(--border)',
+                cursor: 'pointer',
+                padding: '0 12px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                outline: 'none',
+                height: '38px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              Todos
+            </button>
+            <input 
+              className="date-input" 
+              type="date" 
+              value={filterDate} 
+              onChange={e => setFilterDate(e.target.value)} 
+              style={{
+                borderColor: filterDate !== '' ? 'var(--brown)' : 'var(--border)'
+              }}
+            />
+          </div>
           <select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
             <option value="">Todos los estados</option>
             <option value="Pendiente">Pendiente</option>
