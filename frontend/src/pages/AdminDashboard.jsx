@@ -83,10 +83,11 @@ export default function AdminDashboard() {
     }
   };
 
-  const filteredOrders = orders.filter(p => 
-    (!filterDate || p.fecha === filterDate) &&
-    (!filterStatus || p.estado === filterStatus)
-  );
+  const filteredOrders = orders.filter(p => {
+    const orderDate = p.fecha ? p.fecha.split('T')[0] : '';
+    return (!filterDate || orderDate === filterDate) &&
+           (!filterStatus || p.estado === filterStatus);
+  });
 
   const getIcon = (estado) => {
     const color = estado === 'Entregado' ? '#2E7D32' : '#F57F17';
@@ -174,6 +175,7 @@ export default function AdminDashboard() {
                     <strong style={{color:'#3D2B1F'}}>{p.nombre} ({p.paquete}u)</strong><br/>
                     <span style={{color:'#8B6F5A', fontSize:'11px'}}>{p.direccion}</span><br/>
                     <span style={{color:'#8B6F5A', fontSize:'11px'}}>📞 {p.telefono}</span><br/>
+                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>📅 {p.fecha ? p.fecha.split('T')[0].split('-').reverse().join('/') : 'Sin fecha'} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</span><br/>
                     <span style={{color:'#8B6F5A', fontSize:'11px'}}>💳 {p.pago}</span>
                     {p.comprobante && (
                       <div><a href={`${API_URL}/uploads/${p.comprobante}`} target="_blank" rel="noreferrer">Ver comprobante</a></div>
@@ -213,6 +215,7 @@ export default function AdminDashboard() {
                     <div>
                       <div className="pedido-nombre">{p.nombre} ({p.paquete}u)</div>
                       <div className="pedido-dir">{p.direccion} | {p.pago}</div>
+                      <div className="pedido-dir" style={{marginTop:'2px', fontWeight: 500}}>📅 {p.fecha ? p.fecha.split('T')[0].split('-').reverse().join('/') : 'Sin fecha'} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</div>
                     </div>
                   </div>
                   <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'4px'}}>
