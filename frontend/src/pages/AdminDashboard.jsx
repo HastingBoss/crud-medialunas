@@ -23,6 +23,7 @@ export default function AdminDashboard() {
   const [mapCenter, setMapCenter] = useState([-34.6080, -58.4620]);
   const [mapZoom, setMapZoom] = useState(13);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('adminAuth') === 'true');
   const [password, setPassword] = useState('');
@@ -119,16 +120,21 @@ export default function AdminDashboard() {
   };
 
   const deleteOrder = async (id) => {
-    if(!window.confirm('¿Eliminar este pedido? Esta acción no se puede deshacer.')) return;
     try {
       await axios.delete(`${API_URL}/api/orders/${id}`);
       setOrders(prev => prev.filter(o => o.id !== id));
+      setOrderToDelete(null);
       if (selectedOrder && selectedOrder.id === id) {
         setSelectedOrder(null);
       }
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const openDeleteConfirm = (order) => {
+    setOrderToDelete(order);
+    setSelectedOrder(null); // Close detail modal if open
   };
 
   const filteredOrders = orders.filter(p => {
@@ -261,7 +267,7 @@ export default function AdminDashboard() {
                     <div style={{marginTop: '10px', display: 'flex', gap: '5px'}}>
                       {p.estado === 'Pendiente' && <button onClick={() => changeStatus(p.id, 'Entregado')} style={{padding:'4px', cursor:'pointer'}}>Entregado</button>}
                       {p.estado === 'Entregado' && <button onClick={() => changeStatus(p.id, 'Pendiente')} style={{padding:'4px', cursor:'pointer'}}>Pendiente</button>}
-                      <button onClick={() => deleteOrder(p.id)} style={{padding:'4px', cursor:'pointer', color:'#B71C1C', background: '#FFF0F0', border: '1px solid #FFCDD2', borderRadius: '4px'}}>🗑 Eliminar</button>
+                      <button onClick={() => openDeleteConfirm(p)} style={{padding:'4px', cursor:'pointer', color:'#B71C1C', background: '#FFF0F0', border: '1px solid #FFCDD2', borderRadius: '4px'}}>🗑 Eliminar</button>
                     </div>
                   </div>
                 </Popup>
@@ -399,7 +405,7 @@ export default function AdminDashboard() {
               </div>
 
               <button 
-                onClick={() => deleteOrder(selectedOrder.id)}
+                onClick={() => openDeleteConfirm(selectedOrder)}
                 style={{ 
                   marginTop: '10px',
                   width: '100%', 
@@ -418,6 +424,39 @@ export default function AdminDashboard() {
                   gap: '8px'
                 }}
               >🗑 Eliminar pedido</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {orderToDelete && (
+        <div 
+          style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+          onClick={() => setOrderToDelete(null)}
+        >
+          <div 
+            style={{ background: '#fff', borderRadius: '16px', padding: '30px', width: '100%', maxWidth: '380px', textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '50px', marginBottom: '15px' }}>⚠️</div>
+            <h3 style={{ color: 'var(--brown)', margin: '0 0 10px 0', fontSize: '22px' }}>¿Eliminar pedido?</h3>
+            <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.5', margin: '0 0 25px 0' }}>
+              Esta acción no se puede deshacer. El pedido de <strong>{orderToDelete.nombre}</strong> será eliminado permanentemente.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => {
+                  const originalOrder = orderToDelete;
+                  setOrderToDelete(null);
+                  setSelectedOrder(originalOrder); // Reopen detail modal
+                }}
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #ddd', background: '#f5f5f5', color: '#666', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
+              >Cancelar</button>
+              <button 
+                onClick={() => deleteOrder(orderToDelete.id)}
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#B71C1C', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
+              >Sí, eliminar</button>
             </div>
           </div>
         </div>
