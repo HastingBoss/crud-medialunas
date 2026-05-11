@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F9F3E8; --warm: #E8D5B0; --gold: #C4922A; --gold-dark: #9A6F1A;
+    --brown: #3D2B1F; --brown-light: #6B4C35; --text: #2C1A0E; --muted: #8B6F5A;
+    --border: #D4B896; --success: #2E7D32;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  .hero {
+    background: var(--brown); padding: 36px 28px 28px; text-align: center; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(196,146,42,0.06) 20px, rgba(196,146,42,0.06) 21px);
+  }
+  .hero-label { font-size: 11px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; position: relative; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; color: var(--cream); line-height: 1.15; position: relative; }
+  .hero h1 em { color: var(--gold); font-style: italic; }
+  .hero-desc { font-size: 13px; color: var(--warm); margin-top: 10px; line-height: 1.6; position: relative; }
+  .divider { display: flex; align-items: center; gap: 10px; margin: 20px 0 0; position: relative; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(196,146,42,0.35); }
+
+  .form-container { padding: 24px 20px 36px; max-width: 480px; margin: 0 auto; }
+
+  .section-title {
+    font-family: 'Playfair Display', serif; font-size: 17px; color: var(--brown);
+    margin-bottom: 14px; padding-bottom: 7px; border-bottom: 1.5px solid var(--border);
+  }
+
+  .field { margin-bottom: 16px; }
+  label.field-label {
+    display: block; font-size: 11px; font-weight: 500; letter-spacing: 0.5px;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 5px;
+  }
+  input[type="text"], input[type="tel"], input[type="time"], select {
+    width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 8px;
+    background: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text);
+    transition: border-color 0.2s; outline: none; appearance: none;
+  }
+  input:focus, select:focus { border-color: var(--gold); }
+
+  .horario-row {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 10px;
+  }
+  .horario-sep {
+    font-size: 13px; color: var(--muted); padding-bottom: 11px; text-align: center;
+  }
+
+  .packs-list { display: flex; flex-direction: column; gap: 10px; }
+  .pack-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    transition: border-color 0.2s;
+  }
+  .pack-row.active { border-color: var(--gold); background: #FFF8EC; }
+  .pack-info { flex: 1; }
+  .pack-name { font-size: 14px; font-weight: 500; color: var(--brown); }
+  .pack-price { font-size: 12px; color: var(--gold-dark); margin-top: 2px; }
+  .qty-control { display: flex; align-items: center; gap: 10px; }
+  .qty-btn {
+    width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border);
+    background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; color: var(--brown); transition: all 0.15s; line-height: 1; padding: 0;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .qty-btn:hover { border-color: var(--gold); background: #FFF8EC; }
+  .qty-btn:disabled { opacity: 0.3; cursor: default; }
+  .qty-num { font-size: 15px; font-weight: 500; min-width: 20px; text-align: center; color: var(--brown); }
+
+  .resumen {
+    background: #fff; border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 14px; margin-bottom: 16px; display: none;
+  }
+  .resumen.visible { display: block; }
+  .resumen-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px; }
+  .resumen-items { font-size: 13px; color: var(--brown-light); line-height: 1.8; }
+  .resumen-total { font-size: 15px; font-weight: 500; color: var(--brown); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+
+  .payment-options { display: flex; gap: 10px; }
+  .pay-option {
+    flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 12px;
+    cursor: pointer; background: #fff; transition: all 0.2s; position: relative;
+  }
+  .pay-option:hover { border-color: var(--gold); }
+  .pay-option.selected { border-color: var(--gold); background: #FFF8EC; box-shadow: 0 0 0 3px rgba(196,146,42,0.12); }
+  .pay-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .pay-icon { font-size: 20px; margin-bottom: 4px; }
+  .pay-label { font-size: 13px; font-weight: 500; color: var(--brown); }
+  .pay-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .comprobante-field { margin-top: 14px; display: none; }
+  .comprobante-field.visible { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  .upload-area {
+    border: 2px dashed var(--border); border-radius: 10px; padding: 20px 16px;
+    text-align: center; cursor: pointer; background: #fff; transition: all 0.2s; position: relative;
+  }
+  .upload-area:hover { border-color: var(--gold); background: #FFFBF4; }
+  .upload-area.has-file { border-color: var(--success); background: #F0FAF0; }
+  .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon { font-size: 22px; margin-bottom: 6px; }
+  .upload-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .upload-text strong { color: var(--gold-dark); font-weight: 500; }
+  .file-name { font-size: 12px; color: var(--success); margin-top: 4px; font-weight: 500; display: none; }
+
+  .submit-btn {
+    width: 100%; padding: 14px; background: var(--brown); color: var(--cream); border: none;
+    border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+    cursor: pointer; margin-top: 26px; transition: all 0.2s;
+  }
+  .submit-btn:hover { background: var(--brown-light); transform: translateY(-1px); }
+  .submit-btn .btn-gold { color: var(--gold); font-style: italic; font-family: 'Playfair Display', serif; }
+  .note { text-align: center; font-size: 11px; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+
+  .success-screen { display: none; padding: 40px 24px; text-align: center; }
+  .success-screen.visible { display: block; }
+  .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #F0FAF0; border: 2px solid var(--success); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; }
+  .success-screen h2 { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--brown); margin-bottom: 10px; }
+  .success-screen p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">Pedidos online</div>
+  <h1>Medialunas<br><em>artesanales</em></h1>
+  <p class="hero-desc">De manteca, hechas con amor. Pedí tu pack y las recibís en el día.</p>
+  <div class="divider"><span>🥐</span></div>
+</div>
+
+<div class="form-container" id="form-wrapper">
+
+  <p class="section-title">Tus datos</p>
+  <div class="field">
+    <label class="field-label">Nombre completo</label>
+    <input type="text" id="nombre" placeholder="Ej: María García">
+  </div>
+  <div class="field">
+    <label class="field-label">Teléfono / WhatsApp</label>
+    <input type="tel" id="telefono" placeholder="Ej: 11 1234-5678">
+  </div>
+  <div class="field">
+    <label class="field-label">Dirección de entrega</label>
+    <input type="text" id="direccion" placeholder="Ej: Av. Corrientes 1234, CABA">
+  </div>
+
+  <p class="section-title" style="margin-top:22px">Elegí tus packs</p>
+  <div class="packs-list">
+    <div class="pack-row" id="row-individual">
+      <div class="pack-info">
+        <div class="pack-name">Pack Individual</div>
+        <div class="pack-price">$2.200</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="cambiarQty('individual', -1)" id="btn-minus-individual" disabled>−</button>
+        <span class="qty-num" id="qty-individual">0</span>
+        <button class="qty-btn" onclick="cambiarQty('individual', 1)">+</button>
+      </div>
+    </div>
+    <div class="pack-row" id="row-media">
+      <div class="pack-info">
+        <div class="pack-name">Pack Media Docena</div>
+        <div class="pack-price">$3.800</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="cambiarQty('media', -1)" id="btn-minus-media" disabled>−</button>
+        <span class="qty-num" id="qty-media">0</span>
+        <button class="qty-btn" onclick="cambiarQty('media', 1)">+</button>
+      </div>
+    </div>
+    <div class="pack-row" id="row-clasico">
+      <div class="pack-info">
+        <div class="pack-name">Pack Clásico</div>
+        <div class="pack-price">$5.500</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="cambiarQty('clasico', -1)" id="btn-minus-clasico" disabled>−</button>
+        <span class="qty-num" id="qty-clasico">0</span>
+        <button class="qty-btn" onclick="cambiarQty('clasico', 1)">+</button>
+      </div>
+    </div>
+    <div class="pack-row" id="row-familiar">
+      <div class="pack-info">
+        <div class="pack-name">Pack Familiar</div>
+        <div class="pack-price">$8.000</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="cambiarQty('familiar', -1)" id="btn-minus-familiar" disabled>−</button>
+        <span class="qty-num" id="qty-familiar">0</span>
+        <button class="qty-btn" onclick="cambiarQty('familiar', 1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="resumen" id="resumen">
+    <div class="resumen-title">Resumen del pedido</div>
+    <div class="resumen-items" id="resumen-items"></div>
+    <div class="resumen-total" id="resumen-total"></div>
+  </div>
+
+  <p class="section-title" style="margin-top:22px">Horario de entrega</p>
+  <div class="field">
+    <label class="field-label">¿A partir de qué hora podés recibir?</label>
+    <div class="horario-row">
+      <div>
+        <label class="field-label">Desde</label>
+        <input type="time" id="horario-desde" min="08:00" max="20:00">
+      </div>
+      <div class="horario-sep">—</div>
+      <div>
+        <label class="field-label">Hasta</label>
+        <input type="time" id="horario-hasta" min="08:00" max="20:00">
+      </div>
+    </div>
+  </div>
+
+  <p class="section-title" style="margin-top:22px">Método de pago</p>
+  <div class="payment-options">
+    <label class="pay-option" onclick="selectPago(this, 'transferencia')">
+      <input type="radio" name="pago" value="transferencia">
+      <div class="pay-icon">🏦</div>
+      <div class="pay-label">Transferencia</div>
+      <div class="pay-sub">Adjuntá comprobante</div>
+    </label>
+    <label class="pay-option" onclick="selectPago(this, 'efectivo')">
+      <input type="radio" name="pago" value="efectivo">
+      <div class="pay-icon">💵</div>
+      <div class="pay-label">Efectivo</div>
+      <div class="pay-sub">Al momento de entrega</div>
+    </label>
+  </div>
+
+  <div class="comprobante-field" id="comprobante-field">
+    <label class="field-label">Comprobante de transferencia</label>
+    <div class="upload-area" id="upload-area">
+      <input type="file" accept="image/*,.pdf" onchange="handleFile(this)">
+      <div class="upload-icon">📎</div>
+      <div class="upload-text"><strong>Tocá para adjuntar</strong><br>JPG, PNG o PDF</div>
+      <div class="file-name" id="file-name"></div>
+    </div>
+  </div>
+
+  <button class="submit-btn" onclick="submitForm()">
+    Enviar pedido <span class="btn-gold">→</span>
+  </button>
+  <p class="note">Te contactaremos por WhatsApp para confirmar 🥐</p>
+</div>
+
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">✓</div>
+  <h2>¡Pedido recibido!</h2>
+  <p>Gracias, <span id="success-nombre" style="font-weight:500;color:var(--brown)"></span>.<br>Te escribimos por WhatsApp para confirmar tu pedido.</p>
+</div>
+
+<script>
+  const precios = { individual: 2200, media: 3800, clasico: 5500, familiar: 8000 };
+  const nombres = { individual: 'Pack Individual', media: 'Pack Media Docena', clasico: 'Pack Clásico', familiar: 'Pack Familiar' };
+  const qtys = { individual: 0, media: 0, clasico: 0, familiar: 0 };
+
+  function cambiarQty(pack, delta) {
+    qtys[pack] = Math.max(0, qtys[pack] + delta);
+    document.getElementById('qty-' + pack).textContent = qtys[pack];
+    document.getElementById('btn-minus-' + pack).disabled = qtys[pack] === 0;
+    document.getElementById('row-' + pack).classList.toggle('active', qtys[pack] > 0);
+    actualizarResumen();
+  }
+
+  function actualizarResumen() {
+    const resumen = document.getElementById('resumen');
+    let lineas = [], suma = 0;
+    for (const k in qtys) {
+      if (qtys[k] > 0) {
+        const sub = qtys[k] * precios[k];
+        suma += sub;
+        lineas.push(qtys[k] + ' × ' + nombres[k] + ' — $' + sub.toLocaleString('es-AR'));
+      }
+    }
+    if (!lineas.length) { resumen.classList.remove('visible'); return; }
+    resumen.classList.add('visible');
+    document.getElementById('resumen-items').innerHTML = lineas.join('<br>');
+    document.getElementById('resumen-total').textContent = 'Total: $' + suma.toLocaleString('es-AR');
+  }
+
+  function selectPago(el, tipo) {
+    document.querySelectorAll('.pay-option').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('comprobante-field').classList.toggle('visible', tipo === 'transferencia');
+  }
+
+  function handleFile(input) {
+    if (input.files && input.files[0]) {
+      document.getElementById('upload-area').classList.add('has-file');
+      const fn = document.getElementById('file-name');
+      fn.style.display = 'block';
+      fn.textContent = '✓ ' + input.files[0].name;
+    }
+  }
+
+  function submitForm() {
+    const nombre = document.getElementById('nombre').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const direccion = document.getElementById('direccion').value.trim();
+    const desde = document.getElementById('horario-desde').value;
+    const hasta = document.getElementById('horario-hasta').value;
+    const pago = document.querySelector('input[name="pago"]:checked');
+    const totalPacks = Object.values(qtys).reduce((a, b) => a + b, 0);
+
+    if (!nombre || !telefono || !direccion) { alert('Completá tus datos personales.'); return; }
+    if (totalPacks === 0) { alert('Seleccioná al menos un pack.'); return; }
+    if (!desde || !hasta) { alert('Indicá el horario de entrega.'); return; }
+    if (desde >= hasta) { alert('El horario "hasta" debe ser posterior al "desde".'); return; }
+    if (!pago) { alert('Elegí un método de pago.'); return; }
+    if (pago.value === 'transferencia') {
+      const file = document.querySelector('input[type="file"]');
+      if (!file.files || !file.files[0]) { alert('Adjuntá el comprobante de transferencia.'); return; }
+    }
+
+    document.getElementById('form-wrapper').style.display = 'none';
+    document.getElementById('success-nombre').textContent = nombre;
+    document.getElementById('success-screen').classList.add('visible');
+  }
+</script>
+</body>
+</html>

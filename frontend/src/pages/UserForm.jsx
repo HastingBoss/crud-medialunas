@@ -2,44 +2,91 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './UserForm.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 export default function UserForm() {
   const [formData, setFormData] = useState({
     nombre: '',
     telefono: '',
-    paquete: '',
+    direccion: '',
+    desde: '',
+    hasta: '',
     pago: ''
   });
+  const [qtys, setQtys] = useState({ individual: 0, media: 0, clasico: 0, familiar: 0 });
   const [comprobante, setComprobante] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
-  const handlePackageSelect = (pkg) => setFormData({ ...formData, paquete: pkg });
-  const handlePaymentSelect = (pay) => setFormData({ ...formData, pago: pay });
-  
+  const precios = { individual: 2200, media: 3800, clasico: 5500, familiar: 8000 };
+  const nombres = { individual: 'Pack Individual', media: 'Pack Media Docena', clasico: 'Pack Clásico', familiar: 'Pack Familiar' };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const cambiarQty = (pack, delta) => {
+    setQtys(prev => ({
+      ...prev,
+      [pack]: Math.max(0, prev[pack] + delta)
+    }));
+  };
+
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setComprobante(e.target.files[0]);
     }
   };
 
+  const resumenLineas = [];
+  let total = 0;
+  for (const k in qtys) {
+    if (qtys[k] > 0) {
+      const sub = qtys[k] * precios[k];
+      total += sub;
+      resumenLineas.push(`${qtys[k]} × ${nombres[k]}`);
+    }
+  }
+
   const handleSubmit = async () => {
-    if (!formData.nombre || !formData.telefono || !formData.paquete || !formData.pago) {
-      alert('Por favor completá todos los campos antes de enviar.');
+    if (!formData.nombre || !formData.telefono || !formData.direccion) {
+      alert('Completá tus datos personales.');
       return;
     }
-
+    const totalPacks = Object.values(qtys).reduce((a, b) => a + b, 0);
+    if (totalPacks === 0) {
+      alert('Seleccioná al menos un pack.');
+      return;
+    }
+    if (!formData.desde || !formData.hasta) {
+      alert('Indicá el horario de entrega.');
+      return;
+    }
+    if (formData.desde >= formData.hasta) {
+      alert('El horario "hasta" debe ser posterior al "desde".');
+      return;
+    }
+    if (!formData.pago) {
+      alert('Elegí un método de pago.');
+      return;
+    }
     if (formData.pago === 'transferencia' && !comprobante) {
-      alert('Por favor adjuntá el comprobante de transferencia.');
+      alert('Adjuntá el comprobante de transferencia.');
       return;
     }
 
     const data = new FormData();
     data.append('nombre', formData.nombre);
     data.append('telefono', formData.telefono);
-    data.append('paquete', formData.paquete);
+    data.append('direccion', formData.direccion);
+    data.append('desde', formData.desde);
+    data.append('hasta', formData.hasta);
     data.append('pago', formData.pago);
+    
+    const paqueteStr = resumenLineas.join(', ');
+    data.append('paquete', paqueteStr);
+
     if (comprobante) data.append('comprobante', comprobante);
     
-    // Asignar una geolocalización o que el backend la asigne
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (pos) => {
         data.append('lat', pos.coords.latitude);
@@ -52,8 +99,6 @@ export default function UserForm() {
       await sendData(data);
     }
   };
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
   const sendData = async (data) => {
     try {
@@ -70,7 +115,7 @@ export default function UserForm() {
       <div className="success-screen visible">
         <div className="success-icon">✓</div>
         <h2>¡Pedido recibido!</h2>
-        <p>Gracias, <span style={{fontWeight:500,color:'var(--brown)'}}>{formData.nombre}</span>.<br/>Te vamos a escribir por WhatsApp para confirmar tu pedido.</p>
+        <p>Gracias, <span style={{fontWeight:500,color:'var(--brown)'}}>{formData.nombre}</span>.<br/>Te escribimos por WhatsApp para confirmar tu pedido.</p>
       </div>
     );
   }
@@ -80,7 +125,7 @@ export default function UserForm() {
       <div className="hero">
         <div className="hero-label">Pedidos online</div>
         <h1>Medialunas<br/><em>artesanales</em></h1>
-        <p className="hero-desc">Elaboradas con manteca de primera calidad. Pedí tu paquete y las recibís en el día.</p>
+        <p className="hero-desc">De manteca, hechas con amor. Pedí tu pack y las recibís en el día.</p>
         <div className="divider"><span>🥐</span></div>
       </div>
 
@@ -88,51 +133,85 @@ export default function UserForm() {
         <p className="section-title">Tus datos</p>
 
         <div className="field">
-          <label>Nombre completo</label>
-          <input type="text" value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} placeholder="Ej: María García" />
+          <label className="field-label">Nombre completo</label>
+          <input type="text" value={formData.nombre} onChange={e => handleInputChange('nombre', e.target.value)} placeholder="Ej: María García" />
         </div>
 
         <div className="field">
-          <label>Teléfono / WhatsApp</label>
-          <input type="tel" value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} placeholder="Ej: 11 1234-5678" />
+          <label className="field-label">Teléfono / WhatsApp</label>
+          <input type="tel" value={formData.telefono} onChange={e => handleInputChange('telefono', e.target.value)} placeholder="Ej: 11 1234-5678" />
         </div>
 
-        <p className="section-title" style={{marginTop:'24px'}}>Elegí tu paquete</p>
+        <div className="field">
+          <label className="field-label">Dirección de entrega</label>
+          <input type="text" value={formData.direccion} onChange={e => handleInputChange('direccion', e.target.value)} placeholder="Ej: Av. Corrientes 1234, CABA" />
+        </div>
 
-        <div className="packages-grid">
-          {[
-            { value: '12', price: '$2.500' },
-            { value: '24', price: '$4.800' },
-            { value: '36', price: '$6.900' },
-            { value: '48', price: '$8.800' }
-          ].map(pkg => (
-            <label key={pkg.value} className={`package-card ${formData.paquete === pkg.value ? 'selected' : ''}`} onClick={() => handlePackageSelect(pkg.value)}>
-              <div className="check-icon"><svg viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
-              <div className="package-qty">{pkg.value}</div>
-              <div className="package-unit">unidades</div>
-              <div className="package-price">{pkg.price}</div>
-            </label>
+        <p className="section-title" style={{marginTop:'22px'}}>Elegí tus packs</p>
+
+        <div className="packs-list">
+          {Object.keys(precios).map(packKey => (
+            <div key={packKey} className={`pack-row ${qtys[packKey] > 0 ? 'active' : ''}`}>
+              <div className="pack-info">
+                <div className="pack-name">{nombres[packKey]}</div>
+                <div className="pack-price">${precios[packKey].toLocaleString('es-AR')}</div>
+              </div>
+              <div className="qty-control">
+                <button className="qty-btn" onClick={() => cambiarQty(packKey, -1)} disabled={qtys[packKey] === 0}>−</button>
+                <span className="qty-num">{qtys[packKey]}</span>
+                <button className="qty-btn" onClick={() => cambiarQty(packKey, 1)}>+</button>
+              </div>
+            </div>
           ))}
         </div>
 
-        <p className="section-title" style={{marginTop:'24px'}}>Método de pago</p>
+        {resumenLineas.length > 0 && (
+          <div className="resumen visible">
+            <div className="resumen-title">Resumen del pedido</div>
+            <div className="resumen-items">
+              {Object.keys(qtys).map(k => qtys[k] > 0 && (
+                <div key={k}>{qtys[k]} × {nombres[k]} — ${(qtys[k] * precios[k]).toLocaleString('es-AR')}</div>
+              ))}
+            </div>
+            <div className="resumen-total">Total: ${total.toLocaleString('es-AR')}</div>
+          </div>
+        )}
+
+        <p className="section-title" style={{marginTop:'22px'}}>Horario de entrega</p>
+
+        <div className="field">
+          <label className="field-label">¿A partir de qué hora podés recibir?</label>
+          <div className="horario-row">
+            <div>
+              <label className="field-label">Desde</label>
+              <input type="time" value={formData.desde} onChange={e => handleInputChange('desde', e.target.value)} min="08:00" max="20:00" />
+            </div>
+            <div className="horario-sep">—</div>
+            <div>
+              <label className="field-label">Hasta</label>
+              <input type="time" value={formData.hasta} onChange={e => handleInputChange('hasta', e.target.value)} min="08:00" max="20:00" />
+            </div>
+          </div>
+        </div>
+
+        <p className="section-title" style={{marginTop:'22px'}}>Método de pago</p>
 
         <div className="payment-options">
-          <label className={`pay-option ${formData.pago === 'transferencia' ? 'selected' : ''}`} onClick={() => handlePaymentSelect('transferencia')}>
+          <label className={`pay-option ${formData.pago === 'transferencia' ? 'selected' : ''}`} onClick={() => handleInputChange('pago', 'transferencia')}>
             <div className="pay-icon">🏦</div>
             <div className="pay-label">Transferencia</div>
-            <div className="pay-sub">Adjuntá tu comprobante</div>
+            <div className="pay-sub">Adjuntá comprobante</div>
           </label>
-          <label className={`pay-option ${formData.pago === 'efectivo' ? 'selected' : ''}`} onClick={() => handlePaymentSelect('efectivo')}>
+          <label className={`pay-option ${formData.pago === 'efectivo' ? 'selected' : ''}`} onClick={() => handleInputChange('pago', 'efectivo')}>
             <div className="pay-icon">💵</div>
             <div className="pay-label">Efectivo</div>
-            <div className="pay-sub">Al momento de la entrega</div>
+            <div className="pay-sub">Al momento de entrega</div>
           </label>
         </div>
 
         {formData.pago === 'transferencia' && (
           <div className="comprobante-field visible">
-            <label>Comprobante de transferencia</label>
+            <label className="field-label">Comprobante de transferencia</label>
             <div className={`upload-area ${comprobante ? 'has-file' : ''}`}>
               <input type="file" accept="image/*,.pdf" onChange={handleFileChange} />
               <div className="upload-icon">📎</div>
@@ -149,7 +228,7 @@ export default function UserForm() {
           Enviar pedido <span className="btn-gold">→</span>
         </button>
 
-        <p className="note">Te contactaremos por WhatsApp para confirmar tu pedido 🥐</p>
+        <p className="note">Te contactaremos por WhatsApp para confirmar 🥐</p>
       </div>
     </>
   );

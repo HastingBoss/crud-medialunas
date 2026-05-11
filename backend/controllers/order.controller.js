@@ -23,13 +23,13 @@ exports.createOrder = async (req, res) => {
       id: Math.random().toString(36).substring(2, 10),
       nombre,
       telefono,
-      paquete: Number(paquete),
+      paquete: paquete,
       pago,
       direccion: direccion || 'Dirección no provista',
       lat: lat ? Number(lat) : defaultLat,
       lng: lng ? Number(lng) : defaultLng,
-      desde: '10:00', // Mock data
-      hasta: '12:00', // Mock data
+      desde: req.body.desde || '10:00',
+      hasta: req.body.hasta || '12:00',
       estado: 'Pendiente',
       fecha: new Date().toISOString().split('T')[0],
       comprobante: req.file ? req.file.filename : null,
