@@ -217,6 +217,26 @@ export default function AdminDashboard() {
                   </div>
                   <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'4px'}}>
                     <span className={`badge ${p.estado==='Entregado' ? 'badge-entregado' : 'badge-pendiente'}`}>{p.estado}</span>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const url = (p.lat != null && p.lng != null) 
+                          ? `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`
+                          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion)}`;
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                      }}
+                      style={{
+                        background: '#f9f9f9',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        padding: '4px 8px',
+                        fontSize: '11px',
+                        cursor: 'pointer',
+                        color: '#333'
+                      }}
+                    >
+                      📍 Navegar
+                    </button>
                   </div>
                 </div>
               ))

@@ -9,6 +9,7 @@ export default function UserForm() {
     nombre: '',
     telefono: '',
     direccion: '',
+    fecha: '',
     desde: '',
     hasta: '',
     pago: ''
@@ -17,6 +18,26 @@ export default function UserForm() {
   const [coords, setCoords] = useState({ lat: null, lng: null });
   const [comprobante, setComprobante] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [dateError, setDateError] = useState(false);
+
+  const today = new Date();
+  const next7Days = Array.from({length: 7}, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    return d;
+  });
+  const formatDateISO = (d) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+  const daysStr = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const minDate = formatDateISO(today);
+  const maxDateObj = new Date(today);
+  maxDateObj.setDate(today.getDate() + 30);
+  const maxDate = formatDateISO(maxDateObj);
 
   const precios = { individual: 2200, media: 3800, clasico: 5500, familiar: 8000 };
   const nombres = { individual: 'Pack Individual', media: 'Pack Media Docena', clasico: 'Pack Clásico', familiar: 'Pack Familiar' };
@@ -73,6 +94,10 @@ export default function UserForm() {
       alert('Seleccioná al menos un pack.');
       return;
     }
+    if (!formData.fecha) {
+      setDateError(true);
+      return;
+    }
     if (!formData.desde || !formData.hasta) {
       alert('Indicá el horario de entrega.');
       return;
@@ -94,6 +119,7 @@ export default function UserForm() {
     data.append('nombre', formData.nombre);
     data.append('telefono', formData.telefono);
     data.append('direccion', formData.direccion);
+    data.append('fecha', formData.fecha);
     data.append('desde', formData.desde);
     data.append('hasta', formData.hasta);
     data.append('pago', formData.pago);
@@ -185,6 +211,66 @@ export default function UserForm() {
             <div className="resumen-total">Total: ${total.toLocaleString('es-AR')}</div>
           </div>
         )}
+
+        <p className="section-title" style={{marginTop:'22px'}}>Fecha de entrega</p>
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '5px', scrollbarWidth: 'none' }}>
+          {next7Days.map(d => {
+            const iso = formatDateISO(d);
+            const isSelected = formData.fecha === iso;
+            return (
+              <button 
+                key={iso}
+                type="button"
+                onClick={() => { handleInputChange('fecha', iso); setDateError(false); }}
+                style={{
+                  flex: '0 0 auto',
+                  minWidth: '60px',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: isSelected ? '2px solid var(--brown)' : '1px solid var(--border)',
+                  background: isSelected ? '#fdf8f5' : '#fff',
+                  color: isSelected ? 'var(--brown)' : 'inherit',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <span style={{ fontSize: '12px', fontWeight: 500 }}>{daysStr[d.getDay()]}</span>
+                <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{d.getDate()}</span>
+              </button>
+            );
+          })}
+        </div>
+        {!showCalendar ? (
+          <button 
+            type="button"
+            onClick={() => setShowCalendar(true)}
+            style={{ marginTop: '5px', background: 'none', border: 'none', color: 'var(--brown)', fontWeight: 500, cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}
+          >
+            Ver más fechas
+          </button>
+        ) : (
+          <div style={{ marginTop: '10px' }}>
+            <input 
+              type="date" 
+              value={formData.fecha}
+              min={minDate}
+              max={maxDate}
+              onChange={e => { handleInputChange('fecha', e.target.value); setDateError(false); }}
+              style={{
+                padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', width: '100%', maxWidth: '200px', outline: 'none'
+              }}
+            />
+            {formData.fecha && !next7Days.find(d => formatDateISO(d) === formData.fecha) && (
+              <div style={{ marginTop: '8px', fontSize: '14px', color: 'var(--brown)', fontWeight: 500 }}>
+                Fecha seleccionada: {formData.fecha.split('-').reverse().join('/')}
+              </div>
+            )}
+          </div>
+        )}
+        {dateError && <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>Debe seleccionar una fecha.</div>}
 
         <p className="section-title" style={{marginTop:'22px'}}>Horario de entrega</p>
 
