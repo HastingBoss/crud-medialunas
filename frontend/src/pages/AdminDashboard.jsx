@@ -23,9 +23,18 @@ export default function AdminDashboard() {
   const [mapCenter, setMapCenter] = useState([-34.6080, -58.4620]);
   const [mapZoom, setMapZoom] = useState(13);
 
+  const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('adminAuth') === 'true');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState(false);
+
   useEffect(() => {
+    if (!isAuthenticated) return;
     fetchOrders();
-  }, []);
+    const intervalId = setInterval(() => {
+      fetchOrders();
+    }, 30000);
+    return () => clearInterval(intervalId);
+  }, [isAuthenticated]);
 
   const fetchOrders = async () => {
     try {
@@ -45,6 +54,10 @@ export default function AdminDashboard() {
         setMapZoom(14);
       }, () => {
         setMapCenter([adminPos.lat, adminPos.lng]);
+      }, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
       });
     } else {
       setMapCenter([adminPos.lat, adminPos.lng]);
@@ -87,6 +100,43 @@ export default function AdminDashboard() {
     html: `<div style="width:18px;height:18px;border-radius:50%;background:#1565C0;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>`,
     iconSize: [18, 18], iconAnchor: [9, 9], className: ''
   });
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (password === 'medialunas2026') {
+      sessionStorage.setItem('adminAuth', 'true');
+      setIsAuthenticated(true);
+      setLoginError(false);
+    } else {
+      setLoginError(true);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="admin-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column' }}>
+        <div style={{ background: '#fff', padding: '30px', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', textAlign: 'center', width: '100%', maxWidth: '300px' }}>
+          <h2 style={{ fontFamily: '"Playfair Display", serif', color: 'var(--brown)', marginBottom: '20px' }}>Admin Login</h2>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <input 
+              type="password" 
+              placeholder="Contraseña" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              style={{ padding: '10px', borderRadius: '8px', border: '1.5px solid var(--border)', outline: 'none' }}
+            />
+            {loginError && <div style={{ color: 'red', fontSize: '12px', marginTop: '-10px', textAlign: 'left' }}>Contraseña incorrecta</div>}
+            <button 
+              type="submit" 
+              style={{ padding: '10px', borderRadius: '8px', background: 'var(--brown)', color: 'white', border: 'none', cursor: 'pointer', fontWeight: '500', fontSize: '15px', fontFamily: '"DM Sans", sans-serif' }}
+            >
+              Ingresar
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-body">
