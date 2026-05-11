@@ -23,6 +23,7 @@ export default function UserForm() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [dateError, setDateError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [comprobanteEnviado, setComprobanteEnviado] = useState(false);
 
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -135,12 +136,19 @@ export default function UserForm() {
     }
   }
 
-  const datosCompletos = formData.nombre && formData.telefono && formData.direccion;
+  const nombreValido = formData.nombre.trim().length >= 3;
+  const telefonoValido = formData.telefono.replace(/\D/g, '').length >= 10;
+  const direccionValida = formData.direccion.trim().length >= 5;
   const totalPacks = Object.values(qtys).reduce((a, b) => a + b, 0);
   const packsCompletos = totalPacks > 0;
   const fechaCompleta = !!formData.fecha;
   const horarioCompleto = formData.desde && formData.hasta && formData.desde < formData.hasta;
-  const pagoCompleto = !!formData.pago;
+  const pagoSeleccionado = !!formData.pago;
+  const pagoCompleto = pagoSeleccionado && (formData.pago !== 'transferencia' || comprobanteEnviado);
+
+  const formValido = nombreValido && telefonoValido && direccionValida && packsCompletos && fechaCompleta && horarioCompleto && pagoCompleto;
+
+  const datosCompletos = formData.nombre && formData.telefono && formData.direccion;
   
   const CheckMark = () => <span style={{color: '#2E7D32', marginLeft: '8px', fontSize: '18px'}}>✓</span>;
 
@@ -498,7 +506,10 @@ export default function UserForm() {
           <div className="comprobante-field visible" style={{ marginTop: '15px' }}>
             <button 
               type="button"
-              onClick={() => window.open('https://wa.me/5491126487393?text=Hola%2C%20realicé%20un%20pedido%20de%20medialunas%20y%20adjunto%20mi%20comprobante%20de%20transferencia%20🥐', '_blank')}
+              onClick={() => {
+                setComprobanteEnviado(true);
+                window.open('https://wa.me/5491126487393?text=Hola%2C%20realicé%20un%20pedido%20de%20medialunas%20y%20adjunto%20mi%20comprobante%20de%20transferencia%20🥐', '_blank');
+              }}
               style={{
                 width: '100%',
                 background: '#25D366',
@@ -521,7 +532,16 @@ export default function UserForm() {
           </div>
         )}
 
-        <button className="submit-btn" onClick={handleSubmit} disabled={isSubmitting}>
+        <button 
+          className="submit-btn" 
+          onClick={handleSubmit} 
+          disabled={isSubmitting || !formValido}
+          style={{ 
+            opacity: isSubmitting || !formValido ? 0.4 : 1, 
+            cursor: isSubmitting || !formValido ? 'not-allowed' : 'pointer',
+            transition: 'opacity 0.3s ease'
+          }}
+        >
           {isSubmitting ? (
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <div style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid #fff', borderRadius: '50%', animation: 'userform-spinner 1s linear infinite' }}></div>

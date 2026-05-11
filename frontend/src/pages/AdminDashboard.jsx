@@ -89,10 +89,11 @@ export default function AdminDashboard() {
     }
   };
 
-  const calcularTotal = (paqueteStr) => {
-    if (!paqueteStr) return 0;
+  const calcularTotal = (paqueteData) => {
+    if (!paqueteData) return 0;
     const preciosMap = { 'Pack Individual': 2200, 'Pack Media Docena': 3800, 'Pack Clásico': 5500, 'Pack Familiar': 8000 };
     let total = 0;
+    const paqueteStr = Array.isArray(paqueteData) ? paqueteData.join(', ') : String(paqueteData);
     const items = paqueteStr.split(', ');
     for (const item of items) {
       const parts = item.split(' × ');
@@ -101,6 +102,20 @@ export default function AdminDashboard() {
       }
     }
     return total;
+  };
+
+  const safeDate = (fecha) => {
+    if (!fecha) return 'Fecha no disponible';
+    const d = new Date(fecha);
+    if (isNaN(d.getTime())) return 'Fecha no disponible';
+    return d.toLocaleDateString('es-AR');
+  };
+
+  const renderPacks = (paquete) => {
+    if (!paquete && paquete !== 0) return 'No disponible';
+    if (Array.isArray(paquete)) return paquete.join(', ');
+    if (typeof paquete === 'number') return `${paquete} unidades`;
+    return String(paquete);
   };
 
   const deleteOrder = async (id) => {
@@ -114,7 +129,7 @@ export default function AdminDashboard() {
   };
 
   const filteredOrders = orders.filter(p => {
-    const orderDate = p.fecha ? p.fecha.split('T')[0] : '';
+    const orderDate = p.fecha ? String(p.fecha).split('T')[0] : '';
     return (!filterDate || orderDate === filterDate) &&
            (!filterStatus || p.estado === filterStatus);
   });
@@ -232,11 +247,11 @@ export default function AdminDashboard() {
               <Marker key={p.id} position={[p.lat, p.lng]} icon={getIcon(p.estado)}>
                 <Popup>
                   <div style={{fontFamily:'"DM Sans",sans-serif', fontSize:'13px', minWidth:'160px'}}>
-                    <strong style={{color:'#3D2B1F'}}>{p.nombre} ({p.paquete}u)</strong><br/>
-                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>{p.direccion}</span><br/>
-                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>📞 {p.telefono}</span><br/>
-                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>📅 {p.fecha ? p.fecha.split('T')[0].split('-').reverse().join('/') : 'Sin fecha'} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</span><br/>
-                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>💳 {p.pago}</span>
+                    <strong style={{color:'#3D2B1F'}}>{p.nombre || 'Sin nombre'} ({renderPacks(p.paquete)})</strong><br/>
+                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>{p.direccion || 'Sin dirección'}</span><br/>
+                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>📞 {p.telefono || 'Sin teléfono'}</span><br/>
+                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>📅 {safeDate(p.fecha)} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</span><br/>
+                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>💳 {p.pago || 'No especificado'}</span>
                     {p.comprobante && (
                       <div><a href={`${API_URL}/uploads/${p.comprobante}`} target="_blank" rel="noreferrer">Ver comprobante</a></div>
                     )}
@@ -274,9 +289,9 @@ export default function AdminDashboard() {
                   <div className="pedido-item-left">
                     <div className="pedido-dot" style={{background: p.estado==='Entregado' ? '#2E7D32' : '#F57F17'}}></div>
                     <div>
-                      <div className="pedido-nombre">{p.nombre} ({p.paquete}u)</div>
-                      <div className="pedido-dir">{p.direccion} | {p.pago}</div>
-                      <div className="pedido-dir" style={{marginTop:'2px', fontWeight: 500}}>📅 {p.fecha ? p.fecha.split('T')[0].split('-').reverse().join('/') : 'Sin fecha'} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</div>
+                      <div className="pedido-nombre">{p.nombre || 'Sin nombre'} ({renderPacks(p.paquete)})</div>
+                      <div className="pedido-dir">{p.direccion || 'Sin dirección'} | {p.pago || 'No especificado'}</div>
+                      <div className="pedido-dir" style={{marginTop:'2px', fontWeight: 500}}>📅 {safeDate(p.fecha)} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</div>
                     </div>
                   </div>
                   <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'4px'}}>
@@ -326,14 +341,14 @@ export default function AdminDashboard() {
             <button onClick={() => setSelectedOrder(null)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--brown)' }}>✕</button>
             <h2 style={{ color: 'var(--brown)', marginTop: 0, marginBottom: '15px', fontSize: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>Detalle del Pedido</h2>
             
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Cliente:</strong> {selectedOrder.nombre}</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Teléfono:</strong> {selectedOrder.telefono}</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Dirección:</strong> {selectedOrder.direccion}</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Fecha y hora:</strong> {selectedOrder.fecha ? selectedOrder.fecha.split('T')[0].split('-').reverse().join('/') : ''} ({selectedOrder.desde} a {selectedOrder.hasta})</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Packs:</strong> {selectedOrder.paquete}</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Cliente:</strong> {selectedOrder.nombre || 'No disponible'}</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Teléfono:</strong> {selectedOrder.telefono || 'No disponible'}</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Dirección:</strong> {selectedOrder.direccion || 'No disponible'}</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Fecha y hora:</strong> {safeDate(selectedOrder.fecha)} ({selectedOrder.desde || '--'} a {selectedOrder.hasta || '--'})</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Packs:</strong> {renderPacks(selectedOrder.paquete)}</p>
             <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Total:</strong> ${(selectedOrder.total || calcularTotal(selectedOrder.paquete)).toLocaleString('es-AR')}</p>
             <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}>
-              <strong style={{ color: 'var(--brown)' }}>Método de pago:</strong> {selectedOrder.pago} 
+              <strong style={{ color: 'var(--brown)' }}>Método de pago:</strong> {selectedOrder.pago || 'No disponible'} 
               {selectedOrder.comprobante && <a href={`${API_URL}/uploads/${selectedOrder.comprobante}`} target="_blank" rel="noreferrer" style={{color: 'var(--gold)', marginLeft: '5px', textDecoration: 'underline'}}>Ver comprobante</a>}
             </p>
             
@@ -349,9 +364,11 @@ export default function AdminDashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
               <button 
                 onClick={() => {
-                  const phoneDigits = selectedOrder.telefono.replace(/\D/g, '');
+                  const phoneDigits = String(selectedOrder.telefono || '').replace(/\D/g, '');
                   const phoneStr = phoneDigits.startsWith('54') ? phoneDigits.slice(2) : phoneDigits;
-                  const msg = `Hola ${selectedOrder.nombre}, tu pedido de ${selectedOrder.paquete} está confirmado para el ${selectedOrder.fecha ? selectedOrder.fecha.split('T')[0].split('-').reverse().join('/') : ''} entre ${selectedOrder.desde} y ${selectedOrder.hasta}. 🥐`;
+                  const packsStr = renderPacks(selectedOrder.paquete);
+                  const fechaStr = safeDate(selectedOrder.fecha);
+                  const msg = `Hola ${selectedOrder.nombre || ''}, tu pedido de ${packsStr} está confirmado para el ${fechaStr} entre ${selectedOrder.desde || '--'} y ${selectedOrder.hasta || '--'}. 🥐`;
                   window.open(`https://wa.me/54${phoneStr}?text=${encodeURIComponent(msg)}`, '_blank');
                 }}
                 style={{ background: '#25D366', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', fontFamily: '"DM Sans", sans-serif' }}
