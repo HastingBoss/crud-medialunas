@@ -101,6 +101,7 @@ export default function UserForm() {
   const nombres = { individual: 'Pack Individual', media: 'Pack Media Docena', clasico: 'Pack Clásico', familiar: 'Pack Familiar' };
 
   const handleInputChange = (field, value) => {
+    if (field === 'pago') setComprobanteEnviado(false);
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -529,6 +530,11 @@ export default function UserForm() {
             >
               Enviar comprobante por WhatsApp 📎
             </button>
+            {comprobanteEnviado && (
+              <div style={{ color: '#2E7D32', fontSize: '13px', marginTop: '8px', fontWeight: 500, textAlign: 'center' }}>
+                ✓ Comprobante enviado por WhatsApp
+              </div>
+            )}
           </div>
         )}
 
