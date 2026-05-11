@@ -1,0 +1,32 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #F9F3E8;
+  --warm: #E8D5B0;
+  --gold: #C4922A;
+  --gold-dark: #9A6F1A;
+  --gold-bg: #FFF8EC;
+  --brown: #3D2B1F;
+  --brown-light: #6B4C35;
+  --text: #2C1A0E;
+  --muted: #8B6F5A;
+  --border: #D4B896;
+  --error: #C0392B;
+  --success: #2E7D32;
+  --success-bg: #F0FAF0;
+  --pending-bg: #FFF8E1;
+  --pending: #F57F17;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

@@ -1,0 +1,72 @@
+.admin-body {
+  background: #F2EDE0;
+  min-height: 100vh;
+}
+
+.header {
+  background: var(--brown); padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #F9F3E8; }
+.header-title span { color: var(--gold); font-style: italic; }
+
+.tabs { display: flex; background: var(--brown); padding: 0 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+.tab { padding: 10px 16px; font-size: 13px; color: rgba(249,243,232,0.5); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; font-weight: 500; }
+.tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+.content { padding: 14px 14px 24px; max-width: 800px; margin: 0 auto; }
+
+/* FILTERS */
+.filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+.filter-select, .date-input {
+  padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+  background: #fff; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; cursor: pointer;
+}
+.mi-ubicacion-btn {
+  padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px;
+  background: #fff; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--brown);
+  cursor: pointer; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.mi-ubicacion-btn:hover { border-color: var(--gold); background: var(--gold-bg); }
+
+/* MAP */
+.map-wrap {
+  border-radius: 12px; overflow: hidden; border: 1px solid var(--border);
+  position: relative;
+}
+
+/* LEYENDA */
+.leyenda {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px;
+  padding: 10px 12px; background: #fff; border: 1px solid var(--border); border-radius: 10px;
+  font-size: 12px; align-items: center;
+}
+.leyenda-item { display: flex; align-items: center; gap: 5px; color: var(--muted); }
+.dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.dot-pendiente { background: #F57F17; }
+.dot-entregado { background: #2E7D32; }
+.dot-admin { background: #1565C0; }
+
+/* LISTA LATERAL / inferior */
+.pedidos-cercanos {
+  margin-top: 10px; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.pedidos-cercanos-header {
+  padding: 10px 14px; background: var(--cream); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--border);
+}
+.pedido-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 1px solid #F0E8D8; cursor: pointer; transition: background 0.15s;
+  font-size: 13px;
+}
+.pedido-item:last-child { border-bottom: none; }
+.pedido-item:hover { background: #FFFBF4; }
+.pedido-item-left { display: flex; align-items: center; gap: 10px; }
+.pedido-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.pedido-nombre { font-weight: 500; color: var(--brown); }
+.pedido-dir { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.pedido-hora { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.badge { display: inline-block; padding: 2px 7px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge-pendiente { background: var(--pending-bg); color: var(--pending); }
+.badge-entregado { background: var(--success-bg); color: var(--success); }
