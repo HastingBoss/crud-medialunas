@@ -53,9 +53,11 @@ export default function UserForm() {
     }
   };
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
   const sendData = async (data) => {
     try {
-      await axios.post('http://localhost:3001/api/orders', data);
+      await axios.post(`${API_URL}/api/orders`, data);
       setSubmitted(true);
     } catch (err) {
       console.error(err);

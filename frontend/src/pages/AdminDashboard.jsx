@@ -5,6 +5,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './AdminDashboard.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 // Fix para íconos de leaflet por defecto
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -27,7 +29,7 @@ export default function AdminDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/orders');
+      const res = await axios.get(`${API_URL}/api/orders`);
       setOrders(res.data);
     } catch (err) {
       console.error(err);
@@ -51,7 +53,7 @@ export default function AdminDashboard() {
 
   const changeStatus = async (id, status) => {
     try {
-      await axios.put(`http://localhost:3001/api/orders/${id}/status`, { estado: status });
+      await axios.put(`${API_URL}/api/orders/${id}/status`, { estado: status });
       fetchOrders();
     } catch (err) {
       console.error(err);
@@ -61,7 +63,7 @@ export default function AdminDashboard() {
   const deleteOrder = async (id) => {
     if(!window.confirm('¿Eliminar pedido?')) return;
     try {
-      await axios.delete(`http://localhost:3001/api/orders/${id}`);
+      await axios.delete(`${API_URL}/api/orders/${id}`);
       fetchOrders();
     } catch (err) {
       console.error(err);
@@ -124,7 +126,7 @@ export default function AdminDashboard() {
                     <span style={{color:'#8B6F5A', fontSize:'11px'}}>📞 {p.telefono}</span><br/>
                     <span style={{color:'#8B6F5A', fontSize:'11px'}}>💳 {p.pago}</span>
                     {p.comprobante && (
-                      <div><a href={`http://localhost:3001/uploads/${p.comprobante}`} target="_blank" rel="noreferrer">Ver comprobante</a></div>
+                      <div><a href={`${API_URL}/uploads/${p.comprobante}`} target="_blank" rel="noreferrer">Ver comprobante</a></div>
                     )}
                     <div style={{marginTop: '10px', display: 'flex', gap: '5px'}}>
                       {p.estado === 'Pendiente' && <button onClick={() => changeStatus(p.id, 'Entregado')} style={{padding:'4px', cursor:'pointer'}}>Entregado</button>}
