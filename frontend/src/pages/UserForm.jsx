@@ -14,6 +14,7 @@ export default function UserForm() {
     pago: ''
   });
   const [qtys, setQtys] = useState({ individual: 0, media: 0, clasico: 0, familiar: 0 });
+  const [coords, setCoords] = useState({ lat: null, lng: null });
   const [comprobante, setComprobante] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -34,6 +35,21 @@ export default function UserForm() {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setComprobante(e.target.files[0]);
+    }
+  };
+
+  const handleAddressBlur = async () => {
+    if (!formData.direccion) return;
+    try {
+      const res = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(formData.direccion)}&countrycodes=ar&format=json&limit=1`);
+      if (res.data && res.data.length > 0) {
+        setCoords({ lat: res.data[0].lat, lng: res.data[0].lon });
+      } else {
+        setCoords({ lat: null, lng: null });
+      }
+    } catch (err) {
+      console.error(err);
+      setCoords({ lat: null, lng: null });
     }
   };
 
@@ -87,17 +103,10 @@ export default function UserForm() {
 
     if (comprobante) data.append('comprobante', comprobante);
     
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        data.append('lat', pos.coords.latitude);
-        data.append('lng', pos.coords.longitude);
-        await sendData(data);
-      }, async () => {
-        await sendData(data);
-      });
-    } else {
-      await sendData(data);
-    }
+    if (coords.lat) data.append('lat', coords.lat);
+    if (coords.lng) data.append('lng', coords.lng);
+
+    await sendData(data);
   };
 
   const sendData = async (data) => {
@@ -144,7 +153,7 @@ export default function UserForm() {
 
         <div className="field">
           <label className="field-label">Dirección de entrega</label>
-          <input type="text" value={formData.direccion} onChange={e => handleInputChange('direccion', e.target.value)} placeholder="Ej: Av. Corrientes 1234, CABA" />
+          <input type="text" value={formData.direccion} onChange={e => handleInputChange('direccion', e.target.value)} onBlur={handleAddressBlur} placeholder="Ej: Av. Corrientes 1234, CABA" />
         </div>
 
         <p className="section-title" style={{marginTop:'22px'}}>Elegí tus packs</p>
