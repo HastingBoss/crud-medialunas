@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import DatePicker from 'react-datepicker';
+import { es } from 'date-fns/locale';
+import 'react-datepicker/dist/react-datepicker.css';
 import './UserForm.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -20,6 +23,7 @@ export default function UserForm() {
   const [submitted, setSubmitted] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [dateError, setDateError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const today = new Date();
   const next7Days = Array.from({length: 7}, (_, i) => {
@@ -38,6 +42,19 @@ export default function UserForm() {
   const maxDateObj = new Date(today);
   maxDateObj.setDate(today.getDate() + 30);
   const maxDate = formatDateISO(maxDateObj);
+
+  const parseLocalDate = (isoStr) => {
+    if (!isoStr) return null;
+    const [y, m, d] = isoStr.split('-');
+    return new Date(y, m - 1, d);
+  };
+
+  const getSelectedDateText = () => {
+    if (!formData.fecha) return null;
+    const [y, m, d] = formData.fecha.split('-');
+    const dateObj = new Date(y, m - 1, d);
+    return `✓ Entrega el ${daysStr[dateObj.getDay()]} ${d}/${m}/${y}`;
+  };
 
   const precios = { individual: 2200, media: 3800, clasico: 5500, familiar: 8000 };
   const nombres = { individual: 'Pack Individual', media: 'Pack Media Docena', clasico: 'Pack Clásico', familiar: 'Pack Familiar' };
@@ -84,13 +101,21 @@ export default function UserForm() {
     }
   }
 
+  const datosCompletos = formData.nombre && formData.telefono && formData.direccion;
+  const totalPacks = Object.values(qtys).reduce((a, b) => a + b, 0);
+  const packsCompletos = totalPacks > 0;
+  const fechaCompleta = !!formData.fecha;
+  const horarioCompleto = formData.desde && formData.hasta && formData.desde < formData.hasta;
+  const pagoCompleto = formData.pago && (formData.pago !== 'transferencia' || comprobante);
+  
+  const CheckMark = () => <span style={{color: '#2E7D32', marginLeft: '8px', fontSize: '18px'}}>✓</span>;
+
   const handleSubmit = async () => {
-    if (!formData.nombre || !formData.telefono || !formData.direccion) {
+    if (!datosCompletos) {
       alert('Completá tus datos personales.');
       return;
     }
-    const totalPacks = Object.values(qtys).reduce((a, b) => a + b, 0);
-    if (totalPacks === 0) {
+    if (!packsCompletos) {
       alert('Seleccioná al menos un pack.');
       return;
     }
@@ -132,6 +157,7 @@ export default function UserForm() {
     if (coords.lat) data.append('lat', coords.lat);
     if (coords.lng) data.append('lng', coords.lng);
 
+    setIsSubmitting(true);
     await sendData(data);
   };
 
@@ -139,9 +165,11 @@ export default function UserForm() {
     try {
       await axios.post(`${API_URL}/api/orders`, data);
       setSubmitted(true);
+      setIsSubmitting(false);
     } catch (err) {
       console.error(err);
       alert('Hubo un error al enviar el pedido');
+      setIsSubmitting(false);
     }
   };
 
@@ -149,8 +177,31 @@ export default function UserForm() {
     return (
       <div className="success-screen visible">
         <div className="success-icon">✓</div>
-        <h2>¡Pedido recibido!</h2>
-        <p>Gracias, <span style={{fontWeight:500,color:'var(--brown)'}}>{formData.nombre}</span>.<br/>Te escribimos por WhatsApp para confirmar tu pedido.</p>
+        <h2 style={{color: 'var(--brown)', marginBottom: '15px'}}>¡Pedido recibido!</h2>
+        <div style={{background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', textAlign: 'left', marginBottom: '20px', width: '100%', maxWidth: '350px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'}}>
+          <h3 style={{marginTop: 0, color: 'var(--brown)', fontSize: '18px', borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '15px'}}>Resumen del pedido</h3>
+          <p style={{margin: '5px 0', color: '#555'}}><strong style={{color: 'var(--brown)'}}>Nombre:</strong> {formData.nombre}</p>
+          <p style={{margin: '5px 0', color: '#555'}}><strong style={{color: 'var(--brown)'}}>Teléfono:</strong> {formData.telefono}</p>
+          <p style={{margin: '5px 0', color: '#555'}}><strong style={{color: 'var(--brown)'}}>Dirección:</strong> {formData.direccion}</p>
+          <p style={{margin: '5px 0', color: '#555'}}><strong style={{color: 'var(--brown)'}}>Entrega:</strong> {formData.fecha.split('-').reverse().join('/')} ({formData.desde} a {formData.hasta})</p>
+          
+          <div style={{marginTop: '15px', paddingTop: '15px', borderTop: '1px dashed var(--border)'}}>
+            <strong style={{color: 'var(--brown)', display: 'block', marginBottom: '5px'}}>Packs:</strong>
+            {resumenLineas.map((line, idx) => (
+              <div key={idx} style={{color: '#555', fontSize: '14px', margin: '3px 0'}}>• {line}</div>
+            ))}
+          </div>
+
+          <div style={{marginTop: '15px', paddingTop: '15px', borderTop: '1px dashed var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <strong style={{color: 'var(--brown)'}}>Total a pagar:</strong>
+            <span style={{color: '#2E7D32', fontWeight: 'bold', fontSize: '18px'}}>${total.toLocaleString('es-AR')}</span>
+          </div>
+          
+          <div style={{marginTop: '10px', color: '#555', fontSize: '14px'}}>
+            <strong style={{color: 'var(--brown)'}}>Método:</strong> {formData.pago === 'efectivo' ? 'Efectivo al recibir' : 'Transferencia'}
+          </div>
+        </div>
+        <p style={{fontWeight: 500, color: 'var(--brown)', textAlign: 'center'}}>Te contactaremos por WhatsApp para confirmar 🥐</p>
       </div>
     );
   }
@@ -165,7 +216,13 @@ export default function UserForm() {
       </div>
 
       <div className="form-container">
-        <p className="section-title">Tus datos</p>
+        <style>{`
+          @keyframes userform-spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+        <p className="section-title">Tus datos{datosCompletos && <CheckMark />}</p>
 
         <div className="field">
           <label className="field-label">Nombre completo</label>
@@ -182,7 +239,7 @@ export default function UserForm() {
           <input type="text" value={formData.direccion} onChange={e => handleInputChange('direccion', e.target.value)} onBlur={handleAddressBlur} placeholder="Ej: Av. Corrientes 1234, CABA" />
         </div>
 
-        <p className="section-title" style={{marginTop:'22px'}}>Elegí tus packs</p>
+        <p className="section-title" style={{marginTop:'22px'}}>Elegí tus packs{packsCompletos && <CheckMark />}</p>
 
         <div className="packs-list">
           {Object.keys(precios).map(packKey => (
@@ -212,84 +269,111 @@ export default function UserForm() {
           </div>
         )}
 
-        <p className="section-title" style={{marginTop:'22px'}}>Fecha de entrega</p>
-        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '5px', scrollbarWidth: 'none' }}>
-          {next7Days.map(d => {
-            const iso = formatDateISO(d);
-            const isSelected = formData.fecha === iso;
-            return (
-              <button 
-                key={iso}
-                type="button"
-                onClick={() => { handleInputChange('fecha', iso); setDateError(false); }}
-                style={{
-                  flex: '0 0 auto',
-                  minWidth: '60px',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  border: isSelected ? '2px solid var(--brown)' : '1px solid var(--border)',
-                  background: isSelected ? '#fdf8f5' : '#fff',
-                  color: isSelected ? 'var(--brown)' : 'inherit',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-              >
-                <span style={{ fontSize: '12px', fontWeight: 500 }}>{daysStr[d.getDay()]}</span>
-                <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{d.getDate()}</span>
-              </button>
-            );
-          })}
-        </div>
+        <p className="section-title" style={{marginTop:'22px'}}>Fecha de entrega{fechaCompleta && <CheckMark />}</p>
+        
         {!showCalendar ? (
-          <button 
-            type="button"
-            onClick={() => setShowCalendar(true)}
-            style={{ marginTop: '5px', background: 'none', border: 'none', color: 'var(--brown)', fontWeight: 500, cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}
-          >
-            Ver más fechas
-          </button>
+          <>
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '5px', scrollbarWidth: 'none' }}>
+              {next7Days.map(d => {
+                const iso = formatDateISO(d);
+                const isSelected = formData.fecha === iso;
+                return (
+                  <button 
+                    key={iso}
+                    type="button"
+                    onClick={() => { handleInputChange('fecha', iso); setDateError(false); }}
+                    style={{
+                      flex: '0 0 auto',
+                      minWidth: '60px',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      border: isSelected ? '2px solid var(--brown)' : '1px solid var(--border)',
+                      background: isSelected ? '#fdf8f5' : '#fff',
+                      color: isSelected ? 'var(--brown)' : 'inherit',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <span style={{ fontSize: '12px', fontWeight: 500 }}>{daysStr[d.getDay()]}</span>
+                    <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{d.getDate()}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <button 
+              type="button"
+              onClick={() => setShowCalendar(true)}
+              style={{ marginTop: '5px', background: 'none', border: 'none', color: 'var(--brown)', fontWeight: 500, cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}
+            >
+              Elegir otra fecha →
+            </button>
+          </>
         ) : (
-          <div style={{ marginTop: '10px' }}>
-            <input 
-              type="date" 
-              value={formData.fecha}
-              min={minDate}
-              max={maxDate}
-              onChange={e => { handleInputChange('fecha', e.target.value); setDateError(false); }}
-              style={{
-                padding: '10px', borderRadius: '8px', border: '1px solid var(--border)', width: '100%', maxWidth: '200px', outline: 'none'
+          <div style={{ marginTop: '5px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
+            <DatePicker
+              selected={parseLocalDate(formData.fecha)}
+              onChange={(date) => {
+                if (date) {
+                  handleInputChange('fecha', formatDateISO(date));
+                  setDateError(false);
+                }
               }}
+              minDate={today}
+              maxDate={maxDateObj}
+              locale={es}
+              dateFormat="dd/MM/yyyy"
+              inline
             />
-            {formData.fecha && !next7Days.find(d => formatDateISO(d) === formData.fecha) && (
-              <div style={{ marginTop: '8px', fontSize: '14px', color: 'var(--brown)', fontWeight: 500 }}>
-                Fecha seleccionada: {formData.fecha.split('-').reverse().join('/')}
-              </div>
-            )}
+            <button 
+              type="button"
+              onClick={() => setShowCalendar(false)}
+              style={{ background: 'none', border: 'none', color: 'var(--brown)', fontWeight: 500, cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}
+            >
+              ← Volver
+            </button>
+          </div>
+        )}
+
+        {formData.fecha && (
+          <div style={{ marginTop: '10px', color: '#2E7D32', fontWeight: 500, fontSize: '14px' }}>
+            {getSelectedDateText()}
           </div>
         )}
         {dateError && <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>Debe seleccionar una fecha.</div>}
 
-        <p className="section-title" style={{marginTop:'22px'}}>Horario de entrega</p>
+        <p className="section-title" style={{marginTop:'22px'}}>Horario de entrega{horarioCompleto && <CheckMark />}</p>
 
         <div className="field">
           <label className="field-label">¿A partir de qué hora podés recibir?</label>
           <div className="horario-row">
             <div>
               <label className="field-label">Desde</label>
-              <input type="time" value={formData.desde} onChange={e => handleInputChange('desde', e.target.value)} min="08:00" max="20:00" />
+              <select value={formData.desde} onChange={e => handleInputChange('desde', e.target.value)}>
+                <option value="" disabled hidden>Hora...</option>
+                {Array.from({length: 13}, (_, i) => {
+                  const h = `${String(i + 8).padStart(2, '0')}:00`;
+                  return <option key={h} value={h}>{h}</option>;
+                })}
+              </select>
             </div>
             <div className="horario-sep">—</div>
             <div>
               <label className="field-label">Hasta</label>
-              <input type="time" value={formData.hasta} onChange={e => handleInputChange('hasta', e.target.value)} min="08:00" max="20:00" />
+              <select value={formData.hasta} onChange={e => handleInputChange('hasta', e.target.value)}>
+                <option value="" disabled hidden>Hora...</option>
+                {Array.from({length: 13}, (_, i) => {
+                  const h = `${String(i + 8).padStart(2, '0')}:00`;
+                  return <option key={h} value={h}>{h}</option>;
+                })}
+              </select>
             </div>
           </div>
         </div>
 
-        <p className="section-title" style={{marginTop:'22px'}}>Método de pago</p>
+        <p className="section-title" style={{marginTop:'22px'}}>Método de pago{pagoCompleto && <CheckMark />}</p>
 
         <div className="payment-options">
           <label className={`pay-option ${formData.pago === 'transferencia' ? 'selected' : ''}`} onClick={() => handleInputChange('pago', 'transferencia')}>
@@ -319,8 +403,15 @@ export default function UserForm() {
           </div>
         )}
 
-        <button className="submit-btn" onClick={handleSubmit}>
-          Enviar pedido <span className="btn-gold">→</span>
+        <button className="submit-btn" onClick={handleSubmit} disabled={isSubmitting}>
+          {isSubmitting ? (
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <div style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid #fff', borderRadius: '50%', animation: 'userform-spinner 1s linear infinite' }}></div>
+              Enviando...
+            </span>
+          ) : (
+            <>Enviar pedido <span className="btn-gold">→</span></>
+          )}
         </button>
 
         <p className="note">Te contactaremos por WhatsApp para confirmar 🥐</p>
