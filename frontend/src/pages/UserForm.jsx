@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import { es } from 'date-fns/locale';
@@ -19,11 +19,51 @@ export default function UserForm() {
   });
   const [qtys, setQtys] = useState({ individual: 0, media: 0, clasico: 0, familiar: 0 });
   const [coords, setCoords] = useState({ lat: null, lng: null });
-  const [comprobante, setComprobante] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [dateError, setDateError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const scrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
+    }
+  };
+
+  useEffect(() => {
+    handleScroll();
+    window.addEventListener('resize', handleScroll);
+    return () => window.removeEventListener('resize', handleScroll);
+  }, [showCalendar]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onWheelNative = (e) => {
+      if (e.deltaY !== 0) {
+        const isScrollingRight = e.deltaY > 0 && Math.ceil(el.scrollLeft + el.clientWidth) < el.scrollWidth;
+        const isScrollingLeft = e.deltaY < 0 && el.scrollLeft > 0;
+        if (isScrollingRight || isScrollingLeft) {
+          e.preventDefault();
+          el.scrollBy({ left: e.deltaY, behavior: 'auto' });
+        }
+      }
+    };
+    el.addEventListener('wheel', onWheelNative, { passive: false });
+    return () => el.removeEventListener('wheel', onWheelNative);
+  }, [showCalendar]);
+
+  const scrollByAmount = (amount) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
 
   const today = new Date();
   const next7Days = Array.from({length: 7}, (_, i) => {
@@ -70,12 +110,6 @@ export default function UserForm() {
     }));
   };
 
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setComprobante(e.target.files[0]);
-    }
-  };
-
   const handleAddressBlur = async () => {
     if (!formData.direccion) return;
     try {
@@ -106,7 +140,7 @@ export default function UserForm() {
   const packsCompletos = totalPacks > 0;
   const fechaCompleta = !!formData.fecha;
   const horarioCompleto = formData.desde && formData.hasta && formData.desde < formData.hasta;
-  const pagoCompleto = formData.pago && (formData.pago !== 'transferencia' || comprobante);
+  const pagoCompleto = !!formData.pago;
   
   const CheckMark = () => <span style={{color: '#2E7D32', marginLeft: '8px', fontSize: '18px'}}>✓</span>;
 
@@ -135,10 +169,6 @@ export default function UserForm() {
       alert('Elegí un método de pago.');
       return;
     }
-    if (formData.pago === 'transferencia' && !comprobante) {
-      alert('Adjuntá el comprobante de transferencia.');
-      return;
-    }
 
     const data = new FormData();
     data.append('nombre', formData.nombre);
@@ -151,8 +181,6 @@ export default function UserForm() {
     
     const paqueteStr = resumenLineas.join(', ');
     data.append('paquete', paqueteStr);
-
-    if (comprobante) data.append('comprobante', comprobante);
     
     if (coords.lat) data.append('lat', coords.lat);
     if (coords.lng) data.append('lng', coords.lng);
@@ -224,6 +252,54 @@ export default function UserForm() {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
+          .days-scroll-wrapper {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+          }
+          .days-scroll-wrapper > div::-webkit-scrollbar {
+            display: none;
+          }
+          .days-scroll-wrapper.can-scroll-left::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; width: 40px;
+            background: linear-gradient(to right, #fff, transparent);
+            pointer-events: none;
+            z-index: 2;
+          }
+          .days-scroll-wrapper.can-scroll-right::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; width: 40px;
+            background: linear-gradient(to left, #fff, transparent);
+            pointer-events: none;
+            z-index: 2;
+          }
+          .nav-arrow {
+            display: none;
+            background: #fdf8f5;
+            border: 1px solid var(--border);
+            color: var(--brown);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+          }
+          .nav-arrow:hover {
+            background: var(--brown);
+            color: white;
+          }
+          @media (min-width: 768px) {
+            .nav-arrow {
+              display: flex;
+            }
+          }
         `}</style>
         <p className="section-title">Tus datos{datosCompletos && <CheckMark />}</p>
 
@@ -275,45 +351,72 @@ export default function UserForm() {
         <p className="section-title" style={{marginTop:'22px'}}>Fecha de entrega{fechaCompleta && <CheckMark />}</p>
         
         {!showCalendar ? (
-          <>
-            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '5px', scrollbarWidth: 'none' }}>
-              {next7Days.map(d => {
-                const iso = formatDateISO(d);
-                const isSelected = formData.fecha === iso;
-                return (
-                  <button 
-                    key={iso}
-                    type="button"
-                    onClick={() => { handleInputChange('fecha', iso); setDateError(false); }}
-                    style={{
-                      flex: '0 0 auto',
-                      minWidth: '60px',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      border: isSelected ? '2px solid var(--brown)' : '1px solid var(--border)',
-                      background: isSelected ? '#fdf8f5' : '#fff',
-                      color: isSelected ? 'var(--brown)' : 'inherit',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <span style={{ fontSize: '12px', fontWeight: 500 }}>{daysStr[d.getDay()]}</span>
-                    <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{d.getDate()}</span>
-                  </button>
-                );
-              })}
+          <div style={{ border: '1.5px solid var(--border)', borderRadius: '10px', padding: '12px', background: '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button 
+                type="button" 
+                className="nav-arrow"
+                onClick={() => scrollByAmount(-150)}
+                style={{ opacity: canScrollLeft ? 1 : 0.3, pointerEvents: canScrollLeft ? 'auto' : 'none' }}
+              >
+                ←
+              </button>
+
+              <div className={`days-scroll-wrapper ${canScrollLeft ? 'can-scroll-left' : ''} ${canScrollRight ? 'can-scroll-right' : ''}`}>
+                <div 
+                  ref={scrollRef}
+                  onScroll={handleScroll}
+                  style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '5px', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1 }}
+                >
+                  {next7Days.map(d => {
+                    const iso = formatDateISO(d);
+                    const isSelected = formData.fecha === iso;
+                    return (
+                      <button 
+                        key={iso}
+                        type="button"
+                        onClick={() => { handleInputChange('fecha', iso); setDateError(false); }}
+                        style={{
+                          flex: '0 0 auto',
+                          minWidth: '60px',
+                          padding: '10px',
+                          borderRadius: '8px',
+                          border: isSelected ? '2px solid var(--brown)' : '1px solid var(--border)',
+                          background: isSelected ? '#fdf8f5' : '#fff',
+                          color: isSelected ? 'var(--brown)' : 'inherit',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <span style={{ fontSize: '12px', fontWeight: 500 }}>{daysStr[d.getDay()]}</span>
+                        <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{d.getDate()}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <button 
+                type="button" 
+                className="nav-arrow"
+                onClick={() => scrollByAmount(150)}
+                style={{ opacity: canScrollRight ? 1 : 0.3, pointerEvents: canScrollRight ? 'auto' : 'none' }}
+              >
+                →
+              </button>
             </div>
+            
             <button 
               type="button"
               onClick={() => setShowCalendar(true)}
-              style={{ marginTop: '5px', background: 'none', border: 'none', color: 'var(--brown)', fontWeight: 500, cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}
+              style={{ marginTop: '10px', background: 'none', border: 'none', color: 'var(--brown)', fontWeight: 500, cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}
             >
               Elegir otra fecha →
             </button>
-          </>
+          </div>
         ) : (
           <div style={{ marginTop: '5px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
             <DatePicker
@@ -392,17 +495,29 @@ export default function UserForm() {
         </div>
 
         {formData.pago === 'transferencia' && (
-          <div className="comprobante-field visible">
-            <label className="field-label">Comprobante de transferencia</label>
-            <div className={`upload-area ${comprobante ? 'has-file' : ''}`}>
-              <input type="file" accept="image/*,.pdf" onChange={handleFileChange} />
-              <div className="upload-icon">📎</div>
-              <div className="upload-text">
-                <strong>Tocá para adjuntar</strong><br/>
-                JPG, PNG o PDF
-              </div>
-              {comprobante && <div className="file-name" style={{display:'block'}}>✓ {comprobante.name}</div>}
-            </div>
+          <div className="comprobante-field visible" style={{ marginTop: '15px' }}>
+            <button 
+              type="button"
+              onClick={() => window.open('https://wa.me/5491126487393?text=Hola%2C%20realicé%20un%20pedido%20de%20medialunas%20y%20adjunto%20mi%20comprobante%20de%20transferencia%20🥐', '_blank')}
+              style={{
+                width: '100%',
+                background: '#25D366',
+                color: 'white',
+                border: 'none',
+                padding: '18px',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: 'inherit',
+                boxShadow: '0 4px 12px rgba(37,211,102,0.2)'
+              }}
+            >
+              Enviar comprobante por WhatsApp 📎
+            </button>
           </div>
         )}
 

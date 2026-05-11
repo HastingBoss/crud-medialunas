@@ -22,6 +22,7 @@ export default function AdminDashboard() {
   const [adminPos, setAdminPos] = useState({ lat: -34.6080, lng: -58.4620 });
   const [mapCenter, setMapCenter] = useState([-34.6080, -58.4620]);
   const [mapZoom, setMapZoom] = useState(13);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('adminAuth') === 'true');
   const [password, setPassword] = useState('');
@@ -68,9 +69,38 @@ export default function AdminDashboard() {
     try {
       await axios.put(`${API_URL}/api/orders/${id}/status`, { estado: status });
       fetchOrders();
+      if (selectedOrder && selectedOrder.id === id) {
+        setSelectedOrder(prev => ({ ...prev, estado: status }));
+      }
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const changePaymentStatus = async (id, status) => {
+    try {
+      await axios.put(`${API_URL}/api/orders/${id}/payment`, { pago_estado: status });
+      fetchOrders();
+      if (selectedOrder && selectedOrder.id === id) {
+        setSelectedOrder(prev => ({ ...prev, pago_estado: status }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const calcularTotal = (paqueteStr) => {
+    if (!paqueteStr) return 0;
+    const preciosMap = { 'Pack Individual': 2200, 'Pack Media Docena': 3800, 'Pack Clásico': 5500, 'Pack Familiar': 8000 };
+    let total = 0;
+    const items = paqueteStr.split(', ');
+    for (const item of items) {
+      const parts = item.split(' × ');
+      if (parts.length === 2) {
+        total += parseInt(parts[0], 10) * (preciosMap[parts[1]] || 0);
+      }
+    }
+    return total;
   };
 
   const deleteOrder = async (id) => {
@@ -239,6 +269,7 @@ export default function AdminDashboard() {
                 <div key={p.id} className="pedido-item" onClick={() => {
                   setMapCenter([p.lat, p.lng]);
                   setMapZoom(16);
+                  setSelectedOrder(p);
                 }}>
                   <div className="pedido-item-left">
                     <div className="pedido-dot" style={{background: p.estado==='Entregado' ? '#2E7D32' : '#F57F17'}}></div>
@@ -249,7 +280,12 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'4px'}}>
-                    <span className={`badge ${p.estado==='Entregado' ? 'badge-entregado' : 'badge-pendiente'}`}>{p.estado}</span>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <span className="badge" style={{ background: p.pago_estado === 'Pagado' ? '#e8f5e9' : '#fff3e0', color: p.pago_estado === 'Pagado' ? '#2E7D32' : '#F57F17' }}>
+                        💲 {p.pago_estado === 'Pagado' ? 'Pagado' : 'Pendiente'}
+                      </span>
+                      <span className={`badge ${p.estado==='Entregado' ? 'badge-entregado' : 'badge-pendiente'}`}>{p.estado}</span>
+                    </div>
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
@@ -277,6 +313,74 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {selectedOrder && (
+        <div 
+          style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', boxSizing: 'border-box' }}
+          onClick={() => setSelectedOrder(null)}
+        >
+          <div 
+            style={{ background: '#fff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '420px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 8px 30px rgba(0,0,0,0.2)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button onClick={() => setSelectedOrder(null)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--brown)' }}>✕</button>
+            <h2 style={{ color: 'var(--brown)', marginTop: 0, marginBottom: '15px', fontSize: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>Detalle del Pedido</h2>
+            
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Cliente:</strong> {selectedOrder.nombre}</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Teléfono:</strong> {selectedOrder.telefono}</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Dirección:</strong> {selectedOrder.direccion}</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Fecha y hora:</strong> {selectedOrder.fecha ? selectedOrder.fecha.split('T')[0].split('-').reverse().join('/') : ''} ({selectedOrder.desde} a {selectedOrder.hasta})</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Packs:</strong> {selectedOrder.paquete}</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Total:</strong> ${(selectedOrder.total || calcularTotal(selectedOrder.paquete)).toLocaleString('es-AR')}</p>
+            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}>
+              <strong style={{ color: 'var(--brown)' }}>Método de pago:</strong> {selectedOrder.pago} 
+              {selectedOrder.comprobante && <a href={`${API_URL}/uploads/${selectedOrder.comprobante}`} target="_blank" rel="noreferrer" style={{color: 'var(--gold)', marginLeft: '5px', textDecoration: 'underline'}}>Ver comprobante</a>}
+            </p>
+            
+            <div style={{ display: 'flex', gap: '10px', marginTop: '15px', alignItems: 'center' }}>
+              <div style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${selectedOrder.pago_estado === 'Pagado' ? '#2E7D32' : '#F57F17'}`, background: selectedOrder.pago_estado === 'Pagado' ? '#e8f5e9' : '#fff3e0', textAlign: 'center', fontSize: '14px' }}>
+                <strong style={{ color: selectedOrder.pago_estado === 'Pagado' ? '#2E7D32' : '#F57F17' }}>Pago: {selectedOrder.pago_estado || 'Pendiente'}</strong>
+              </div>
+              <div style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${selectedOrder.estado === 'Entregado' ? '#2E7D32' : '#F57F17'}`, background: selectedOrder.estado === 'Entregado' ? '#e8f5e9' : '#fff3e0', textAlign: 'center', fontSize: '14px' }}>
+                <strong style={{ color: selectedOrder.estado === 'Entregado' ? '#2E7D32' : '#F57F17' }}>Entrega: {selectedOrder.estado}</strong>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
+              <button 
+                onClick={() => {
+                  const phoneDigits = selectedOrder.telefono.replace(/\D/g, '');
+                  const phoneStr = phoneDigits.startsWith('54') ? phoneDigits.slice(2) : phoneDigits;
+                  const msg = `Hola ${selectedOrder.nombre}, tu pedido de ${selectedOrder.paquete} está confirmado para el ${selectedOrder.fecha ? selectedOrder.fecha.split('T')[0].split('-').reverse().join('/') : ''} entre ${selectedOrder.desde} y ${selectedOrder.hasta}. 🥐`;
+                  window.open(`https://wa.me/54${phoneStr}?text=${encodeURIComponent(msg)}`, '_blank');
+                }}
+                style={{ background: '#25D366', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', fontFamily: '"DM Sans", sans-serif' }}
+              >Confirmar por WhatsApp</button>
+              
+              <button 
+                onClick={() => {
+                  const url = (selectedOrder.lat != null && selectedOrder.lng != null) 
+                    ? `https://www.google.com/maps/dir/?api=1&destination=${selectedOrder.lat},${selectedOrder.lng}`
+                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedOrder.direccion)}`;
+                  window.open(url, '_blank', 'noopener,noreferrer');
+                }}
+                style={{ background: '#1976D2', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', fontFamily: '"DM Sans", sans-serif' }}
+              >📍 Navegar</button>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button 
+                  onClick={() => changePaymentStatus(selectedOrder.id, selectedOrder.pago_estado === 'Pagado' ? 'Pendiente' : 'Pagado')}
+                  style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid var(--border)', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontFamily: '"DM Sans", sans-serif', fontWeight: 500 }}
+                >Marcar como {selectedOrder.pago_estado === 'Pagado' ? 'Pendiente de pago' : 'Pagado'}</button>
+                <button 
+                  onClick={() => changeStatus(selectedOrder.id, selectedOrder.estado === 'Entregado' ? 'Pendiente' : 'Entregado')}
+                  style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid var(--border)', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontFamily: '"DM Sans", sans-serif', fontWeight: 500 }}
+                >Marcar como {selectedOrder.estado === 'Entregado' ? 'Pendiente' : 'Entregado'}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
