@@ -54,15 +54,17 @@ exports.getOrders = (req, res) => {
 
 exports.updateOrderStatus = (req, res) => {
   const { id } = req.params;
-  const { estado } = req.body;
+  const { estado, estadoPago } = req.body;
   
   const orderIndex = orders.findIndex(o => o.id === id);
   if (orderIndex === -1) {
     return res.status(404).json({ message: 'Pedido no encontrado' });
   }
   
-  orders[orderIndex].estado = estado;
-  res.json({ message: 'Estado actualizado', order: orders[orderIndex] });
+  if (estado !== undefined) orders[orderIndex].estado = estado;
+  if (estadoPago !== undefined) orders[orderIndex].estadoPago = estadoPago;
+  
+  res.json({ message: 'Pedido actualizado', order: orders[orderIndex] });
 };
 
 exports.deleteOrder = (req, res) => {

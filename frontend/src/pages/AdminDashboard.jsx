@@ -68,7 +68,7 @@ export default function AdminDashboard() {
   const changeStatus = async (id, status) => {
     try {
       await axios.put(`${API_URL}/api/orders/${id}/status`, { estado: status });
-      fetchOrders();
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, estado: status } : o));
       if (selectedOrder && selectedOrder.id === id) {
         setSelectedOrder(prev => ({ ...prev, estado: status }));
       }
@@ -79,10 +79,10 @@ export default function AdminDashboard() {
 
   const changePaymentStatus = async (id, status) => {
     try {
-      await axios.put(`${API_URL}/api/orders/${id}/payment`, { pago_estado: status });
-      fetchOrders();
+      await axios.put(`${API_URL}/api/orders/${id}/status`, { estadoPago: status });
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, estadoPago: status } : o));
       if (selectedOrder && selectedOrder.id === id) {
-        setSelectedOrder(prev => ({ ...prev, pago_estado: status }));
+        setSelectedOrder(prev => ({ ...prev, estadoPago: status }));
       }
     } catch (err) {
       console.error(err);
@@ -119,10 +119,13 @@ export default function AdminDashboard() {
   };
 
   const deleteOrder = async (id) => {
-    if(!window.confirm('¿Eliminar pedido?')) return;
+    if(!window.confirm('¿Eliminar este pedido? Esta acción no se puede deshacer.')) return;
     try {
       await axios.delete(`${API_URL}/api/orders/${id}`);
-      fetchOrders();
+      setOrders(prev => prev.filter(o => o.id !== id));
+      if (selectedOrder && selectedOrder.id === id) {
+        setSelectedOrder(null);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -258,7 +261,7 @@ export default function AdminDashboard() {
                     <div style={{marginTop: '10px', display: 'flex', gap: '5px'}}>
                       {p.estado === 'Pendiente' && <button onClick={() => changeStatus(p.id, 'Entregado')} style={{padding:'4px', cursor:'pointer'}}>Entregado</button>}
                       {p.estado === 'Entregado' && <button onClick={() => changeStatus(p.id, 'Pendiente')} style={{padding:'4px', cursor:'pointer'}}>Pendiente</button>}
-                      <button onClick={() => deleteOrder(p.id)} style={{padding:'4px', cursor:'pointer', color:'red'}}>Borrar</button>
+                      <button onClick={() => deleteOrder(p.id)} style={{padding:'4px', cursor:'pointer', color:'#B71C1C', background: '#FFF0F0', border: '1px solid #FFCDD2', borderRadius: '4px'}}>🗑 Eliminar</button>
                     </div>
                   </div>
                 </Popup>
@@ -296,8 +299,8 @@ export default function AdminDashboard() {
                   </div>
                   <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'4px'}}>
                     <div style={{ display: 'flex', gap: '4px' }}>
-                      <span className="badge" style={{ background: p.pago_estado === 'Pagado' ? '#e8f5e9' : '#fff3e0', color: p.pago_estado === 'Pagado' ? '#2E7D32' : '#F57F17' }}>
-                        💲 {p.pago_estado === 'Pagado' ? 'Pagado' : 'Pendiente'}
+                      <span className="badge" style={{ background: p.estadoPago === 'Pagado' ? '#e8f5e9' : '#fff3e0', color: p.estadoPago === 'Pagado' ? '#2E7D32' : '#F57F17' }}>
+                        💲 {p.estadoPago === 'Pagado' ? 'Pagado' : 'Pendiente'}
                       </span>
                       <span className={`badge ${p.estado==='Entregado' ? 'badge-entregado' : 'badge-pendiente'}`}>{p.estado}</span>
                     </div>
@@ -353,8 +356,8 @@ export default function AdminDashboard() {
             </p>
             
             <div style={{ display: 'flex', gap: '10px', marginTop: '15px', alignItems: 'center' }}>
-              <div style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${selectedOrder.pago_estado === 'Pagado' ? '#2E7D32' : '#F57F17'}`, background: selectedOrder.pago_estado === 'Pagado' ? '#e8f5e9' : '#fff3e0', textAlign: 'center', fontSize: '14px' }}>
-                <strong style={{ color: selectedOrder.pago_estado === 'Pagado' ? '#2E7D32' : '#F57F17' }}>Pago: {selectedOrder.pago_estado || 'Pendiente'}</strong>
+              <div style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${selectedOrder.estadoPago === 'Pagado' ? '#2E7D32' : '#F57F17'}`, background: selectedOrder.estadoPago === 'Pagado' ? '#e8f5e9' : '#fff3e0', textAlign: 'center', fontSize: '14px' }}>
+                <strong style={{ color: selectedOrder.estadoPago === 'Pagado' ? '#2E7D32' : '#F57F17' }}>Pago: {selectedOrder.estadoPago || 'Pendiente'}</strong>
               </div>
               <div style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${selectedOrder.estado === 'Entregado' ? '#2E7D32' : '#F57F17'}`, background: selectedOrder.estado === 'Entregado' ? '#e8f5e9' : '#fff3e0', textAlign: 'center', fontSize: '14px' }}>
                 <strong style={{ color: selectedOrder.estado === 'Entregado' ? '#2E7D32' : '#F57F17' }}>Entrega: {selectedOrder.estado}</strong>
@@ -386,14 +389,35 @@ export default function AdminDashboard() {
 
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button 
-                  onClick={() => changePaymentStatus(selectedOrder.id, selectedOrder.pago_estado === 'Pagado' ? 'Pendiente' : 'Pagado')}
+                  onClick={() => changePaymentStatus(selectedOrder.id, selectedOrder.estadoPago === 'Pagado' ? 'Pendiente' : 'Pagado')}
                   style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid var(--border)', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontFamily: '"DM Sans", sans-serif', fontWeight: 500 }}
-                >Marcar como {selectedOrder.pago_estado === 'Pagado' ? 'Pendiente de pago' : 'Pagado'}</button>
+                >Marcar como {selectedOrder.estadoPago === 'Pagado' ? 'Pendiente de pago' : 'Pagado'}</button>
                 <button 
                   onClick={() => changeStatus(selectedOrder.id, selectedOrder.estado === 'Entregado' ? 'Pendiente' : 'Entregado')}
                   style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid var(--border)', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontFamily: '"DM Sans", sans-serif', fontWeight: 500 }}
                 >Marcar como {selectedOrder.estado === 'Entregado' ? 'Pendiente' : 'Entregado'}</button>
               </div>
+
+              <button 
+                onClick={() => deleteOrder(selectedOrder.id)}
+                style={{ 
+                  marginTop: '10px',
+                  width: '100%', 
+                  background: '#FFF0F0', 
+                  color: '#B71C1C', 
+                  border: '1px solid #FFCDD2', 
+                  padding: '12px', 
+                  borderRadius: '8px', 
+                  cursor: 'pointer', 
+                  fontWeight: 600, 
+                  fontSize: '14px', 
+                  fontFamily: '"DM Sans", sans-serif',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >🗑 Eliminar pedido</button>
             </div>
           </div>
         </div>
