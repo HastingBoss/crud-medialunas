@@ -97,33 +97,40 @@ export default function UserForm() {
           <input type="tel" value={formData.telefono} onChange={e => handleInputChange('telefono', e.target.value)} placeholder="Ej: 11 1234-5678" />
         </div>
 
-        <div className="field" style={{ position: 'relative' }}>
+        <div className="field">
           <label className="field-label">Dirección de entrega</label>
-          <input 
-            type="text" 
-            value={formData.direccion} 
-            onChange={e => handleInputChange('direccion', e.target.value)} 
-            onBlur={() => setTimeout(() => setAddressSuggestions([]), 200)}
-            placeholder="Ej: Av. Corrientes 1234, CABA" 
-          />
-          {isSearchingAddress && (
-            <div style={{ position: 'absolute', right: '12px', top: '38px', width: '16px', height: '16px', border: '2px solid rgba(0,0,0,0.1)', borderTop: '2px solid var(--brown)', borderRadius: '50%', animation: 'userform-spinner 1s linear infinite' }} />
-          )}
-          {addressSuggestions.length > 0 && (
-            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid var(--border)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, marginTop: '4px', overflow: 'hidden' }}>
-              {addressSuggestions.map((s, i) => (
-                <div 
-                  key={i} 
-                  onClick={() => selectSuggestion(s)}
-                  style={{ padding: '10px 12px', fontSize: '13px', cursor: 'pointer', borderBottom: i < addressSuggestions.length - 1 ? '1px solid #f0f0f0' : 'none', color: 'var(--brown)', transition: 'background 0.2s' }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#fdf8f5'}
-                  onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-                >
-                  📍 {s.display_name}
-                </div>
-              ))}
-            </div>
-          )}
+          <div style={{ position: 'relative' }}>
+            <input 
+              type="text" 
+              value={formData.direccion} 
+              onChange={e => handleInputChange('direccion', e.target.value)} 
+              onBlur={() => setTimeout(() => setAddressSuggestions([]), 200)}
+              placeholder="Ej: Av. Corrientes 1234, CABA" 
+            />
+            {isSearchingAddress && (
+              <div style={{ 
+                position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', 
+                width: '18px', height: '18px', border: '2px solid rgba(196,146,42,0.1)', 
+                borderTop: '2px solid var(--brown)', borderRadius: '50%', 
+                animation: 'userform-spinner 1s linear infinite' 
+              }} />
+            )}
+            {addressSuggestions.length > 0 && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid var(--border)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 100, marginTop: '4px', overflow: 'hidden' }}>
+                {addressSuggestions.map((s, i) => (
+                  <div 
+                    key={i} 
+                    onClick={() => selectSuggestion(s)}
+                    style={{ padding: '10px 12px', fontSize: '13px', cursor: 'pointer', borderBottom: i < addressSuggestions.length - 1 ? '1px solid #f0f0f0' : 'none', color: 'var(--brown)', transition: 'background 0.2s' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#fdf8f5'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                  >
+                    📍 {s.display_name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <PackSelector qtys={qtys} cambiarQty={cambiarQty} precios={precios} nombres={nombres} resumenLineas={resumenLineas} total={total} packsCompletos={packsCompletos} />
