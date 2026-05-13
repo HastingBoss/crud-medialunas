@@ -99,20 +99,22 @@ export default function UserForm() {
 
         <div className="field">
           <label className="field-label">Dirección de entrega</label>
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
             <input 
               type="text" 
               value={formData.direccion} 
               onChange={e => handleInputChange('direccion', e.target.value)} 
               onBlur={() => setTimeout(() => setAddressSuggestions([]), 200)}
               placeholder="Ej: Av. Corrientes 1234, CABA" 
+              style={{ width: '100%' }}
             />
             {isSearchingAddress && (
               <div style={{ 
-                position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', 
+                position: 'absolute', right: '12px', top: 0, bottom: 0, margin: 'auto',
                 width: '18px', height: '18px', border: '2px solid rgba(196,146,42,0.1)', 
                 borderTop: '2px solid var(--brown)', borderRadius: '50%', 
-                animation: 'userform-spinner 1s linear infinite' 
+                animation: 'userform-spinner 1s linear infinite',
+                pointerEvents: 'none'
               }} />
             )}
             {addressSuggestions.length > 0 && (
