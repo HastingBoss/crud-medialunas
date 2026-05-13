@@ -1,22 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useState, useEffect } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './AdminDashboard.css';
+import leafletIconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import leafletIcon from 'leaflet/dist/images/marker-icon.png';
+import leafletShadow from 'leaflet/dist/images/marker-shadow.png';
+
+import useOrders, { calcularTotal } from '../hooks/useOrders.js';
+import MapView from '../components/MapView.jsx';
+import OrderTable from '../components/OrderTable.jsx';
+import OrderModal from '../components/OrderModal.jsx';
+import DeleteConfirmModal from '../components/DeleteConfirmModal.jsx';
+import ReportsView from '../components/ReportsView.jsx';
+import PricesView from '../components/PricesView.jsx';
+import ArchivedView from '../components/ArchivedView.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-// Fix para íconos de leaflet por defecto
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  iconRetinaUrl: leafletIconRetina,
+  iconUrl: leafletIcon,
+  shadowUrl: leafletShadow,
 });
 
 export default function AdminDashboard() {
-  const [orders, setOrders] = useState([]);
+  const { orders, fetchOrders, changeStatus, changePaymentStatus, deleteOrder, archiveOrder, undoArchive, archiveToast, progressWidth } = useOrders();
+
   const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
   const [filterStatus, setFilterStatus] = useState('');
   const [adminPos, setAdminPos] = useState({ lat: -34.6080, lng: -58.4620 });
@@ -24,10 +34,7 @@ export default function AdminDashboard() {
   const [mapZoom, setMapZoom] = useState(13);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderToDelete, setOrderToDelete] = useState(null);
-  const [archiveToast, setArchiveToast] = useState(null); // { order, startTime }
-  const archiveTimerRef = useRef(null);
-  const archiveProgressRef = useRef(null);
-  const [progressWidth, setProgressWidth] = useState(100);
+  const [activeTab, setActiveTab] = useState('pedidos');
 
   const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('adminAuth') === 'true');
   const [password, setPassword] = useState('');
@@ -36,20 +43,18 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!isAuthenticated) return;
     fetchOrders();
-    const intervalId = setInterval(() => {
-      fetchOrders();
-    }, 30000);
+    const intervalId = setInterval(fetchOrders, 30000);
     return () => clearInterval(intervalId);
   }, [isAuthenticated]);
 
-  const fetchOrders = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/api/orders`);
-      setOrders(res.data);
-    } catch (err) {
-      console.error(err);
+  // Sync selectedOrder state when changeStatus/changePaymentStatus mutate orders
+  useEffect(() => {
+    if (!selectedOrder) return;
+    const updated = orders.find(o => o.id === selectedOrder.id);
+    if (updated && (updated.estado !== selectedOrder.estado || updated.estadoPago !== selectedOrder.estadoPago)) {
+      setSelectedOrder(updated);
     }
-  };
+  }, [orders]);
 
   const centrarEnMi = () => {
     if (navigator.geolocation) {
@@ -58,55 +63,10 @@ export default function AdminDashboard() {
         setAdminPos({ lat: latitude, lng: longitude });
         setMapCenter([latitude, longitude]);
         setMapZoom(14);
-      }, () => {
-        setMapCenter([adminPos.lat, adminPos.lng]);
-      }, {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      });
+      }, () => setMapCenter([adminPos.lat, adminPos.lng]), { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
     } else {
       setMapCenter([adminPos.lat, adminPos.lng]);
     }
-  };
-
-  const changeStatus = async (id, status) => {
-    try {
-      await axios.put(`${API_URL}/api/orders/${id}/status`, { estado: status });
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, estado: status } : o));
-      if (selectedOrder && selectedOrder.id === id) {
-        setSelectedOrder(prev => ({ ...prev, estado: status }));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const changePaymentStatus = async (id, status) => {
-    try {
-      await axios.put(`${API_URL}/api/orders/${id}/status`, { estadoPago: status });
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, estadoPago: status } : o));
-      if (selectedOrder && selectedOrder.id === id) {
-        setSelectedOrder(prev => ({ ...prev, estadoPago: status }));
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const calcularTotal = (paqueteData) => {
-    if (!paqueteData) return 0;
-    const preciosMap = { 'Pack Individual': 2200, 'Pack Media Docena': 3800, 'Pack Clásico': 5500, 'Pack Familiar': 8000 };
-    let total = 0;
-    const paqueteStr = Array.isArray(paqueteData) ? paqueteData.join(', ') : String(paqueteData);
-    const items = paqueteStr.split(', ');
-    for (const item of items) {
-      const parts = item.split(' × ');
-      if (parts.length === 2) {
-        total += parseInt(parts[0], 10) * (preciosMap[parts[1]] || 0);
-      }
-    }
-    return total;
   };
 
   const safeDate = (fecha) => {
@@ -123,107 +83,14 @@ export default function AdminDashboard() {
     return String(paquete);
   };
 
-  const deleteOrder = async (id) => {
-    try {
-      await axios.delete(`${API_URL}/api/orders/${id}`);
-      setOrders(prev => prev.filter(o => o.id !== id));
-      setOrderToDelete(null);
-      if (selectedOrder && selectedOrder.id === id) {
-        setSelectedOrder(null);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const commitArchive = async (order) => {
-    try {
-      await axios.put(`${API_URL}/api/orders/${order.id}/status`, { archivado: true });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const archiveOrder = (order) => {
-    // If there's already a pending toast, commit it immediately
-    if (archiveTimerRef.current) {
-      clearTimeout(archiveTimerRef.current);
-      clearInterval(archiveProgressRef.current);
-      archiveTimerRef.current = null;
-      archiveProgressRef.current = null;
-      setArchiveToast(prev => {
-        if (prev) commitArchive(prev.order);
-        return null;
-      });
-    }
-
-    // Optimistic: remove from list, close modal
-    setOrders(prev => prev.filter(o => o.id !== order.id));
-    setSelectedOrder(null);
-    setProgressWidth(100);
-    setArchiveToast({ order });
-
-    // Animate progress bar
-    const DURATION = 5000;
-    const INTERVAL = 50;
-    let elapsed = 0;
-    archiveProgressRef.current = setInterval(() => {
-      elapsed += INTERVAL;
-      const pct = Math.max(0, 100 - (elapsed / DURATION) * 100);
-      setProgressWidth(pct);
-      if (elapsed >= DURATION) {
-        clearInterval(archiveProgressRef.current);
-        archiveProgressRef.current = null;
-      }
-    }, INTERVAL);
-
-    // Commit after 5s
-    archiveTimerRef.current = setTimeout(() => {
-      archiveTimerRef.current = null;
-      clearInterval(archiveProgressRef.current);
-      archiveProgressRef.current = null;
-      commitArchive(order);
-      setArchiveToast(null);
-    }, DURATION);
-  };
-
-  const undoArchive = () => {
-    if (archiveTimerRef.current) {
-      clearTimeout(archiveTimerRef.current);
-      archiveTimerRef.current = null;
-    }
-    if (archiveProgressRef.current) {
-      clearInterval(archiveProgressRef.current);
-      archiveProgressRef.current = null;
-    }
-    setArchiveToast(prev => {
-      if (prev) setOrders(cur => [prev.order, ...cur]);
-      return null;
-    });
-  };
-
   const openDeleteConfirm = (order) => {
     setOrderToDelete(order);
-    setSelectedOrder(null); // Close detail modal if open
+    setSelectedOrder(null);
   };
 
   const filteredOrders = orders.filter(p => {
     const orderDate = p.fecha ? String(p.fecha).split('T')[0] : '';
-    return (!filterDate || orderDate === filterDate) &&
-           (!filterStatus || p.estado === filterStatus);
-  });
-
-  const getIcon = (estado) => {
-    const color = estado === 'Entregado' ? '#2E7D32' : '#F57F17';
-    return L.divIcon({
-      html: `<div style="width:16px;height:16px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.3)"></div>`,
-      iconSize: [16, 16], iconAnchor: [8, 8], className: ''
-    });
-  };
-
-  const adminIcon = L.divIcon({
-    html: `<div style="width:18px;height:18px;border-radius:50%;background:#1565C0;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>`,
-    iconSize: [18, 18], iconAnchor: [9, 9], className: ''
+    return (!filterDate || orderDate === filterDate) && (!filterStatus || p.estado === filterStatus);
   });
 
   const handleLogin = (e) => {
@@ -243,18 +110,10 @@ export default function AdminDashboard() {
         <div style={{ background: '#fff', padding: '30px', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', textAlign: 'center', width: '100%', maxWidth: '300px' }}>
           <h2 style={{ fontFamily: '"Playfair Display", serif', color: 'var(--brown)', marginBottom: '20px' }}>Admin Login</h2>
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <input 
-              type="password" 
-              placeholder="Contraseña" 
-              value={password} 
-              onChange={e => setPassword(e.target.value)} 
-              style={{ padding: '10px', borderRadius: '8px', border: '1.5px solid var(--border)', outline: 'none' }}
-            />
+            <input type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)}
+              style={{ padding: '10px', borderRadius: '8px', border: '1.5px solid var(--border)', outline: 'none' }} />
             {loginError && <div style={{ color: 'red', fontSize: '12px', marginTop: '-10px', textAlign: 'left' }}>Contraseña incorrecta</div>}
-            <button 
-              type="submit" 
-              style={{ padding: '10px', borderRadius: '8px', background: 'var(--brown)', color: 'white', border: 'none', cursor: 'pointer', fontWeight: '500', fontSize: '15px', fontFamily: '"DM Sans", sans-serif' }}
-            >
+            <button type="submit" style={{ padding: '10px', borderRadius: '8px', background: 'var(--brown)', color: 'white', border: 'none', cursor: 'pointer', fontWeight: '500', fontSize: '15px', fontFamily: '"DM Sans", sans-serif' }}>
               Ingresar
             </button>
           </form>
@@ -263,317 +122,100 @@ export default function AdminDashboard() {
     );
   }
 
+  const TABS = [
+    { id: 'pedidos', label: 'Mapa y Pedidos' },
+    { id: 'reportes', label: '📊 Reportes' },
+    { id: 'precios', label: '💰 Precios' },
+    { id: 'archivados', label: '📦 Archivados' },
+  ];
+
   return (
     <div className="admin-body">
       <div className="header">
         <div className="header-title">🥐 <span>Admin</span> Medialunas</div>
       </div>
+
       <div className="tabs">
-        <div className="tab active">Mapa y Pedidos</div>
+        {TABS.map(t => (
+          <div key={t.id} className={`tab${activeTab === t.id ? ' active' : ''}`} onClick={() => setActiveTab(t.id)} style={{ cursor: 'pointer' }}>
+            {t.label}
+          </div>
+        ))}
       </div>
 
-      <div className="content">
-        <div className="filters">
-          <div style={{display: 'flex', gap: '8px'}}>
-            <button 
-              onClick={() => setFilterDate('')}
-              style={{
-                background: filterDate === '' ? 'var(--brown)' : '#fff',
-                color: filterDate === '' ? '#fff' : 'inherit',
-                border: filterDate === '' ? '1px solid var(--brown)' : '1px solid var(--border)',
-                cursor: 'pointer',
-                padding: '0 12px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontFamily: 'inherit',
-                outline: 'none',
-                height: '38px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              Todos
-            </button>
-            <input 
-              className="date-input" 
-              type="date" 
-              value={filterDate} 
-              onChange={e => setFilterDate(e.target.value)} 
-              style={{
-                borderColor: filterDate !== '' ? 'var(--brown)' : 'var(--border)'
-              }}
-            />
-          </div>
-          <select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-            <option value="">Todos los estados</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Entregado">Entregado</option>
-          </select>
-          <button className="mi-ubicacion-btn" onClick={centrarEnMi}>📍 Mi ubicación</button>
-        </div>
-
-        <div className="map-wrap">
-          <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '380px', width: '100%' }}>
-            <TileLayer
-              attribution='&copy; OpenStreetMap'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker position={[adminPos.lat, adminPos.lng]} icon={adminIcon}>
-              <Popup><strong>Mi ubicación</strong></Popup>
-            </Marker>
-            {filteredOrders.map(p => (
-              <Marker key={p.id} position={[p.lat, p.lng]} icon={getIcon(p.estado)}>
-                <Popup>
-                  <div style={{fontFamily:'"DM Sans",sans-serif', fontSize:'13px', minWidth:'160px'}}>
-                    <strong style={{color:'#3D2B1F'}}>{p.nombre || 'Sin nombre'} ({renderPacks(p.paquete)})</strong><br/>
-                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>{p.direccion || 'Sin dirección'}</span><br/>
-                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>📞 {p.telefono || 'Sin teléfono'}</span><br/>
-                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>📅 {safeDate(p.fecha)} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</span><br/>
-                    <span style={{color:'#8B6F5A', fontSize:'11px'}}>💳 {p.pago || 'No especificado'}</span>
-                    {p.comprobante && (
-                      <div><a href={`${API_URL}/uploads/${p.comprobante}`} target="_blank" rel="noreferrer">Ver comprobante</a></div>
-                    )}
-                    <div style={{marginTop: '10px', display: 'flex', gap: '5px'}}>
-                      {p.estado === 'Pendiente' && <button onClick={() => changeStatus(p.id, 'Entregado')} style={{padding:'4px', cursor:'pointer'}}>Entregado</button>}
-                      {p.estado === 'Entregado' && <button onClick={() => changeStatus(p.id, 'Pendiente')} style={{padding:'4px', cursor:'pointer'}}>Pendiente</button>}
-                      <button onClick={() => openDeleteConfirm(p)} style={{padding:'4px', cursor:'pointer', color:'#B71C1C', background: '#FFF0F0', border: '1px solid #FFCDD2', borderRadius: '4px'}}>🗑 Eliminar</button>
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
-
-        <div className="leyenda">
-          <span style={{fontSize:'12px', color:'var(--muted)', fontWeight:500, marginRight:'4px'}}>Referencias:</span>
-          <div className="leyenda-item"><div className="dot dot-pendiente"></div> Pendiente</div>
-          <div className="leyenda-item"><div className="dot dot-entregado"></div> Entregado</div>
-          <div className="leyenda-item"><div className="dot dot-admin"></div> Mi ubicación</div>
-        </div>
-
-        <div className="pedidos-cercanos">
-          <div className="pedidos-cercanos-header">{filteredOrders.length} pedido{filteredOrders.length !== 1 ? 's' : ''} en el mapa</div>
-          <div>
-            {!filteredOrders.length ? (
-              <div style={{padding:'20px', textAlign:'center', color:'var(--muted)', fontSize:'13px'}}>No hay pedidos para mostrar</div>
-            ) : (
-              filteredOrders.map(p => (
-                <div key={p.id} className="pedido-item" onClick={() => {
-                  setMapCenter([p.lat, p.lng]);
-                  setMapZoom(16);
-                  setSelectedOrder(p);
-                }}>
-                  <div className="pedido-item-left">
-                    <div className="pedido-dot" style={{background: p.estado==='Entregado' ? '#2E7D32' : '#F57F17'}}></div>
-                    <div>
-                      <div className="pedido-nombre">{p.nombre || 'Sin nombre'} ({renderPacks(p.paquete)})</div>
-                      <div className="pedido-dir">{p.direccion || 'Sin dirección'} | {p.pago || 'No especificado'}</div>
-                      <div className="pedido-dir" style={{marginTop:'2px', fontWeight: 500}}>📅 {safeDate(p.fecha)} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</div>
-                    </div>
-                  </div>
-                  <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:'4px'}}>
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                      <span className="badge" style={{ background: p.estadoPago === 'Pagado' ? '#e8f5e9' : '#fff3e0', color: p.estadoPago === 'Pagado' ? '#2E7D32' : '#F57F17' }}>
-                        💲 {p.estadoPago === 'Pagado' ? 'Pagado' : 'Pendiente'}
-                      </span>
-                      <span className={`badge ${p.estado==='Entregado' ? 'badge-entregado' : 'badge-pendiente'}`}>{p.estado}</span>
-                    </div>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const url = (p.lat != null && p.lng != null) 
-                          ? `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`
-                          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.direccion)}`;
-                        window.open(url, '_blank', 'noopener,noreferrer');
-                      }}
-                      style={{
-                        background: '#f9f9f9',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px',
-                        padding: '4px 8px',
-                        fontSize: '11px',
-                        cursor: 'pointer',
-                        color: '#333'
-                      }}
-                    >
-                      📍 Navegar
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-
-      {selectedOrder && (
-        <div 
-          style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', boxSizing: 'border-box' }}
-          onClick={() => setSelectedOrder(null)}
-        >
-          <div 
-            style={{ background: '#fff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '420px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 8px 30px rgba(0,0,0,0.2)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button onClick={() => setSelectedOrder(null)} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--brown)' }}>✕</button>
-            <h2 style={{ color: 'var(--brown)', marginTop: 0, marginBottom: '15px', fontSize: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>Detalle del Pedido</h2>
-            
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Cliente:</strong> {selectedOrder.nombre || 'No disponible'}</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Teléfono:</strong> {selectedOrder.telefono || 'No disponible'}</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Dirección:</strong> {selectedOrder.direccion || 'No disponible'}</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Fecha y hora:</strong> {safeDate(selectedOrder.fecha)} ({selectedOrder.desde || '--'} a {selectedOrder.hasta || '--'})</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Packs:</strong> {renderPacks(selectedOrder.paquete)}</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}><strong style={{ color: 'var(--brown)' }}>Total:</strong> ${(selectedOrder.total || calcularTotal(selectedOrder.paquete)).toLocaleString('es-AR')}</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#555' }}>
-              <strong style={{ color: 'var(--brown)' }}>Método de pago:</strong> {selectedOrder.pago || 'No disponible'} 
-              {selectedOrder.comprobante && <a href={`${API_URL}/uploads/${selectedOrder.comprobante}`} target="_blank" rel="noreferrer" style={{color: 'var(--gold)', marginLeft: '5px', textDecoration: 'underline'}}>Ver comprobante</a>}
-            </p>
-            
-            <div style={{ display: 'flex', gap: '10px', marginTop: '15px', alignItems: 'center' }}>
-              <div style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${selectedOrder.estadoPago === 'Pagado' ? '#2E7D32' : '#F57F17'}`, background: selectedOrder.estadoPago === 'Pagado' ? '#e8f5e9' : '#fff3e0', textAlign: 'center', fontSize: '14px' }}>
-                <strong style={{ color: selectedOrder.estadoPago === 'Pagado' ? '#2E7D32' : '#F57F17' }}>Pago: {selectedOrder.estadoPago || 'Pendiente'}</strong>
-              </div>
-              <div style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${selectedOrder.estado === 'Entregado' ? '#2E7D32' : '#F57F17'}`, background: selectedOrder.estado === 'Entregado' ? '#e8f5e9' : '#fff3e0', textAlign: 'center', fontSize: '14px' }}>
-                <strong style={{ color: selectedOrder.estado === 'Entregado' ? '#2E7D32' : '#F57F17' }}>Entrega: {selectedOrder.estado}</strong>
-              </div>
+      {activeTab === 'pedidos' && (
+        <div className="content">
+          <div className="filters">
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => setFilterDate('')}
+                style={{ background: filterDate === '' ? 'var(--brown)' : '#fff', color: filterDate === '' ? '#fff' : 'inherit', border: filterDate === '' ? '1px solid var(--brown)' : '1px solid var(--border)', cursor: 'pointer', padding: '0 12px', borderRadius: '8px', fontSize: '14px', fontFamily: 'inherit', outline: 'none', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >Todos</button>
+              <input className="date-input" type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)}
+                style={{ borderColor: filterDate !== '' ? 'var(--brown)' : 'var(--border)' }} />
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
-              <button 
-                onClick={() => {
-                  const phoneDigits = String(selectedOrder.telefono || '').replace(/\D/g, '');
-                  const phoneStr = phoneDigits.startsWith('54') ? phoneDigits.slice(2) : phoneDigits;
-                  const packsStr = renderPacks(selectedOrder.paquete);
-                  const fechaStr = safeDate(selectedOrder.fecha);
-                  const msg = `Hola ${selectedOrder.nombre || ''}, tu pedido de ${packsStr} está confirmado para el ${fechaStr} entre ${selectedOrder.desde || '--'} y ${selectedOrder.hasta || '--'}. 🥐`;
-                  window.open(`https://wa.me/54${phoneStr}?text=${encodeURIComponent(msg)}`, '_blank');
-                }}
-                style={{ background: '#25D366', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', fontFamily: '"DM Sans", sans-serif' }}
-              >Confirmar por WhatsApp</button>
-              
-              <button 
-                onClick={() => {
-                  const url = (selectedOrder.lat != null && selectedOrder.lng != null) 
-                    ? `https://www.google.com/maps/dir/?api=1&destination=${selectedOrder.lat},${selectedOrder.lng}`
-                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedOrder.direccion)}`;
-                  window.open(url, '_blank', 'noopener,noreferrer');
-                }}
-                style={{ background: '#1976D2', color: '#fff', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', fontFamily: '"DM Sans", sans-serif' }}
-              >📍 Navegar</button>
-
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button 
-                  onClick={() => changePaymentStatus(selectedOrder.id, selectedOrder.estadoPago === 'Pagado' ? 'Pendiente' : 'Pagado')}
-                  style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid var(--border)', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontFamily: '"DM Sans", sans-serif', fontWeight: 500 }}
-                >Marcar como {selectedOrder.estadoPago === 'Pagado' ? 'Pendiente de pago' : 'Pagado'}</button>
-                <button 
-                  onClick={() => changeStatus(selectedOrder.id, selectedOrder.estado === 'Entregado' ? 'Pendiente' : 'Entregado')}
-                  style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid var(--border)', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontFamily: '"DM Sans", sans-serif', fontWeight: 500 }}
-                >Marcar como {selectedOrder.estado === 'Entregado' ? 'Pendiente' : 'Entregado'}</button>
-              </div>
-
-              <button 
-                onClick={() => archiveOrder(selectedOrder)}
-                style={{ 
-                  marginTop: '10px',
-                  width: '100%', 
-                  background: '#FFF3E0', 
-                  color: '#E65100', 
-                  border: '1px solid #FFCC80', 
-                  padding: '12px', 
-                  borderRadius: '8px', 
-                  cursor: 'pointer', 
-                  fontWeight: 600, 
-                  fontSize: '14px', 
-                  fontFamily: '"DM Sans", sans-serif',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
-                }}
-              >📦 Archivar pedido</button>
-            </div>
+            <select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+              <option value="">Todos los estados</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Entregado">Entregado</option>
+            </select>
+            <button className="mi-ubicacion-btn" onClick={centrarEnMi}>📍 Mi ubicación</button>
           </div>
+
+          <MapView
+            filteredOrders={filteredOrders}
+            mapCenter={mapCenter} mapZoom={mapZoom}
+            adminPos={adminPos}
+            renderPacks={renderPacks} safeDate={safeDate}
+            changeStatus={changeStatus} openDeleteConfirm={openDeleteConfirm}
+            API_URL={API_URL}
+          />
+
+          <div className="leyenda">
+            <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500, marginRight: '4px' }}>Referencias:</span>
+            <div className="leyenda-item"><div className="dot dot-pendiente" /> Pendiente</div>
+            <div className="leyenda-item"><div className="dot dot-entregado" /> Entregado</div>
+            <div className="leyenda-item"><div className="dot dot-admin" /> Mi ubicación</div>
+          </div>
+
+          <OrderTable
+            filteredOrders={filteredOrders}
+            setSelectedOrder={setSelectedOrder}
+            setMapCenter={setMapCenter} setMapZoom={setMapZoom}
+            renderPacks={renderPacks} safeDate={safeDate}
+          />
         </div>
       )}
 
-      {orderToDelete && (
-        <div 
-          style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
-          onClick={() => setOrderToDelete(null)}
-        >
-          <div 
-            style={{ background: '#fff', borderRadius: '16px', padding: '30px', width: '100%', maxWidth: '380px', textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ fontSize: '50px', marginBottom: '15px' }}>⚠️</div>
-            <h3 style={{ color: 'var(--brown)', margin: '0 0 10px 0', fontSize: '22px' }}>¿Eliminar pedido?</h3>
-            <p style={{ color: '#666', fontSize: '14px', lineHeight: '1.5', margin: '0 0 25px 0' }}>
-              Esta acción no se puede deshacer. El pedido de <strong>{orderToDelete.nombre}</strong> será eliminado permanentemente.
-            </p>
-            
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button 
-                onClick={() => {
-                  const originalOrder = orderToDelete;
-                  setOrderToDelete(null);
-                  setSelectedOrder(originalOrder); // Reopen detail modal
-                }}
-                style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #ddd', background: '#f5f5f5', color: '#666', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
-              >Cancelar</button>
-              <button 
-                onClick={() => deleteOrder(orderToDelete.id)}
-                style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#B71C1C', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
-              >Sí, eliminar</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {activeTab === 'reportes' && <ReportsView orders={orders} calcularTotal={calcularTotal} />}
+      {activeTab === 'precios' && <PricesView />}
+      {activeTab === 'archivados' && <ArchivedView />}
+
+      <OrderModal
+        selectedOrder={selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        changeStatus={changeStatus}
+        changePaymentStatus={changePaymentStatus}
+        archiveOrder={archiveOrder}
+        renderPacks={renderPacks}
+        safeDate={safeDate}
+        calcularTotal={calcularTotal}
+      />
+
+      <DeleteConfirmModal
+        orderToDelete={orderToDelete}
+        onCancel={() => { setOrderToDelete(null); setSelectedOrder(orderToDelete); }}
+        onConfirm={async (id) => { await deleteOrder(id); setOrderToDelete(null); setSelectedOrder(null); }}
+      />
+
       {archiveToast && (
-        <div style={{
-          position: 'fixed',
-          bottom: '24px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 11000,
-          background: '#2D2012',
-          color: '#fff',
-          borderRadius: '12px',
-          padding: '0',
-          width: 'calc(100% - 32px)',
-          maxWidth: '420px',
-          boxShadow: '0 6px 24px rgba(0,0,0,0.35)',
-          overflow: 'hidden',
-          fontFamily: '"DM Sans", sans-serif'
-        }}>
+        <div style={{ position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 11000, background: '#2D2012', color: '#fff', borderRadius: '12px', padding: '0', width: 'calc(100% - 32px)', maxWidth: '420px', boxShadow: '0 6px 24px rgba(0,0,0,0.35)', overflow: 'hidden', fontFamily: '"DM Sans", sans-serif' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
             <span style={{ fontSize: '14px', fontWeight: 500 }}>📦 Pedido archivado</span>
-            <button
-              onClick={undoArchive}
-              style={{
-                background: '#C4922A',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '6px 14px',
-                fontWeight: 700,
-                fontSize: '13px',
-                cursor: 'pointer',
-                fontFamily: '"DM Sans", sans-serif',
-                letterSpacing: '0.3px'
-              }}
-            >Deshacer</button>
+            <button onClick={undoArchive} style={{ background: '#C4922A', color: '#fff', border: 'none', borderRadius: '8px', padding: '6px 14px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', fontFamily: '"DM Sans", sans-serif', letterSpacing: '0.3px' }}>Deshacer</button>
           </div>
           <div style={{ height: '4px', background: 'rgba(255,255,255,0.15)', borderRadius: '0 0 12px 12px' }}>
-            <div style={{
-              height: '100%',
-              width: `${progressWidth}%`,
-              background: '#C4922A',
-              transition: 'width 0.05s linear',
-              borderRadius: '0 0 0 12px'
-            }} />
+            <div style={{ height: '100%', width: `${progressWidth}%`, background: '#C4922A', transition: 'width 0.05s linear', borderRadius: '0 0 0 12px' }} />
           </div>
         </div>
       )}
