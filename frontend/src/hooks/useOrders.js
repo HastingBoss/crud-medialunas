@@ -12,6 +12,7 @@ export default function useOrders() {
   const archiveProgressRef = useRef(null);
 
   const [stock, setStock] = useState(0);
+  const [threshold, setThreshold] = useState(10);
 
   const fetchPrices = async () => {
     try {
@@ -26,15 +27,21 @@ export default function useOrders() {
     try {
       const res = await axios.get(`${API_URL}/api/stock`);
       setStock(res.data.stock);
+      setThreshold(res.data.threshold || 10);
     } catch (err) {
       console.error('Error fetching stock:', err);
     }
   };
 
-  const updateStockAPI = async (newValue) => {
+  const updateStockAPI = async (newValue, newThreshold) => {
     try {
-      await axios.put(`${API_URL}/api/stock`, { value: newValue });
-      setStock(newValue);
+      const payload = {};
+      if (newValue !== undefined) payload.value = newValue;
+      if (newThreshold !== undefined) payload.threshold = newThreshold;
+      
+      const res = await axios.put(`${API_URL}/api/stock`, payload);
+      setStock(res.data.stock);
+      setThreshold(res.data.threshold);
     } catch (err) {
       console.error('Error updating stock:', err);
     }
@@ -215,6 +222,6 @@ export default function useOrders() {
     reprogramarOrder,
     archiveToast, progressWidth,
     calcularTotal, calcularUnidades,
-    stock, updateStockAPI,
+    stock, threshold, updateStockAPI,
   };
 }

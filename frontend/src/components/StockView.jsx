@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 
-export default function StockView({ orders, stock, updateStockAPI, calcularUnidades }) {
+export default function StockView({ orders, stock, threshold, updateStockAPI, calcularUnidades }) {
   const [newStockValue, setNewStockValue] = useState('');
+  const [newThreshold, setNewThreshold] = useState(threshold);
 
   const handleUpdate = () => {
-    const val = parseInt(newStockValue, 10);
-    if (isNaN(val)) {
-      alert('Ingresá un número válido');
+    const val = newStockValue === '' ? undefined : parseInt(newStockValue, 10);
+    if (newStockValue !== '' && isNaN(val)) {
+      alert('Ingresá un número válido para el stock');
       return;
     }
-    updateStockAPI(val);
+    updateStockAPI(val, parseInt(newThreshold, 10));
     setNewStockValue('');
   };
 
@@ -44,24 +45,35 @@ export default function StockView({ orders, stock, updateStockAPI, calcularUnida
           </div>
 
           {/* Card Actualizar Stock */}
-          <div style={{ background: '#fdf8f5', borderRadius: '14px', padding: '20px', border: '1px solid var(--border)', flex: '1 1 250px' }}>
-            <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '12px' }}>Ingreso Manual</div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <input 
-                type="number" 
-                placeholder="Ej: 100"
-                value={newStockValue}
-                onChange={e => setNewStockValue(e.target.value)}
-                style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1.5px solid var(--border)', outline: 'none', fontSize: '15px' }}
-              />
+          <div style={{ background: '#fdf8f5', borderRadius: '14px', padding: '20px', border: '1px solid var(--border)', flex: '1 1 350px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '12px' }}>Configuración de Stock</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div style={{ fontSize: '13px', color: 'var(--brown)', width: '120px' }}>Nuevo Stock:</div>
+                <input 
+                  type="number" 
+                  placeholder="Ej: 100"
+                  value={newStockValue}
+                  onChange={e => setNewStockValue(e.target.value)}
+                  style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border)', outline: 'none', fontSize: '14px' }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div style={{ fontSize: '13px', color: 'var(--brown)', width: '120px' }}>Alerta en:</div>
+                <input 
+                  type="number" 
+                  value={newThreshold}
+                  onChange={e => setNewThreshold(e.target.value)}
+                  style={{ flex: 1, padding: '10px', borderRadius: '10px', border: '1.5px solid var(--border)', outline: 'none', fontSize: '14px' }}
+                />
+              </div>
               <button 
                 onClick={handleUpdate}
-                style={{ background: 'var(--brown)', color: '#fff', border: 'none', padding: '0 20px', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}
+                style={{ background: 'var(--brown)', color: '#fff', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', marginTop: '4px' }}
               >
-                Actualizar
+                Guardar cambios
               </button>
             </div>
-            <p style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '10px' }}>* Se descontará automáticamente al entregar pedidos.</p>
           </div>
         </div>
       </div>

@@ -15,6 +15,7 @@ import ReportsView from '../components/ReportsView.jsx';
 import PricesView from '../components/PricesView.jsx';
 import ArchivedView from '../components/ArchivedView.jsx';
 import StockView from '../components/StockView.jsx';
+import StockAlert from '../components/StockAlert.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -243,6 +244,8 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      <StockAlert stock={stock} threshold={threshold} />
     </div>
   );
 }
