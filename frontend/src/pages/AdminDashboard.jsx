@@ -30,7 +30,7 @@ export default function AdminDashboard() {
   const { 
     orders, fetchOrders, changeStatus, changePaymentStatus, deleteOrder, 
     archiveOrder, undoArchive, archiveToast, progressWidth, 
-    calcularTotal, reprogramarOrder, stock, updateStockAPI, calcularUnidades 
+    calcularTotal, reprogramarOrder, stock, threshold, updateStockAPI, calcularUnidades 
   } = useOrders();
 
   const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
