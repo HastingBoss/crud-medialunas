@@ -24,6 +24,7 @@ export default function UserForm() {
   const [dateError, setDateError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [comprobanteEnviado, setComprobanteEnviado] = useState(false);
+  const [anticipationError, setAnticipationError] = useState(false);
 
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -67,19 +68,32 @@ export default function UserForm() {
   };
 
   const today = new Date();
-  const next7Days = Array.from({length: 7}, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    return d;
-  });
   const formatDateISO = (d) => {
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
   };
+  const todayISO = formatDateISO(today);
+  const tomorrowObj = new Date(today);
+  tomorrowObj.setDate(today.getDate() + 1);
+
+  useEffect(() => {
+    if (formData.fecha === todayISO) {
+      setFormData(prev => ({ ...prev, fecha: '' }));
+      setAnticipationError(true);
+    } else if (formData.fecha) {
+      setAnticipationError(false);
+    }
+  }, [formData.fecha, todayISO]);
+
+  const next7Days = Array.from({length: 7}, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    return d;
+  });
   const daysStr = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-  const minDate = formatDateISO(today);
+  const minDate = formatDateISO(tomorrowObj);
   const maxDateObj = new Date(today);
   maxDateObj.setDate(today.getDate() + 30);
   const maxDate = formatDateISO(maxDateObj);
@@ -380,11 +394,18 @@ export default function UserForm() {
                   {next7Days.map(d => {
                     const iso = formatDateISO(d);
                     const isSelected = formData.fecha === iso;
+                    const isToday = iso === todayISO;
                     return (
                       <button 
                         key={iso}
                         type="button"
-                        onClick={() => { handleInputChange('fecha', iso); setDateError(false); }}
+                        onClick={() => { 
+                          if (isToday) return;
+                          handleInputChange('fecha', iso); 
+                          setDateError(false);
+                          setAnticipationError(false);
+                        }}
+                        disabled={isToday}
                         style={{
                           flex: '0 0 auto',
                           minWidth: '60px',
@@ -393,7 +414,8 @@ export default function UserForm() {
                           border: isSelected ? '2px solid var(--brown)' : '1px solid var(--border)',
                           background: isSelected ? '#fdf8f5' : '#fff',
                           color: isSelected ? 'var(--brown)' : 'inherit',
-                          cursor: 'pointer',
+                          cursor: isToday ? 'not-allowed' : 'pointer',
+                          opacity: isToday ? 0.4 : 1,
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
@@ -436,7 +458,7 @@ export default function UserForm() {
                   setDateError(false);
                 }
               }}
-              minDate={today}
+              minDate={tomorrowObj}
               maxDate={maxDateObj}
               locale={es}
               dateFormat="dd/MM/yyyy"
@@ -458,6 +480,7 @@ export default function UserForm() {
           </div>
         )}
         {dateError && <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>Debe seleccionar una fecha.</div>}
+        {anticipationError && <div style={{ color: 'red', fontSize: '12px', marginTop: '5px', fontWeight: 600 }}>Los pedidos deben realizarse con al menos 24hs de anticipación.</div>}
 
         <p className="section-title" style={{marginTop:'22px'}}>Horario de entrega{horarioCompleto && <CheckMark />}</p>
 
@@ -468,10 +491,9 @@ export default function UserForm() {
               <label className="field-label">Desde</label>
               <select value={formData.desde} onChange={e => handleInputChange('desde', e.target.value)}>
                 <option value="" disabled hidden>Hora...</option>
-                {Array.from({length: 13}, (_, i) => {
-                  const h = `${String(i + 8).padStart(2, '0')}:00`;
-                  return <option key={h} value={h}>{h}</option>;
-                })}
+                {['08:00', '08:30', '09:00', '09:30', '10:00'].map(h => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
               </select>
             </div>
             <div className="horario-sep">—</div>
@@ -479,10 +501,9 @@ export default function UserForm() {
               <label className="field-label">Hasta</label>
               <select value={formData.hasta} onChange={e => handleInputChange('hasta', e.target.value)}>
                 <option value="" disabled hidden>Hora...</option>
-                {Array.from({length: 13}, (_, i) => {
-                  const h = `${String(i + 8).padStart(2, '0')}:00`;
-                  return <option key={h} value={h}>{h}</option>;
-                })}
+                {['08:00', '08:30', '09:00', '09:30', '10:00'].map(h => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
               </select>
             </div>
           </div>

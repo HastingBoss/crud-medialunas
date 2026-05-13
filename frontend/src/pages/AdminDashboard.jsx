@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -24,6 +24,10 @@ export default function AdminDashboard() {
   const [mapZoom, setMapZoom] = useState(13);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderToDelete, setOrderToDelete] = useState(null);
+  const [archiveToast, setArchiveToast] = useState(null); // { order, startTime }
+  const archiveTimerRef = useRef(null);
+  const archiveProgressRef = useRef(null);
+  const [progressWidth, setProgressWidth] = useState(100);
 
   const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('adminAuth') === 'true');
   const [password, setPassword] = useState('');
@@ -130,6 +134,72 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const commitArchive = async (order) => {
+    try {
+      await axios.put(`${API_URL}/api/orders/${order.id}/status`, { archivado: true });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const archiveOrder = (order) => {
+    // If there's already a pending toast, commit it immediately
+    if (archiveTimerRef.current) {
+      clearTimeout(archiveTimerRef.current);
+      clearInterval(archiveProgressRef.current);
+      archiveTimerRef.current = null;
+      archiveProgressRef.current = null;
+      setArchiveToast(prev => {
+        if (prev) commitArchive(prev.order);
+        return null;
+      });
+    }
+
+    // Optimistic: remove from list, close modal
+    setOrders(prev => prev.filter(o => o.id !== order.id));
+    setSelectedOrder(null);
+    setProgressWidth(100);
+    setArchiveToast({ order });
+
+    // Animate progress bar
+    const DURATION = 5000;
+    const INTERVAL = 50;
+    let elapsed = 0;
+    archiveProgressRef.current = setInterval(() => {
+      elapsed += INTERVAL;
+      const pct = Math.max(0, 100 - (elapsed / DURATION) * 100);
+      setProgressWidth(pct);
+      if (elapsed >= DURATION) {
+        clearInterval(archiveProgressRef.current);
+        archiveProgressRef.current = null;
+      }
+    }, INTERVAL);
+
+    // Commit after 5s
+    archiveTimerRef.current = setTimeout(() => {
+      archiveTimerRef.current = null;
+      clearInterval(archiveProgressRef.current);
+      archiveProgressRef.current = null;
+      commitArchive(order);
+      setArchiveToast(null);
+    }, DURATION);
+  };
+
+  const undoArchive = () => {
+    if (archiveTimerRef.current) {
+      clearTimeout(archiveTimerRef.current);
+      archiveTimerRef.current = null;
+    }
+    if (archiveProgressRef.current) {
+      clearInterval(archiveProgressRef.current);
+      archiveProgressRef.current = null;
+    }
+    setArchiveToast(prev => {
+      if (prev) setOrders(cur => [prev.order, ...cur]);
+      return null;
+    });
   };
 
   const openDeleteConfirm = (order) => {
@@ -405,13 +475,13 @@ export default function AdminDashboard() {
               </div>
 
               <button 
-                onClick={() => openDeleteConfirm(selectedOrder)}
+                onClick={() => archiveOrder(selectedOrder)}
                 style={{ 
                   marginTop: '10px',
                   width: '100%', 
-                  background: '#FFF0F0', 
-                  color: '#B71C1C', 
-                  border: '1px solid #FFCDD2', 
+                  background: '#FFF3E0', 
+                  color: '#E65100', 
+                  border: '1px solid #FFCC80', 
                   padding: '12px', 
                   borderRadius: '8px', 
                   cursor: 'pointer', 
@@ -423,7 +493,7 @@ export default function AdminDashboard() {
                   justifyContent: 'center',
                   gap: '8px'
                 }}
-              >🗑 Eliminar pedido</button>
+              >📦 Archivar pedido</button>
             </div>
           </div>
         </div>
@@ -458,6 +528,52 @@ export default function AdminDashboard() {
                 style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#B71C1C', color: '#fff', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
               >Sí, eliminar</button>
             </div>
+          </div>
+        </div>
+      )}
+      {archiveToast && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 11000,
+          background: '#2D2012',
+          color: '#fff',
+          borderRadius: '12px',
+          padding: '0',
+          width: 'calc(100% - 32px)',
+          maxWidth: '420px',
+          boxShadow: '0 6px 24px rgba(0,0,0,0.35)',
+          overflow: 'hidden',
+          fontFamily: '"DM Sans", sans-serif'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px' }}>
+            <span style={{ fontSize: '14px', fontWeight: 500 }}>📦 Pedido archivado</span>
+            <button
+              onClick={undoArchive}
+              style={{
+                background: '#C4922A',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '6px 14px',
+                fontWeight: 700,
+                fontSize: '13px',
+                cursor: 'pointer',
+                fontFamily: '"DM Sans", sans-serif',
+                letterSpacing: '0.3px'
+              }}
+            >Deshacer</button>
+          </div>
+          <div style={{ height: '4px', background: 'rgba(255,255,255,0.15)', borderRadius: '0 0 12px 12px' }}>
+            <div style={{
+              height: '100%',
+              width: `${progressWidth}%`,
+              background: '#C4922A',
+              transition: 'width 0.05s linear',
+              borderRadius: '0 0 0 12px'
+            }} />
           </div>
         </div>
       )}
