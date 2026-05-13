@@ -89,15 +89,15 @@ exports.getOrders = (req, res) => {
 
 exports.updateOrderStatus = (req, res) => {
   const { id } = req.params;
-  const { estado, estadoPago } = req.body;
+  const updates = req.body;
   
   const orderIndex = orders.findIndex(o => o.id === id);
   if (orderIndex === -1) {
     return res.status(404).json({ message: 'Pedido no encontrado' });
   }
   
-  if (estado !== undefined) orders[orderIndex].estado = estado;
-  if (estadoPago !== undefined) orders[orderIndex].estadoPago = estadoPago;
+  // Actualizar cualquier campo que venga en el body
+  orders[orderIndex] = { ...orders[orderIndex], ...updates };
   
   res.json({ message: 'Pedido actualizado', order: orders[orderIndex] });
 };

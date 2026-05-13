@@ -89,6 +89,7 @@ export default function AdminDashboard() {
   };
 
   const filteredOrders = orders.filter(p => {
+    if (p.archivado) return false;
     const orderDate = p.fecha ? String(p.fecha).split('T')[0] : '';
     return (!filterDate || orderDate === filterDate) && (!filterStatus || p.estado === filterStatus);
   });
@@ -190,7 +191,14 @@ export default function AdminDashboard() {
       <div className="content">
         {activeTab === 'reportes' && <ReportsView orders={orders} calcularTotal={calcularTotal} />}
         {activeTab === 'precios' && <PricesView />}
-        {activeTab === 'archivados' && <ArchivedView />}
+        {activeTab === 'archivados' && (
+          <ArchivedView 
+            orders={orders} 
+            deleteOrder={deleteOrder} 
+            reprogramarOrder={reprogramarOrder} 
+            calcularTotal={calcularTotal} 
+          />
+        )}
       </div>
 
       <OrderModal

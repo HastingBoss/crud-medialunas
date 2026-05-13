@@ -78,6 +78,8 @@ export default function useOrders() {
   const commitArchive = async (order) => {
     try {
       await axios.put(`${API_URL}/api/orders/${order.id}/status`, { archivado: true });
+      // Update local state to mark as archived
+      setOrders(prev => prev.map(o => o.id === order.id ? { ...o, archivado: true } : o));
     } catch (err) {
       console.error(err);
     }
@@ -89,10 +91,16 @@ export default function useOrders() {
       clearInterval(archiveProgressRef.current);
       archiveTimerRef.current = null;
       archiveProgressRef.current = null;
-      setArchiveToast(prev => { if (prev) commitArchive(prev.order); return null; });
+      // If there was a previous pending archive, commit it now
+      setArchiveToast(prev => { 
+        if (prev) commitArchive(prev.order); 
+        return null; 
+      });
     }
 
-    setOrders(prev => prev.filter(o => o.id !== order.id));
+    // Optimistically mark as archived in local state (to hide from main view)
+    setOrders(prev => prev.map(o => o.id === order.id ? { ...o, archivado: true } : o));
+    
     if (onClose) onClose();
     setProgressWidth(100);
     setArchiveToast({ order });
@@ -122,7 +130,31 @@ export default function useOrders() {
   const undoArchive = () => {
     if (archiveTimerRef.current) { clearTimeout(archiveTimerRef.current); archiveTimerRef.current = null; }
     if (archiveProgressRef.current) { clearInterval(archiveProgressRef.current); archiveProgressRef.current = null; }
-    setArchiveToast(prev => { if (prev) setOrders(cur => [prev.order, ...cur]); return null; });
+    setArchiveToast(prev => { 
+      if (prev) {
+        // Revert local state
+        setOrders(cur => cur.map(o => o.id === prev.order.id ? { ...o, archivado: false } : o));
+      }
+      return null; 
+    });
+  };
+
+  const reprogramarOrder = async (id, nuevaFecha, nuevoDesde, nuevoHasta) => {
+    try {
+      const updateData = {
+        fecha: nuevaFecha,
+        desde: nuevoDesde,
+        hasta: nuevoHasta,
+        estado: 'Pendiente',
+        archivado: false
+      };
+      await axios.put(`${API_URL}/api/orders/${id}/status`, updateData);
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updateData } : o));
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   };
 
   return {
@@ -130,6 +162,7 @@ export default function useOrders() {
     changeStatus, changePaymentStatus,
     deleteOrder,
     archiveOrder, undoArchive,
+    reprogramarOrder,
     archiveToast, progressWidth,
     calcularTotal,
   };
