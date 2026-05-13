@@ -25,7 +25,7 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function AdminDashboard() {
-  const { orders, fetchOrders, changeStatus, changePaymentStatus, deleteOrder, archiveOrder, undoArchive, archiveToast, progressWidth, calcularTotal } = useOrders();
+  const { orders, fetchOrders, changeStatus, changePaymentStatus, deleteOrder, archiveOrder, undoArchive, archiveToast, progressWidth, calcularTotal, reprogramarOrder } = useOrders();
 
   const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
   const [filterStatus, setFilterStatus] = useState('');
