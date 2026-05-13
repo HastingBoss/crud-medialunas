@@ -6,7 +6,7 @@ import leafletIconRetina from 'leaflet/dist/images/marker-icon-2x.png';
 import leafletIcon from 'leaflet/dist/images/marker-icon.png';
 import leafletShadow from 'leaflet/dist/images/marker-shadow.png';
 
-import useOrders, { calcularTotal } from '../hooks/useOrders.js';
+import useOrders from '../hooks/useOrders.js';
 import MapView from '../components/MapView.jsx';
 import OrderTable from '../components/OrderTable.jsx';
 import OrderModal from '../components/OrderModal.jsx';
@@ -25,7 +25,7 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function AdminDashboard() {
-  const { orders, fetchOrders, changeStatus, changePaymentStatus, deleteOrder, archiveOrder, undoArchive, archiveToast, progressWidth } = useOrders();
+  const { orders, fetchOrders, changeStatus, changePaymentStatus, deleteOrder, archiveOrder, undoArchive, archiveToast, progressWidth, calcularTotal } = useOrders();
 
   const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
   const [filterStatus, setFilterStatus] = useState('');
