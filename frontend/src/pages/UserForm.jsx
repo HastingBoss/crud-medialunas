@@ -21,8 +21,8 @@ export default function UserForm() {
     todayISO, tomorrowObj, next7Days, daysStr, formatDateISO, parseLocalDate, maxDateObj, getSelectedDateText,
     resumenLineas, total,
     packsCompletos, fechaCompleta, horarioCompleto, pagoCompleto, formValido, datosCompletos,
-    handleSubmit, handleAddressBlur,
-    precios, nombres,
+    handleSubmit, handleAddressBlur, selectSuggestion,
+    precios, nombres, addressSuggestions, isSearchingAddress,
   } = useOrderForm();
 
   const CheckMark = () => <span style={{ color: '#2E7D32', marginLeft: '8px', fontSize: '18px' }}>✓</span>;
