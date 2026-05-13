@@ -113,11 +113,12 @@ export default function useOrderForm() {
   };
 
   const formatAddress = (addr) => {
-    const { road, house_number, suburb, city, town, village } = addr;
+    const { road, house_number, suburb, city, town, village, county } = addr;
     const street = road || '';
     const num = house_number ? ` ${house_number}` : '';
     const local = suburb || city || town || village || '';
-    return `${street}${num}${local ? `, ${local}` : ''}`;
+    const mun = county ? `, ${county.replace('Partido de ', '').replace('Departamento de ', '')}` : '';
+    return `${street}${num}${local ? `, ${local}` : ''}${mun}`;
   };
 
   const handleInputChange = (field, value) => {
