@@ -87,12 +87,14 @@ export default function ArchivedView({ orders, deleteOrder, reprogramarOrder, ca
                   </td>
                   <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                      <button 
-                        onClick={() => handleOpenReprogram(o)}
-                        style={{ background: '#C4922A', color: '#fff', border: 'none', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
-                      >
-                        📅 Reprogramar
-                      </button>
+                      {o.estadoPago !== 'Pagado' && (
+                        <button 
+                          onClick={() => handleOpenReprogram(o)}
+                          style={{ background: '#C4922A', color: '#fff', border: 'none', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                        >
+                          📅 Reprogramar
+                        </button>
+                      )}
                       <button 
                         onClick={() => setOrderToDelete(o)}
                         style={{ background: '#fff', color: '#d32f2f', border: '1px solid #ffcdd2', padding: '6px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
