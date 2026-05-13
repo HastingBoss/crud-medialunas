@@ -5,6 +5,7 @@ import PackSelector from '../components/PackSelector.jsx';
 import TimeSelector from '../components/TimeSelector.jsx';
 import PaymentSelector from '../components/PaymentSelector.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
+import './UserForm.css';
 
 export default function UserForm() {
   const {
