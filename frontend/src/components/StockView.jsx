@@ -45,7 +45,7 @@ export default function StockView({ orders, stock, threshold, updateStockAPI, ca
           </div>
 
           {/* Card Actualizar Stock */}
-          <div style={{ background: '#fdf8f5', borderRadius: '14px', padding: '20px', border: '1px solid var(--border)', flex: '1 1 350px' }}>
+          <div style={{ background: '#fdf8f5', borderRadius: '14px', padding: '20px', border: '1px solid var(--border)', flex: '1 1 280px' }}>
             <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '12px' }}>Configuración de Stock</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>

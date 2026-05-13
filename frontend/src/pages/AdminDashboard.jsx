@@ -194,9 +194,16 @@ export default function AdminDashboard() {
         <div className="header-title">🥐 <span>Admin</span> Medialunas</div>
       </div>
 
-      <div className="tabs">
+      <div className="tabs" style={{ 
+        overflowX: 'auto', 
+        display: 'flex', 
+        whiteSpace: 'nowrap', 
+        paddingBottom: '2px',
+        msOverflowStyle: 'none',
+        scrollbarWidth: 'none'
+      }}>
         {TABS.map(t => (
-          <div key={t.id} className={`tab${activeTab === t.id ? ' active' : ''}`} onClick={() => setActiveTab(t.id)} style={{ cursor: 'pointer' }}>
+          <div key={t.id} className={`tab${activeTab === t.id ? ' active' : ''}`} onClick={() => setActiveTab(t.id)} style={{ cursor: 'pointer', flexShrink: 0 }}>
             {t.label}
           </div>
         ))}

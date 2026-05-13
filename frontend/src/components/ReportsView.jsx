@@ -49,10 +49,14 @@ export default function ReportsView({ orders, calcularTotal }) {
   const payTotal = dayEfectivo + dayTransferencia || 1;
 
   const MetricCard = ({ label, value, sub, isZero }) => (
-    <div style={{ background: '#fff', borderRadius: '12px', padding: '16px 20px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 140px', minWidth: '130px' }}>
-      <div style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px' }}>{label}</div>
-      <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--brown)', lineHeight: 1.1 }}>{value}</div>
-      {sub && <div style={{ fontSize: '12px', color: isZero ? '#d32f2f' : 'var(--muted)', fontWeight: isZero ? 500 : 400 }}>{sub}</div>}
+    <div style={{ 
+      background: '#fff', borderRadius: '12px', padding: '12px 14px', 
+      border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', 
+      gap: '2px', flex: '1 1 120px', minWidth: '120px' 
+    }}>
+      <div style={{ fontSize: '10px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.6px' }}>{label}</div>
+      <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--brown)', lineHeight: 1.1 }}>{value}</div>
+      {sub && <div style={{ fontSize: '11px', color: isZero ? '#d32f2f' : 'var(--muted)', fontWeight: isZero ? 500 : 400 }}>{sub}</div>}
     </div>
   );
 

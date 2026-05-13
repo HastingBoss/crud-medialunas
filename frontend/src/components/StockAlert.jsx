@@ -17,8 +17,10 @@ export default function StockAlert({ stock, threshold }) {
     <div style={{
       position: 'fixed',
       bottom: '30px',
-      right: '30px',
-      width: '320px',
+      right: '20px',
+      left: '20px',
+      maxWidth: '350px',
+      margin: '0 auto',
       background: '#fff',
       borderLeft: '6px solid #d32f2f',
       borderRadius: '12px',
