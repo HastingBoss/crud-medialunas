@@ -112,6 +112,14 @@ export default function useOrderForm() {
     return `✓ Entrega el ${daysStr[dateObj.getDay()]} ${d}/${m}/${y}`;
   };
 
+  const formatAddress = (addr) => {
+    const { road, house_number, suburb, city, town, village } = addr;
+    const street = road || '';
+    const num = house_number ? ` ${house_number}` : '';
+    const local = suburb || city || town || village || '';
+    return `${street}${num}${local ? `, ${local}` : ''}`;
+  };
+
   const handleInputChange = (field, value) => {
     if (field === 'pago') setComprobanteEnviado(false);
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -127,7 +135,12 @@ export default function useOrderForm() {
       searchTimeoutRef.current = setTimeout(async () => {
         try {
           const res = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&countrycodes=ar&format=json&limit=5&addressdetails=1`);
-          setAddressSuggestions(res.data);
+          // Formatear cada sugerencia
+          const formatted = res.data.map(s => ({
+            ...s,
+            cleanName: formatAddress(s.address)
+          }));
+          setAddressSuggestions(formatted);
         } catch (err) {
           console.error(err);
         } finally {
@@ -138,7 +151,7 @@ export default function useOrderForm() {
   };
 
   const selectSuggestion = (s) => {
-    setFormData(prev => ({ ...prev, direccion: s.display_name }));
+    setFormData(prev => ({ ...prev, direccion: s.cleanName }));
     setCoords({ lat: s.lat, lng: s.lon });
     setAddressSuggestions([]);
   };

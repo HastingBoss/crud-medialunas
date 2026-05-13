@@ -125,7 +125,7 @@ export default function UserForm() {
                     onMouseEnter={e => e.currentTarget.style.background = '#fdf8f5'}
                     onMouseLeave={e => e.currentTarget.style.background = '#fff'}
                   >
-                    📍 {s.display_name}
+                    📍 {s.cleanName}
                   </div>
                 ))}
               </div>
