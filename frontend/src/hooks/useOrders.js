@@ -11,6 +11,8 @@ export default function useOrders() {
   const archiveTimerRef = useRef(null);
   const archiveProgressRef = useRef(null);
 
+  const [stock, setStock] = useState(0);
+
   const fetchPrices = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/prices`);
@@ -18,6 +20,46 @@ export default function useOrders() {
     } catch (err) {
       console.error('Error fetching prices:', err);
     }
+  };
+
+  const fetchStock = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/stock`);
+      setStock(res.data.stock);
+    } catch (err) {
+      console.error('Error fetching stock:', err);
+    }
+  };
+
+  const updateStockAPI = async (newValue) => {
+    try {
+      await axios.put(`${API_URL}/api/stock`, { value: newValue });
+      setStock(newValue);
+    } catch (err) {
+      console.error('Error updating stock:', err);
+    }
+  };
+
+  const calcularUnidades = (paqueteData) => {
+    if (!paqueteData) return 0;
+    const unidadesMap = { 
+      'Pack Individual': 1, 
+      'Pack Media Docena': 6, 
+      'Pack Clásico': 12, 
+      'Pack Familiar': 24 
+    };
+    let totalUnidades = 0;
+    const paqueteStr = Array.isArray(paqueteData) ? paqueteData.join(', ') : String(paqueteData);
+    const items = paqueteStr.split(', ');
+    for (const item of items) {
+      const parts = item.split(' × ');
+      if (parts.length === 2) {
+        const qty = parseInt(parts[0], 10);
+        const type = parts[1];
+        totalUnidades += qty * (unidadesMap[type] || 0);
+      }
+    }
+    return totalUnidades;
   };
 
   const calcularTotal = (paqueteData) => {
@@ -40,6 +82,7 @@ export default function useOrders() {
 
   const fetchOrders = async () => {
     await fetchPrices();
+    await fetchStock();
     try {
       const res = await axios.get(`${API_URL}/api/orders`);
       setOrders(res.data);
@@ -50,8 +93,15 @@ export default function useOrders() {
 
   const changeStatus = async (id, status) => {
     try {
+      const order = orders.find(o => o.id === id);
       await axios.put(`${API_URL}/api/orders/${id}/status`, { estado: status });
       setOrders(prev => prev.map(o => o.id === id ? { ...o, estado: status } : o));
+
+      // Si se marca como entregado, descontar stock
+      if (status === 'Entregado' && order && order.estado !== 'Entregado') {
+        const unidades = calcularUnidades(order.paquete);
+        updateStockAPI(Math.max(0, stock - unidades));
+      }
     } catch (err) {
       console.error(err);
     }
@@ -164,6 +214,7 @@ export default function useOrders() {
     archiveOrder, undoArchive,
     reprogramarOrder,
     archiveToast, progressWidth,
-    calcularTotal,
+    calcularTotal, calcularUnidades,
+    stock, updateStockAPI,
   };
 }

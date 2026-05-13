@@ -14,6 +14,7 @@ import DeleteConfirmModal from '../components/DeleteConfirmModal.jsx';
 import ReportsView from '../components/ReportsView.jsx';
 import PricesView from '../components/PricesView.jsx';
 import ArchivedView from '../components/ArchivedView.jsx';
+import StockView from '../components/StockView.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -25,7 +26,11 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function AdminDashboard() {
-  const { orders, fetchOrders, changeStatus, changePaymentStatus, deleteOrder, archiveOrder, undoArchive, archiveToast, progressWidth, calcularTotal, reprogramarOrder } = useOrders();
+  const { 
+    orders, fetchOrders, changeStatus, changePaymentStatus, deleteOrder, 
+    archiveOrder, undoArchive, archiveToast, progressWidth, 
+    calcularTotal, reprogramarOrder, stock, updateStockAPI, calcularUnidades 
+  } = useOrders();
 
   const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
   const [filterStatus, setFilterStatus] = useState('');
@@ -127,6 +132,7 @@ export default function AdminDashboard() {
     { id: 'pedidos', label: 'Mapa y Pedidos' },
     { id: 'reportes', label: '📊 Reportes' },
     { id: 'precios', label: '💰 Precios' },
+    { id: 'stock', label: '📦 Stock' },
     { id: 'archivados', label: '📦 Archivados' },
   ];
 
@@ -191,6 +197,14 @@ export default function AdminDashboard() {
       <div className="content">
         {activeTab === 'reportes' && <ReportsView orders={orders} calcularTotal={calcularTotal} />}
         {activeTab === 'precios' && <PricesView />}
+        {activeTab === 'stock' && (
+          <StockView 
+            orders={orders} 
+            stock={stock} 
+            updateStockAPI={updateStockAPI} 
+            calcularUnidades={calcularUnidades} 
+          />
+        )}
         {activeTab === 'archivados' && (
           <ArchivedView 
             orders={orders} 
