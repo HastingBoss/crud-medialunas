@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export default function useOrders() {
   const [orders, setOrders] = useState([]);
-  const [prices, setPrices] = useState({ individual: 2200, media: 3800, clasico: 5500, familiar: 8000 });
+  const [prices, setPrices] = useState({ individual: 2200, media: 3800, clasico: 6800, familiar: 12500 });
   const [archiveToast, setArchiveToast] = useState(null);
   const [progressWidth, setProgressWidth] = useState(100);
   const archiveTimerRef = useRef(null);
@@ -50,7 +50,7 @@ export default function useOrders() {
   const calcularUnidades = (paqueteData) => {
     if (!paqueteData) return 0;
     const unidadesMap = { 
-      'Pack Individual': 1, 
+      'Pack Individual': 3, 
       'Pack Media Docena': 6, 
       'Pack Clásico': 12, 
       'Pack Familiar': 24 

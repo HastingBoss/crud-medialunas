@@ -2,8 +2,8 @@
 let prices = {
   individual: 2200,
   media: 3800,
-  clasico: 5500,
-  familiar: 8000
+  clasico: 6800,
+  familiar: 12500
 };
 
 exports.getPrices = (req, res) => {
