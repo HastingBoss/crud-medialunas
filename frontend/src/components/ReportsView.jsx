@@ -48,11 +48,11 @@ export default function ReportsView({ orders, calcularTotal }) {
 
   const payTotal = dayEfectivo + dayTransferencia || 1;
 
-  const MetricCard = ({ label, value, sub }) => (
+  const MetricCard = ({ label, value, sub, isZero }) => (
     <div style={{ background: '#fff', borderRadius: '12px', padding: '16px 20px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '4px', flex: '1 1 140px', minWidth: '130px' }}>
-      <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</div>
-      <div style={{ fontSize: '26px', fontWeight: 700, color: 'var(--brown)', lineHeight: 1.1 }}>{value}</div>
-      {sub && <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{sub}</div>}
+      <div style={{ fontSize: '11px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px' }}>{label}</div>
+      <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--brown)', lineHeight: 1.1 }}>{value}</div>
+      {sub && <div style={{ fontSize: '12px', color: isZero ? '#d32f2f' : 'var(--muted)', fontWeight: isZero ? 500 : 400 }}>{sub}</div>}
     </div>
   );
 
@@ -61,7 +61,7 @@ export default function ReportsView({ orders, calcularTotal }) {
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontFamily: '"DM Sans", sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontFamily: '"DM Sans", sans-serif', paddingBottom: '40px' }}>
 
       {/* Reporte Diario */}
       <div style={{ background: '#fdf8f5', borderRadius: '14px', padding: '20px', border: '1px solid var(--border)' }}>
@@ -71,15 +71,20 @@ export default function ReportsView({ orders, calcularTotal }) {
             style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid var(--border)', fontSize: '13px', fontFamily: 'inherit', color: 'var(--brown)', outline: 'none' }} />
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
           <MetricCard label="Total pedidos" value={dayOrders.length} />
-          <MetricCard label="Recaudado" value={`$${dayRevenue.toLocaleString('es-AR')}`} sub="Solo pagados" />
+          <MetricCard 
+            label="Recaudado" 
+            value={`$${dayRevenue.toLocaleString('es-AR')}`} 
+            sub={dayRevenue === 0 ? "Sin pedidos pagados aún" : "Solo pagados"} 
+            isZero={dayRevenue === 0}
+          />
           <MetricCard label="Pendientes" value={dayPendientes} sub={`${dayEntregados} entregados`} />
           <MetricCard label="Pack estrella" value={topPackDay ? topPackDay[0].replace('Pack ', '') : '—'} sub={topPackDay ? `${topPackDay[1]} und.` : 'Sin datos'} />
         </div>
 
         <div style={{ background: '#fff', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--muted)', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Método de pago</div>
+          <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Método de pago</div>
           {[['💵 Efectivo', dayEfectivo], ['🏦 Transferencia', dayTransferencia]].map(([label, count]) => (
             <div key={label} style={{ marginBottom: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '4px' }}>
@@ -102,14 +107,19 @@ export default function ReportsView({ orders, calcularTotal }) {
             style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid var(--border)', fontSize: '13px', fontFamily: 'inherit', color: 'var(--brown)', outline: 'none' }} />
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
           <MetricCard label="Total pedidos" value={monthOrders.length} />
-          <MetricCard label="Recaudado" value={`$${monthRevenue.toLocaleString('es-AR')}`} sub="Solo pagados" />
+          <MetricCard 
+            label="Recaudado" 
+            value={`$${monthRevenue.toLocaleString('es-AR')}`} 
+            sub={monthRevenue === 0 ? "Sin pedidos pagados aún" : "Solo pagados"}
+            isZero={monthRevenue === 0}
+          />
           <MetricCard label="Prom. x día" value={avgPerDay} sub={`sobre ${daysInMonth} días`} />
         </div>
 
-        <div style={{ background: '#fff', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--border)', marginBottom: '16px' }}>
-          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--muted)', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🏆 Top 3 packs del mes</div>
+        <div style={{ background: '#fff', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--border)', marginBottom: '12px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>🏆 Top 3 packs del mes</div>
           {topPacksMonth.length === 0 && <div style={{ color: 'var(--muted)', fontSize: '13px' }}>Sin datos</div>}
           {topPacksMonth.map(([name, qty], idx) => {
             const medals = ['🥇', '🥈', '🥉'];
@@ -129,14 +139,14 @@ export default function ReportsView({ orders, calcularTotal }) {
           })}
         </div>
 
-        <div style={{ background: '#fff', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--border)' }}>
-          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pedidos por día del mes</div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '80px', overflowX: 'auto', paddingBottom: '20px', position: 'relative' }}>
+        <div style={{ background: '#fff', borderRadius: '10px', padding: '20px 16px', border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Pedidos por día del mes</div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '200px', overflowX: 'auto', paddingBottom: '30px', position: 'relative' }}>
             {ordersPerDay.map((count, i) => (
               <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '0 0 auto', width: '22px', height: '100%', justifyContent: 'flex-end', position: 'relative' }} title={`Día ${i + 1}: ${count} pedidos`}>
-                <div style={{ fontSize: '9px', color: 'var(--brown)', fontWeight: 600, marginBottom: '2px', opacity: count > 0 ? 1 : 0 }}>{count || ''}</div>
-                <div style={{ width: '16px', height: `${(count / maxBarVal) * 58}px`, minHeight: count > 0 ? '4px' : '0', background: count > 0 ? '#C4922A' : '#f0e8e0', borderRadius: '3px 3px 0 0', transition: 'height 0.3s ease' }} />
-                <div style={{ position: 'absolute', bottom: '-18px', fontSize: '9px', color: 'var(--muted)', width: '22px', textAlign: 'center' }}>{i + 1}</div>
+                <div style={{ fontSize: '10px', color: 'var(--brown)', fontWeight: 700, marginBottom: '4px', opacity: count > 0 ? 1 : 0 }}>{count || ''}</div>
+                <div style={{ width: '18px', height: `${(count / maxBarVal) * 140}px`, minHeight: count > 0 ? '6px' : '0', background: count > 0 ? '#C4922A' : '#f5f0eb', borderRadius: '4px 4px 0 0', transition: 'height 0.4s cubic-bezier(0.4, 0, 0.2, 1)' }} />
+                <div style={{ position: 'absolute', bottom: '-22px', fontSize: '10px', color: count > 0 ? 'var(--brown)' : 'var(--muted)', fontWeight: count > 0 ? 600 : 400, width: '22px', textAlign: 'center' }}>{i + 1}</div>
               </div>
             ))}
           </div>
