@@ -42,6 +42,57 @@ export default function AdminDashboard() {
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [activeTab, setActiveTab] = useState('pedidos');
 
+  // Ruteo
+  const [selectedForRoute, setSelectedForRoute] = useState([]);
+
+  const toggleOrderSelection = (id) => {
+    setSelectedForRoute(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const toggleSelectAll = () => {
+    const allInViewIds = filteredOrders.map(o => o.id);
+    const areAllSelected = allInViewIds.every(id => selectedForRoute.includes(id));
+    if (areAllSelected) {
+      setSelectedForRoute(prev => prev.filter(id => !allInViewIds.includes(id)));
+    } else {
+      setSelectedForRoute(prev => [...new Set([...prev, ...allInViewIds])]);
+    }
+  };
+
+  const openOptimizedRoute = () => {
+    if (selectedForRoute.length === 0) return;
+    if (selectedForRoute.length > 10) {
+      if (!window.confirm('Google Maps solo permite hasta 10 paradas. Se abrirán las primeras 9 paradas + tu ubicación. ¿Continuar?')) return;
+    }
+
+    const toRoute = orders.filter(o => selectedForRoute.includes(o.id));
+    let currentPos = { lat: adminPos.lat, lng: adminPos.lng };
+    let unvisited = [...toRoute];
+    let route = [];
+
+    // Algoritmo Nearest Neighbor (Vecino más cercano)
+    while (unvisited.length > 0 && route.length < 9) {
+      let closestIdx = 0;
+      let minDocs = Infinity;
+
+      unvisited.forEach((order, idx) => {
+        const d = Math.sqrt(Math.pow(order.lat - currentPos.lat, 2) + Math.pow(order.lng - currentPos.lng, 2));
+        if (d < minDocs) {
+          minDocs = d;
+          closestIdx = idx;
+        }
+      });
+
+      const next = unvisited.splice(closestIdx, 1)[0];
+      route.push(next);
+      currentPos = { lat: next.lat, lng: next.lng };
+    }
+
+    const stops = route.map(o => `${o.lat},${o.lng}`).join('/');
+    const url = `https://www.google.com/maps/dir/${adminPos.lat},${adminPos.lng}/${stops}`;
+    window.open(url, '_blank');
+  };
+
   const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('adminAuth') === 'true');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
@@ -191,7 +242,37 @@ export default function AdminDashboard() {
             setSelectedOrder={setSelectedOrder}
             setMapCenter={setMapCenter} setMapZoom={setMapZoom}
             renderPacks={renderPacks} safeDate={safeDate}
+            selectedForRoute={selectedForRoute}
+            toggleOrderSelection={toggleOrderSelection}
+            toggleSelectAll={toggleSelectAll}
           />
+        </div>
+      )}
+
+      {selectedForRoute.length > 0 && activeTab === 'pedidos' && (
+        <div style={{ 
+          position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', 
+          background: 'var(--brown)', color: '#fff', padding: '12px 24px', borderRadius: '50px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', gap: '20px',
+          zIndex: 1000, animation: 'slideUp 0.3s ease-out'
+        }}>
+          <style>{`
+            @keyframes slideUp {
+              from { transform: translate(-50%, 100px); opacity: 0; }
+              to { transform: translate(-50%, 0); opacity: 1; }
+            }
+          `}</style>
+          <div style={{ fontSize: '14px', fontWeight: 600 }}>{selectedForRoute.length} seleccionados</div>
+          <button 
+            onClick={openOptimizedRoute}
+            style={{ background: 'var(--gold)', color: 'var(--brown)', border: 'none', padding: '8px 16px', borderRadius: '20px', fontWeight: 700, cursor: 'pointer', fontSize: '14px' }}
+          >
+            🚀 Armar Ruta (Optimizar)
+          </button>
+          <button 
+            onClick={() => setSelectedForRoute([])}
+            style={{ background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer', padding: '0 4px' }}
+          >✕</button>
         </div>
       )}
 
