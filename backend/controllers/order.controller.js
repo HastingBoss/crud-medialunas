@@ -4,10 +4,45 @@ const { v4: uuidv4 } = require('uuid');
 // In-memory data store para MVP
 // En producción, reemplazar con MongoDB (Mongoose) o similar.
 let orders = [
-  // Datos mockeados iniciales (zona CABA)
-  { id: 'a87d6b00', nombre: 'María Gabriela', telefono: '1112345678', direccion: 'Av. Corrientes 1234, CABA', lat: -34.6037, lng: -58.3816, desde: '09:00', hasta: '09:30', estado: 'Entregado', fecha: new Date().toISOString().split('T')[0], paquete: 12, pago: 'efectivo' },
-  { id: 'acfc5813', nombre: 'Maria Gabriela', telefono: '1112345678', direccion: 'Tucumán 850, CABA', lat: -34.5985, lng: -58.3782, desde: '10:00', hasta: '11:00', estado: 'Pendiente', fecha: new Date().toISOString().split('T')[0], paquete: 24, pago: 'transferencia' },
-  { id: '3f43a837', nombre: 'Enzo', telefono: '1112345678', direccion: 'Thames 300, CABA', lat: -34.5921, lng: -58.4285, desde: '12:00', hasta: '13:00', estado: 'Pendiente', fecha: new Date().toISOString().split('T')[0], paquete: 12, pago: 'efectivo' },
+  { 
+    id: 'a87d6b00', 
+    nombre: 'Julieta Martínez', 
+    telefono: '1145678912', 
+    direccion: 'Av. Corrientes 1234, CABA', 
+    lat: -34.6037, lng: -58.3816, 
+    desde: '10:00', hasta: '12:00', 
+    estado: 'Entregado', 
+    estadoPago: 'Pagado',
+    fecha: new Date().toISOString().split('T')[0], 
+    paquete: '1 × Pack Clásico, 1 × Pack Individual', 
+    pago: 'transferencia' 
+  },
+  { 
+    id: 'acfc5813', 
+    nombre: 'Ricardo Darín', 
+    telefono: '1123456789', 
+    direccion: 'Tucumán 850, CABA', 
+    lat: -34.5985, lng: -58.3782, 
+    desde: '08:30', hasta: '09:30', 
+    estado: 'Pendiente', 
+    estadoPago: 'Pendiente',
+    fecha: new Date().toISOString().split('T')[0], 
+    paquete: '2 × Pack Media Docena', 
+    pago: 'efectivo' 
+  },
+  { 
+    id: '3f43a837', 
+    nombre: 'Lionel Messi', 
+    telefono: '1198765432', 
+    direccion: 'Thames 300, CABA', 
+    lat: -34.5921, lng: -58.4285, 
+    desde: '11:00', hasta: '12:30', 
+    estado: 'Pendiente', 
+    estadoPago: 'Pendiente',
+    fecha: new Date().toISOString().split('T')[0], 
+    paquete: '1 × Pack Familiar', 
+    pago: 'transferencia' 
+  },
 ];
 
 exports.createOrder = async (req, res) => {
