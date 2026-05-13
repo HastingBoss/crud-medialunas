@@ -218,6 +218,13 @@ export default function AdminDashboard() {
               <option value="Pendiente">Pendiente</option>
               <option value="Entregado">Entregado</option>
             </select>
+            <button 
+              className="mi-ubicacion-btn" 
+              onClick={fetchOrders}
+              style={{ background: '#fff', color: 'var(--brown)', border: '1.5px solid var(--border)', display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              🔄 <span className="mobile-hide">Refrescar</span>
+            </button>
             <button className="mi-ubicacion-btn" onClick={centrarEnMi}>📍 Mi ubicación</button>
           </div>
 
