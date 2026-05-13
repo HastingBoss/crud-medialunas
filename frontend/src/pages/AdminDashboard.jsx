@@ -59,19 +59,15 @@ export default function AdminDashboard() {
     }
   };
 
-  const openOptimizedRoute = () => {
-    if (selectedForRoute.length === 0) return;
-    if (selectedForRoute.length > 10) {
-      if (!window.confirm('Google Maps solo permite hasta 10 paradas. Se abrirán las primeras 9 paradas + tu ubicación. ¿Continuar?')) return;
-    }
-
+  const getOptimizedRoute = () => {
+    if (selectedForRoute.length === 0) return [];
+    
     const toRoute = orders.filter(o => selectedForRoute.includes(o.id));
     let currentPos = { lat: adminPos.lat, lng: adminPos.lng };
     let unvisited = [...toRoute];
     let route = [];
 
-    // Algoritmo Nearest Neighbor (Vecino más cercano)
-    while (unvisited.length > 0 && route.length < 9) {
+    while (unvisited.length > 0) {
       let closestIdx = 0;
       let minDocs = Infinity;
 
@@ -87,8 +83,12 @@ export default function AdminDashboard() {
       route.push(next);
       currentPos = { lat: next.lat, lng: next.lng };
     }
+    return route;
+  };
 
-    const stops = route.map(o => `${o.lat},${o.lng}`).join('/');
+  const openRouteLeg = (legOrders) => {
+    const stops = legOrders.map(o => `${o.lat},${o.lng}`).join('/');
+    // El punto de partida del tramo es adminPos o el final del tramo anterior (pero para simplificar usamos adminPos o coords del 1er pedido)
     const url = `https://www.google.com/maps/dir/${adminPos.lat},${adminPos.lng}/${stops}`;
     window.open(url, '_blank');
   };
@@ -249,32 +249,58 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {selectedForRoute.length > 0 && activeTab === 'pedidos' && (
-        <div style={{ 
-          position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', 
-          background: 'var(--brown)', color: '#fff', padding: '12px 24px', borderRadius: '50px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', gap: '20px',
-          zIndex: 1000, animation: 'slideUp 0.3s ease-out'
-        }}>
-          <style>{`
-            @keyframes slideUp {
-              from { transform: translate(-50%, 100px); opacity: 0; }
-              to { transform: translate(-50%, 0); opacity: 1; }
-            }
-          `}</style>
-          <div style={{ fontSize: '14px', fontWeight: 600 }}>{selectedForRoute.length} seleccionados</div>
-          <button 
-            onClick={openOptimizedRoute}
-            style={{ background: 'var(--gold)', color: 'var(--brown)', border: 'none', padding: '8px 16px', borderRadius: '20px', fontWeight: 700, cursor: 'pointer', fontSize: '14px' }}
-          >
-            🚀 Armar Ruta (Optimizar)
-          </button>
-          <button 
-            onClick={() => setSelectedForRoute([])}
-            style={{ background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer', padding: '0 4px' }}
-          >✕</button>
-        </div>
-      )}
+      {selectedForRoute.length > 0 && activeTab === 'pedidos' && (() => {
+        const fullRoute = getOptimizedRoute();
+        const legs = [];
+        for (let i = 0; i < fullRoute.length; i += 9) {
+          legs.push(fullRoute.slice(i, i + 9));
+        }
+
+        return (
+          <div style={{ 
+            position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', 
+            background: 'var(--brown)', color: '#fff', padding: '12px 20px', borderRadius: '24px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px',
+            zIndex: 1000, animation: 'slideUp 0.3s ease-out', width: 'max-content', maxWidth: '90vw'
+          }}>
+            <style>{`
+              @keyframes slideUp {
+                from { transform: translate(-50%, 100px); opacity: 0; }
+                to { transform: translate(-50%, 0); opacity: 1; }
+              }
+            `}</style>
+            <div style={{ fontSize: '13px', fontWeight: 600, borderRight: '1px solid rgba(255,255,255,0.2)', paddingRight: '12px' }}>
+              {selectedForRoute.length} seleccionado{selectedForRoute.length !== 1 ? 's' : ''}
+            </div>
+            
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {legs.length === 1 ? (
+                <button 
+                  onClick={() => openRouteLeg(legs[0])}
+                  style={{ background: 'var(--gold)', color: 'var(--brown)', border: 'none', padding: '8px 16px', borderRadius: '20px', fontWeight: 700, cursor: 'pointer', fontSize: '13px' }}
+                >
+                  🚀 Armar Ruta
+                </button>
+              ) : (
+                legs.map((leg, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => openRouteLeg(leg)}
+                    style={{ background: 'var(--gold)', color: 'var(--brown)', border: 'none', padding: '6px 12px', borderRadius: '20px', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}
+                  >
+                    Tramo {idx + 1} ({leg.length})
+                  </button>
+                ))
+              )}
+            </div>
+
+            <button 
+              onClick={() => setSelectedForRoute([])}
+              style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '16px', cursor: 'pointer', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >✕</button>
+          </div>
+        );
+      })()}
 
       <div className="content">
         {activeTab === 'reportes' && <ReportsView orders={orders} calcularTotal={calcularTotal} />}
