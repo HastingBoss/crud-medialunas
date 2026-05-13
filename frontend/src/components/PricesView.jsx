@@ -74,7 +74,7 @@ export default function PricesView() {
   if (loading) return <div style={{ padding: '20px', color: 'var(--muted)' }}>Cargando precios...</div>;
 
   return (
-    <div style={{ padding: '20px', fontFamily: '"DM Sans", sans-serif', maxWidth: '500px' }}>
+    <div style={{ fontFamily: '"DM Sans", sans-serif', width: '100%' }}>
 
       <div style={{ marginBottom: '20px' }}>
         <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--brown)', borderBottom: '2px solid #C4922A', paddingBottom: '6px', marginBottom: '6px' }}>

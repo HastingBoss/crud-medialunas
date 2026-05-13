@@ -187,9 +187,11 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {activeTab === 'reportes' && <ReportsView orders={orders} calcularTotal={calcularTotal} />}
-      {activeTab === 'precios' && <PricesView />}
-      {activeTab === 'archivados' && <ArchivedView />}
+      <div className="content">
+        {activeTab === 'reportes' && <ReportsView orders={orders} calcularTotal={calcularTotal} />}
+        {activeTab === 'precios' && <PricesView />}
+        {activeTab === 'archivados' && <ArchivedView />}
+      </div>
 
       <OrderModal
         selectedOrder={selectedOrder}

@@ -61,7 +61,7 @@ export default function ReportsView({ orders, calcularTotal }) {
   );
 
   return (
-    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '24px', fontFamily: '"DM Sans", sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontFamily: '"DM Sans", sans-serif' }}>
 
       {/* Reporte Diario */}
       <div style={{ background: '#fdf8f5', borderRadius: '14px', padding: '20px', border: '1px solid var(--border)' }}>
