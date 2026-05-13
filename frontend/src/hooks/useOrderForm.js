@@ -28,6 +28,9 @@ export default function useOrderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [comprobanteEnviado, setComprobanteEnviado] = useState(false);
   const [anticipationError, setAnticipationError] = useState(false);
+  const [addressSuggestions, setAddressSuggestions] = useState([]);
+  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+  const searchTimeoutRef = useRef(null);
 
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -112,6 +115,32 @@ export default function useOrderForm() {
   const handleInputChange = (field, value) => {
     if (field === 'pago') setComprobanteEnviado(false);
     setFormData(prev => ({ ...prev, [field]: value }));
+
+    if (field === 'direccion') {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+      if (value.length < 4) {
+        setAddressSuggestions([]);
+        return;
+      }
+      
+      setIsSearchingAddress(true);
+      searchTimeoutRef.current = setTimeout(async () => {
+        try {
+          const res = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&countrycodes=ar&format=json&limit=5&addressdetails=1`);
+          setAddressSuggestions(res.data);
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setIsSearchingAddress(false);
+        }
+      }, 800);
+    }
+  };
+
+  const selectSuggestion = (s) => {
+    setFormData(prev => ({ ...prev, direccion: s.display_name }));
+    setCoords({ lat: s.lat, lng: s.lon });
+    setAddressSuggestions([]);
   };
 
   const cambiarQty = (pack, delta) => {
@@ -200,7 +229,7 @@ export default function useOrderForm() {
     today, todayISO, tomorrowObj, next7Days, daysStr, formatDateISO, parseLocalDate, maxDateObj, getSelectedDateText,
     resumenLineas, total,
     packsCompletos, fechaCompleta, horarioCompleto, pagoCompleto, formValido, datosCompletos,
-    handleSubmit, handleAddressBlur,
-    precios, nombres,
+    handleSubmit, handleAddressBlur, selectSuggestion,
+    precios, nombres, addressSuggestions, isSearchingAddress,
   };
 }
