@@ -3,27 +3,43 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export const calcularTotal = (paqueteData) => {
-  if (!paqueteData) return 0;
-  const preciosMap = { 'Pack Individual': 2200, 'Pack Media Docena': 3800, 'Pack Clásico': 5500, 'Pack Familiar': 8000 };
-  let total = 0;
-  const paqueteStr = Array.isArray(paqueteData) ? paqueteData.join(', ') : String(paqueteData);
-  const items = paqueteStr.split(', ');
-  for (const item of items) {
-    const parts = item.split(' × ');
-    if (parts.length === 2) total += parseInt(parts[0], 10) * (preciosMap[parts[1]] || 0);
-  }
-  return total;
-};
-
 export default function useOrders() {
   const [orders, setOrders] = useState([]);
+  const [prices, setPrices] = useState({ individual: 2200, media: 3800, clasico: 5500, familiar: 8000 });
   const [archiveToast, setArchiveToast] = useState(null);
   const [progressWidth, setProgressWidth] = useState(100);
   const archiveTimerRef = useRef(null);
   const archiveProgressRef = useRef(null);
 
+  const fetchPrices = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/prices`);
+      setPrices(res.data);
+    } catch (err) {
+      console.error('Error fetching prices:', err);
+    }
+  };
+
+  const calcularTotal = (paqueteData) => {
+    if (!paqueteData) return 0;
+    const preciosMap = { 
+      'Pack Individual': prices.individual, 
+      'Pack Media Docena': prices.media, 
+      'Pack Clásico': prices.clasico, 
+      'Pack Familiar': prices.familiar 
+    };
+    let total = 0;
+    const paqueteStr = Array.isArray(paqueteData) ? paqueteData.join(', ') : String(paqueteData);
+    const items = paqueteStr.split(', ');
+    for (const item of items) {
+      const parts = item.split(' × ');
+      if (parts.length === 2) total += parseInt(parts[0], 10) * (preciosMap[parts[1]] || 0);
+    }
+    return total;
+  };
+
   const fetchOrders = async () => {
+    await fetchPrices();
     try {
       const res = await axios.get(`${API_URL}/api/orders`);
       setOrders(res.data);

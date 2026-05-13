@@ -10,6 +10,7 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 const orderRoutes = require('./routes/order.routes');
+const priceRoutes = require('./routes/price.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -21,6 +22,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rutas
 app.use('/api/orders', orderRoutes);
+app.use('/api/prices', priceRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

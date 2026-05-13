@@ -3,11 +3,23 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export const precios = { individual: 2200, media: 3800, clasico: 5500, familiar: 8000 };
 export const nombres = { individual: 'Pack Individual', media: 'Pack Media Docena', clasico: 'Pack Clásico', familiar: 'Pack Familiar' };
 
 export default function useOrderForm() {
+  const [precios, setPrecios] = useState({ individual: 2200, media: 3800, clasico: 5500, familiar: 8000 });
   const [formData, setFormData] = useState({ nombre: '', telefono: '', direccion: '', fecha: '', desde: '', hasta: '', pago: '' });
+
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/prices`);
+        setPrecios(res.data);
+      } catch (err) {
+        console.error('Error fetching prices:', err);
+      }
+    };
+    fetchPrices();
+  }, []);
   const [qtys, setQtys] = useState({ individual: 0, media: 0, clasico: 0, familiar: 0 });
   const [coords, setCoords] = useState({ lat: null, lng: null });
   const [submitted, setSubmitted] = useState(false);
