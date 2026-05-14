@@ -44,6 +44,7 @@ export default function AdminDashboard() {
 
   // Ruteo
   const [selectedForRoute, setSelectedForRoute] = useState([]);
+  const [clickedLegs, setClickedLegs] = useState([]);
 
   const toggleOrderSelection = (id) => {
     setSelectedForRoute(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -112,6 +113,11 @@ export default function AdminDashboard() {
       setSelectedOrder(updated);
     }
   }, [orders]);
+
+  // Reset clicked legs when selection changes
+  useEffect(() => {
+    setClickedLegs([]);
+  }, [selectedForRoute]);
 
   const centrarEnMi = () => {
     if (navigator.geolocation) {
@@ -296,15 +302,34 @@ export default function AdminDashboard() {
                   🚀 Armar Ruta
                 </button>
               ) : (
-                legs.map((leg, idx) => (
-                  <button 
-                    key={idx}
-                    onClick={() => openRouteLeg(leg)}
-                    style={{ background: 'var(--gold)', color: 'var(--brown)', border: 'none', padding: '6px 12px', borderRadius: '20px', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}
-                  >
-                    Tramo {idx + 1} ({leg.length})
-                  </button>
-                ))
+                legs.map((leg, idx) => {
+                  const isDisabled = idx > 0 && !clickedLegs.includes(idx - 1);
+                  return (
+                    <button 
+                      key={idx}
+                      disabled={isDisabled}
+                      onClick={() => {
+                        openRouteLeg(leg);
+                        setClickedLegs(prev => [...new Set([...prev, idx])]);
+                      }}
+                      style={{ 
+                        background: isDisabled ? 'rgba(255,255,255,0.2)' : 'var(--gold)', 
+                        color: isDisabled ? 'rgba(255,255,255,0.4)' : 'var(--brown)', 
+                        border: 'none', 
+                        padding: '6px 12px', 
+                        borderRadius: '20px', 
+                        fontWeight: 700, 
+                        cursor: isDisabled ? 'not-allowed' : 'pointer', 
+                        fontSize: '12px',
+                        transition: 'all 0.2s ease',
+                        filter: isDisabled ? 'grayscale(1)' : 'none',
+                        opacity: isDisabled ? 0.7 : 1
+                      }}
+                    >
+                      Tramo {idx + 1} ({leg.length})
+                    </button>
+                  );
+                })
               )}
             </div>
 

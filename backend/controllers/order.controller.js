@@ -13,7 +13,7 @@ let orders = [
     desde: '10:00', hasta: '12:00', 
     estado: 'Entregado', 
     estadoPago: 'Pagado',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Clásico, 1 × Pack Individual', 
     pago: 'transferencia' 
   },
@@ -26,7 +26,7 @@ let orders = [
     desde: '08:30', hasta: '09:30', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '2 × Pack Media Docena', 
     pago: 'efectivo' 
   },
@@ -39,7 +39,7 @@ let orders = [
     desde: '11:00', hasta: '12:30', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Familiar', 
     pago: 'transferencia' 
   },
@@ -52,7 +52,7 @@ let orders = [
     desde: '09:00', hasta: '11:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Clásico', 
     pago: 'transferencia' 
   },
@@ -65,7 +65,7 @@ let orders = [
     desde: '14:00', hasta: '16:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pagado',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '3 × Pack Individual', 
     pago: 'transferencia' 
   },
@@ -78,7 +78,7 @@ let orders = [
     desde: '10:00', hasta: '11:30', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Media Docena', 
     pago: 'efectivo' 
   },
@@ -91,7 +91,7 @@ let orders = [
     desde: '08:00', hasta: '10:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pagado',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '2 × Pack Clásico', 
     pago: 'transferencia' 
   },
@@ -104,7 +104,7 @@ let orders = [
     desde: '12:00', hasta: '14:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Familiar', 
     pago: 'transferencia' 
   },
@@ -117,7 +117,7 @@ let orders = [
     desde: '09:30', hasta: '11:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Media Docena', 
     pago: 'efectivo' 
   },
@@ -130,7 +130,7 @@ let orders = [
     desde: '15:00', hasta: '17:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pagado',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '2 × Pack Individual', 
     pago: 'transferencia' 
   },
@@ -143,7 +143,7 @@ let orders = [
     desde: '11:00', hasta: '13:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Clásico', 
     pago: 'efectivo' 
   },
@@ -156,7 +156,7 @@ let orders = [
     desde: '10:00', hasta: '12:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pagado',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Familiar', 
     pago: 'transferencia' 
   },
@@ -169,7 +169,7 @@ let orders = [
     desde: '09:00', hasta: '10:30', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '2 × Pack Media Docena', 
     pago: 'transferencia' 
   },
@@ -182,7 +182,7 @@ let orders = [
     desde: '13:00', hasta: '15:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pagado',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '3 × Pack Clásico', 
     pago: 'transferencia' 
   },
@@ -195,7 +195,7 @@ let orders = [
     desde: '08:30', hasta: '10:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Individual', 
     pago: 'efectivo' 
   },
@@ -208,7 +208,7 @@ let orders = [
     desde: '16:00', hasta: '18:00', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '2 × Pack Media Docena', 
     pago: 'transferencia' 
   },
@@ -221,7 +221,7 @@ let orders = [
     desde: '11:00', hasta: '12:30', 
     estado: 'Pendiente', 
     estadoPago: 'Pagado',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Clásico', 
     pago: 'transferencia' 
   },
@@ -234,7 +234,7 @@ let orders = [
     desde: '09:30', hasta: '11:30', 
     estado: 'Pendiente', 
     estadoPago: 'Pendiente',
-    fecha: new Date().toISOString().split('T')[0], 
+    fecha: new Date().toLocaleDateString('sv-SE'), 
     paquete: '1 × Pack Familiar', 
     pago: 'efectivo' 
   },
@@ -242,6 +242,9 @@ let orders = [
 
 exports.createOrder = async (req, res) => {
   try {
+    if (!global.config.formularioAbierto) {
+      return res.status(403).json({ message: 'El horario de pedidos está cerrado por hoy.' });
+    }
     const { nombre, telefono, paquete, pago, direccion, lat, lng } = req.body;
     
     // Si no envían coords, podemos asignar unas por defecto o usar un geocoder
@@ -261,9 +264,9 @@ exports.createOrder = async (req, res) => {
       desde: req.body.desde || '10:00',
       hasta: req.body.hasta || '12:00',
       estado: 'Pendiente',
-      fecha: new Date().toISOString().split('T')[0],
+      fecha: new Date().toLocaleDateString('sv-SE'),
       comprobante: req.file ? req.file.filename : null,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toLocaleString('sv-SE')
     };
 
     orders.push(newOrder);

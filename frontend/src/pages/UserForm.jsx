@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import useOrderForm from '../hooks/useOrderForm.js';
 import DaySelector from '../components/DaySelector.jsx';
 import PackSelector from '../components/PackSelector.jsx';
@@ -6,6 +6,10 @@ import TimeSelector from '../components/TimeSelector.jsx';
 import PaymentSelector from '../components/PaymentSelector.jsx';
 import OrderSummary from '../components/OrderSummary.jsx';
 import './UserForm.css';
+
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export default function UserForm() {
   const {
@@ -25,6 +29,48 @@ export default function UserForm() {
     precios, nombres, addressSuggestions, isSearchingAddress,
   } = useOrderForm();
 
+  const [config, setConfig] = useState({ formularioAbierto: true, horarioCierre: '05:00' });
+  const [showCutoffBanner, setShowCutoffBanner] = useState(false);
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/config/estado`);
+        setConfig(res.data);
+      } catch (err) {
+        console.error('Error fetching config:', err);
+      }
+    };
+    fetchConfig();
+  }, []);
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (config.formularioAbierto && hour >= 0 && hour < 5) {
+      setShowCutoffBanner(true);
+    } else {
+      setShowCutoffBanner(false);
+    }
+  }, [config.formularioAbierto]);
+
+  const isClosedForTomorrow = !config.formularioAbierto;
+  
+  // Calcular pasado mañana para el mensaje y la fecha mínima
+  const pasadoManana = new Date();
+  pasadoManana.setDate(pasadoManana.getDate() + 2);
+  const pasadoMananaISO = formatDateISO(pasadoManana);
+  const pasadoMananaText = `${pasadoManana.getDate()}/${pasadoManana.getMonth() + 1}`;
+
+  // Ajustar fecha mínima si está cerrado para mañana
+  useEffect(() => {
+    if (isClosedForTomorrow && formData.fecha) {
+      const tomorrowISO = formatDateISO(tomorrowObj);
+      if (formData.fecha === tomorrowISO) {
+        handleInputChange('fecha', pasadoMananaISO);
+      }
+    }
+  }, [isClosedForTomorrow, formData.fecha, tomorrowObj]);
+
   const CheckMark = () => <span style={{ color: '#2E7D32', marginLeft: '8px', fontSize: '18px' }}>✓</span>;
 
   if (submitted) {
@@ -33,12 +79,67 @@ export default function UserForm() {
 
   return (
     <>
-      <div className="hero">
-        <div className="hero-label">Pedidos online</div>
-        <h1>Medialunas<br /><em>artesanales</em></h1>
-        <p className="hero-desc">De manteca, hechas con amor. Pedí tu pack y las recibís en el día.</p>
-        <div className="divider"><span>🥐</span></div>
-      </div>
+      {isClosedForTomorrow ? (
+        <div style={{
+          background: '#FFFBE6',
+          border: '1.5px solid #FF9800',
+          borderRadius: '16px',
+          padding: '40px 24px',
+          textAlign: 'center',
+          maxWidth: '600px',
+          margin: '20px auto 30px auto',
+          boxShadow: '0 4px 12px rgba(255, 152, 0, 0.1)'
+        }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
+          <h2 style={{ color: '#856404', fontSize: '22px', marginBottom: '12px', fontWeight: 'bold' }}>
+            Pedidos para mañana cerrados
+          </h2>
+          <p style={{ color: '#856404', fontSize: '16px', lineHeight: '1.5', margin: 0 }}>
+            El horario de pedidos para mañana ya cerró.<br />
+            <strong>Podés reservar tu pedido para el {pasadoMananaText}.</strong>
+          </p>
+        </div>
+      ) : (
+        <div className="hero">
+          <div className="hero-label">Pedidos online</div>
+          <h1>Medialunas<br /><em>artesanales</em></h1>
+          <p className="hero-desc">De manteca, hechas con amor. Pedí tu pack y las recibís en el día.</p>
+          <div className="divider"><span>🥐</span></div>
+        </div>
+      )}
+
+      {showCutoffBanner && (
+        <div style={{
+          maxWidth: '500px',
+          margin: '0 auto 20px auto',
+          padding: '12px 16px',
+          backgroundColor: '#FFFBE6',
+          border: '1px solid #FF9800',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '12px',
+          position: 'relative'
+        }}>
+          <span style={{ fontSize: '14px', color: '#856404', lineHeight: '1.4', flex: 1 }}>
+            ⚠️ Los pedidos realizados después de las 00hs están sujetos a disponibilidad de stock. Te contactaremos para confirmar.
+          </span>
+          <button 
+            onClick={() => setShowCutoffBanner(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '18px',
+              cursor: 'pointer',
+              color: '#856404',
+              padding: '0',
+              lineHeight: '1'
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="form-container">
         <style>{`
@@ -139,11 +240,11 @@ export default function UserForm() {
 
         <p className="section-title" style={{ marginTop: '22px' }}>Fecha de entrega{fechaCompleta && <CheckMark />}</p>
         <DaySelector
-          next7Days={next7Days} formatDateISO={formatDateISO} todayISO={todayISO} daysStr={daysStr}
+          next7Days={isClosedForTomorrow ? next7Days.slice(2) : next7Days} formatDateISO={formatDateISO} todayISO={todayISO} daysStr={daysStr}
           fecha={formData.fecha} handleInputChange={handleInputChange}
           setDateError={setDateError} setAnticipationError={setAnticipationError}
           showCalendar={showCalendar} setShowCalendar={setShowCalendar}
-          parseLocalDate={parseLocalDate} tomorrowObj={tomorrowObj} maxDateObj={maxDateObj}
+          parseLocalDate={parseLocalDate} tomorrowObj={isClosedForTomorrow ? pasadoManana : tomorrowObj} maxDateObj={maxDateObj}
           canScrollLeft={canScrollLeft} canScrollRight={canScrollRight}
           scrollRef={scrollRef} scrollByAmount={scrollByAmount} handleScroll={handleScroll}
           dateError={dateError} anticipationError={anticipationError} getSelectedDateText={getSelectedDateText}
