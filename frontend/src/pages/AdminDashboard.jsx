@@ -7,16 +7,22 @@ import leafletIcon from 'leaflet/dist/images/marker-icon.png';
 import leafletShadow from 'leaflet/dist/images/marker-shadow.png';
 
 import useOrders from '../hooks/useOrders.js';
-import MapView from '../components/MapView.jsx';
-import OrderTable from '../components/OrderTable.jsx';
-import OrderModal from '../components/OrderModal.jsx';
-import DeleteConfirmModal from '../components/DeleteConfirmModal.jsx';
-import ReportsView from '../components/ReportsView.jsx';
-import PricesView from '../components/PricesView.jsx';
-import ArchivedView from '../components/ArchivedView.jsx';
-import StockView from '../components/StockView.jsx';
-import StockAlert from '../components/StockAlert.jsx';
+import MapView from '../components/MapView/MapView.jsx';
+import OrderTable from '../components/OrderTable/OrderTable.jsx';
+import OrderModal from '../components/OrderModal/OrderModal.jsx';
+import DeleteConfirmModal from '../components/DeleteConfirmModal/DeleteConfirmModal.jsx';
+import ReportsView from '../components/ReportsView/ReportsView.jsx';
+import PricesView from '../components/PricesView/PricesView.jsx';
+import ArchivedView from '../components/ArchivedView/ArchivedView.jsx';
+import StockView from '../components/StockView/StockView.jsx';
+import StockAlert from '../components/StockAlert/StockAlert.jsx';
 import axios from 'axios';
+
+// Componentes extraídos
+import AdminHeader from '../components/AdminHeader/AdminHeader.jsx';
+import AdminTabs from '../components/AdminTabs/AdminTabs.jsx';
+import RoutePlanner from '../components/RoutePlanner/RoutePlanner.jsx';
+import CutoffModals from '../components/CutoffModals/CutoffModals.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -44,6 +50,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('pedidos');
   const [config, setConfig] = useState({ formularioAbierto: true, horarioCierre: '05:00' });
   const [showExtendModal, setShowExtendModal] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [extendTime, setExtendTime] = useState('06:00');
 
   const fetchConfig = async () => {
@@ -237,53 +244,17 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-body">
-      <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="header-title">🥐 <span>Admin</span> Medialunas</div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginRight: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'rgba(0,0,0,0.05)', borderRadius: '20px' }}>
-            <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: config.formularioAbierto ? '#4CAF50' : '#F44336', boxShadow: `0 0 8px ${config.formularioAbierto ? '#4CAF50' : '#F44336'}` }} />
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--brown)', whiteSpace: 'nowrap' }}>
-              {config.formularioAbierto ? 'Pedidos abiertos' : 'Pedidos cerrados'}
-            </span>
-          </div>
+      <AdminHeader 
+        config={config} 
+        onOpenCloseConfirm={() => setShowCloseConfirm(true)} 
+        onOpenExtendModal={() => setShowExtendModal(true)} 
+      />
 
-          {config.formularioAbierto ? (
-            <button 
-              onClick={handleCloseNow}
-              style={{ background: 'var(--brown)', color: '#fff', border: 'none', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-            >
-              Cerrar ahora
-            </button>
-          ) : (
-            <button 
-              onClick={() => setShowExtendModal(true)}
-              style={{ background: 'var(--gold)', color: 'var(--brown)', border: 'none', padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-            >
-              Extender horario
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="tabs" style={{ 
-        overflowX: 'auto', 
-        display: 'flex', 
-        whiteSpace: 'nowrap', 
-        paddingBottom: '2px',
-        msOverflowStyle: 'none',
-        scrollbarWidth: 'none'
-      }}>
-        {TABS.map(t => (
-          <div key={t.id} className={`tab${activeTab === t.id ? ' active' : ''}`} onClick={() => setActiveTab(t.id)} style={{ cursor: 'pointer', flexShrink: 0 }}>
-            {t.label}
-          </div>
-        ))}
-      </div>
+      <AdminTabs 
+        tabs={TABS} 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+      />
 
       {activeTab === 'pedidos' && (
         <div className="content">
@@ -339,77 +310,16 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {selectedForRoute.length > 0 && activeTab === 'pedidos' && (() => {
-        const fullRoute = getOptimizedRoute();
-        const legs = [];
-        for (let i = 0; i < fullRoute.length; i += 9) {
-          legs.push(fullRoute.slice(i, i + 9));
-        }
-
-        return (
-          <div style={{ 
-            position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', 
-            background: 'var(--brown)', color: '#fff', padding: '12px 20px', borderRadius: '24px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px',
-            zIndex: 1000, animation: 'slideUp 0.3s ease-out', width: 'max-content', maxWidth: '90vw'
-          }}>
-            <style>{`
-              @keyframes slideUp {
-                from { transform: translate(-50%, 100px); opacity: 0; }
-                to { transform: translate(-50%, 0); opacity: 1; }
-              }
-            `}</style>
-            <div style={{ fontSize: '13px', fontWeight: 600, borderRight: '1px solid rgba(255,255,255,0.2)', paddingRight: '12px' }}>
-              {selectedForRoute.length} seleccionado{selectedForRoute.length !== 1 ? 's' : ''}
-            </div>
-            
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {legs.length === 1 ? (
-                <button 
-                  onClick={() => openRouteLeg(legs[0])}
-                  style={{ background: 'var(--gold)', color: 'var(--brown)', border: 'none', padding: '8px 16px', borderRadius: '20px', fontWeight: 700, cursor: 'pointer', fontSize: '13px' }}
-                >
-                  🚀 Armar Ruta
-                </button>
-              ) : (
-                legs.map((leg, idx) => {
-                  const isDisabled = idx > 0 && !clickedLegs.includes(idx - 1);
-                  return (
-                    <button 
-                      key={idx}
-                      disabled={isDisabled}
-                      onClick={() => {
-                        openRouteLeg(leg);
-                        setClickedLegs(prev => [...new Set([...prev, idx])]);
-                      }}
-                      style={{ 
-                        background: isDisabled ? 'rgba(255,255,255,0.2)' : 'var(--gold)', 
-                        color: isDisabled ? 'rgba(255,255,255,0.4)' : 'var(--brown)', 
-                        border: 'none', 
-                        padding: '6px 12px', 
-                        borderRadius: '20px', 
-                        fontWeight: 700, 
-                        cursor: isDisabled ? 'not-allowed' : 'pointer', 
-                        fontSize: '12px',
-                        transition: 'all 0.2s ease',
-                        filter: isDisabled ? 'grayscale(1)' : 'none',
-                        opacity: isDisabled ? 0.7 : 1
-                      }}
-                    >
-                      Tramo {idx + 1} ({leg.length})
-                    </button>
-                  );
-                })
-              )}
-            </div>
-
-            <button 
-              onClick={() => setSelectedForRoute([])}
-              style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '16px', cursor: 'pointer', width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >✕</button>
-          </div>
-        );
-      })()}
+      {activeTab === 'pedidos' && (
+        <RoutePlanner 
+          selectedForRoute={selectedForRoute}
+          getOptimizedRoute={getOptimizedRoute}
+          openRouteLeg={openRouteLeg}
+          clickedLegs={clickedLegs}
+          setClickedLegs={setClickedLegs}
+          setSelectedForRoute={setSelectedForRoute}
+        />
+      )}
 
       <div className="content">
         {activeTab === 'reportes' && <ReportsView orders={orders} calcularTotal={calcularTotal} />}
@@ -463,37 +373,16 @@ export default function AdminDashboard() {
 
       <StockAlert stock={stock} threshold={threshold} />
       
-      {showExtendModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 12000 }}>
-          <div style={{ background: '#fff', padding: '24px', borderRadius: '16px', width: '90%', maxWidth: '320px', textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
-            <h3 style={{ fontFamily: '"Playfair Display", serif', color: 'var(--brown)', marginTop: 0 }}>Extender horario</h3>
-            <p style={{ fontSize: '14px', color: 'var(--muted)', marginBottom: '20px' }}>Elegí la nueva hora de cierre automático para hoy.</p>
-            
-            <select 
-              value={extendTime} 
-              onChange={e => setExtendTime(e.target.value)}
-              style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1.5px solid var(--border)', marginBottom: '20px', outline: 'none', fontSize: '16px', fontFamily: 'inherit' }}
-            >
-              <option value="06:00">06:00 hs</option>
-              <option value="07:00">07:00 hs</option>
-              <option value="08:00">08:00 hs</option>
-              <option value="09:00">09:00 hs</option>
-              <option value="10:00">10:00 hs</option>
-            </select>
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button 
-                onClick={() => setShowExtendModal(false)}
-                style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#f5f5f5', border: 'none', cursor: 'pointer', fontWeight: 600 }}
-              >Cancelar</button>
-              <button 
-                onClick={handleExtend}
-                style={{ flex: 1, padding: '12px', borderRadius: '8px', background: 'var(--brown)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}
-              >Confirmar</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CutoffModals 
+        showExtendModal={showExtendModal}
+        setShowExtendModal={setShowExtendModal}
+        showCloseConfirm={showCloseConfirm}
+        setShowCloseConfirm={setShowCloseConfirm}
+        extendTime={extendTime}
+        setExtendTime={setExtendTime}
+        handleExtend={handleExtend}
+        handleCloseNow={handleCloseNow}
+      />
     </div>
   );
 }

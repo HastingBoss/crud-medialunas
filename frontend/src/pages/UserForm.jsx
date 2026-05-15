@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import useOrderForm from '../hooks/useOrderForm.js';
-import DaySelector from '../components/DaySelector.jsx';
-import PackSelector from '../components/PackSelector.jsx';
-import TimeSelector from '../components/TimeSelector.jsx';
-import PaymentSelector from '../components/PaymentSelector.jsx';
-import OrderSummary from '../components/OrderSummary.jsx';
+import DaySelector from '../components/DaySelector/DaySelector.jsx';
+import PackSelector from '../components/PackSelector/PackSelector.jsx';
+import TimeSelector from '../components/TimeSelector/TimeSelector.jsx';
+import PaymentSelector from '../components/PaymentSelector/PaymentSelector.jsx';
+import OrderSummary from '../components/OrderSummary/OrderSummary.jsx';
 import './UserForm.css';
 
 import axios from 'axios';

@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import './MapView.css';
 
 export default function MapView({ filteredOrders, mapCenter, mapZoom, adminPos, renderPacks, safeDate, changeStatus, openDeleteConfirm, API_URL }) {
   const getIcon = (estado) => {
@@ -18,7 +19,7 @@ export default function MapView({ filteredOrders, mapCenter, mapZoom, adminPos, 
 
   return (
     <div className="map-wrap">
-      <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '380px', width: '100%' }}>
+      <MapContainer center={mapCenter} zoom={mapZoom} className="map-view-container">
         <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <Marker position={[adminPos.lat, adminPos.lng]} icon={adminIcon}>
           <Popup><strong>Mi ubicación</strong></Popup>
@@ -26,19 +27,19 @@ export default function MapView({ filteredOrders, mapCenter, mapZoom, adminPos, 
         {filteredOrders.map(p => (
           <Marker key={p.id} position={[p.lat, p.lng]} icon={getIcon(p.estado)}>
             <Popup>
-              <div style={{ fontFamily: '"DM Sans",sans-serif', fontSize: '13px', minWidth: '160px' }}>
-                <strong style={{ color: '#3D2B1F' }}>{p.nombre || 'Sin nombre'} ({renderPacks(p.paquete)})</strong><br />
-                <span style={{ color: '#8B6F5A', fontSize: '11px' }}>{p.direccion || 'Sin dirección'}</span><br />
-                <span style={{ color: '#8B6F5A', fontSize: '11px' }}>📞 {p.telefono || 'Sin teléfono'}</span><br />
-                <span style={{ color: '#8B6F5A', fontSize: '11px' }}>📅 {safeDate(p.fecha)} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</span><br />
-                <span style={{ color: '#8B6F5A', fontSize: '11px' }}>💳 {p.pago || 'No especificado'}</span>
+              <div className="map-popup-content">
+                <strong className="map-popup-title">{p.nombre || 'Sin nombre'} ({renderPacks(p.paquete)})</strong><br />
+                <span className="map-popup-info">{p.direccion || 'Sin dirección'}</span>
+                <span className="map-popup-info">📞 {p.telefono || 'Sin teléfono'}</span>
+                <span className="map-popup-info">📅 {safeDate(p.fecha)} {p.desde && p.hasta ? `(${p.desde} a ${p.hasta})` : ''}</span>
+                <span className="map-popup-info">💳 {p.pago || 'No especificado'}</span>
                 {p.comprobante && (
                   <div><a href={`${API_URL}/uploads/${p.comprobante}`} target="_blank" rel="noreferrer">Ver comprobante</a></div>
                 )}
-                <div style={{ marginTop: '10px', display: 'flex', gap: '5px' }}>
-                  {p.estado === 'Pendiente' && <button onClick={() => changeStatus(p.id, 'Entregado')} style={{ padding: '4px', cursor: 'pointer' }}>Entregado</button>}
-                  {p.estado === 'Entregado' && <button onClick={() => changeStatus(p.id, 'Pendiente')} style={{ padding: '4px', cursor: 'pointer' }}>Pendiente</button>}
-                  <button onClick={() => openDeleteConfirm(p)} style={{ padding: '4px', cursor: 'pointer', color: '#B71C1C', background: '#FFF0F0', border: '1px solid #FFCDD2', borderRadius: '4px' }}>🗑 Eliminar</button>
+                <div className="map-popup-actions">
+                  {p.estado === 'Pendiente' && <button className="btn-popup-status" onClick={() => changeStatus(p.id, 'Entregado')}>Entregado</button>}
+                  {p.estado === 'Entregado' && <button className="btn-popup-status" onClick={() => changeStatus(p.id, 'Pendiente')}>Pendiente</button>}
+                  <button className="btn-popup-delete" onClick={() => openDeleteConfirm(p)}>🗑 Eliminar</button>
                 </div>
               </div>
             </Popup>

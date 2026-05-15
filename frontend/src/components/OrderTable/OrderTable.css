@@ -1,0 +1,178 @@
+.order-list {
+  margin-top: 20px;
+}
+
+.order-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.order-count-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.btn-toggle-select {
+  background: none;
+  border: none;
+  color: var(--gold-dark);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.empty-orders {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  background: #fff;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+}
+
+.orders-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #fff;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.order-card.selected {
+  border-left: 4px solid var(--brown);
+}
+
+.custom-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #ddd;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.custom-checkbox.checked {
+  border-color: var(--brown);
+  background: var(--brown);
+}
+
+.checkbox-tick {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.order-info-main {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 0;
+}
+
+.order-text-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.order-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brown);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-address {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-time-range {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.order-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+  margin: 0 12px;
+  flex-shrink: 0;
+}
+
+.badge-status {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+.badge-status.pagado {
+  background: #e8f5e9;
+  color: #2E7D32;
+  border-color: #c8e6c9;
+}
+
+.badge-status.pendiente-pago {
+  background: #fff3e0;
+  color: #E65100;
+  border-color: #ffe0b2;
+}
+
+.badge-status.entregado {
+  background: #e8f5e9;
+  color: #2E7D32;
+  border-color: #c8e6c9;
+}
+
+.badge-status.pendiente-entrega {
+  background: #fbe9e7;
+  color: #d32f2f;
+  border-color: #ffccbc;
+}
+
+.btn-map-action {
+  background: #1565C0;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}

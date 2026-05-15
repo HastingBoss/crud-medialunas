@@ -2,6 +2,7 @@ import React from 'react';
 import DatePicker from 'react-datepicker';
 import { es } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
+import './DaySelector.css';
 
 export default function DaySelector({
   next7Days, formatDateISO, todayISO, daysStr, fecha, handleInputChange,
@@ -10,10 +11,10 @@ export default function DaySelector({
   scrollRef, scrollByAmount, handleScroll, dateError, anticipationError, getSelectedDateText,
 }) {
   return (
-    <>
+    <div className="day-selector-container">
       {!showCalendar ? (
-        <div style={{ border: '1.5px solid var(--border)', borderRadius: '10px', padding: '12px', background: '#fff' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="day-selector-card">
+          <div className="day-selector-row">
             <button
               type="button"
               className="nav-arrow"
@@ -25,7 +26,7 @@ export default function DaySelector({
               <div
                 ref={scrollRef}
                 onScroll={handleScroll}
-                style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '5px', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1 }}
+                className="days-scroll-container"
               >
                 {next7Days.map(d => {
                   const iso = formatDateISO(d);
@@ -35,6 +36,7 @@ export default function DaySelector({
                     <button
                       key={iso}
                       type="button"
+                      className={`day-btn ${isSelected ? 'selected' : ''}`}
                       onClick={() => {
                         if (isToday) return;
                         handleInputChange('fecha', iso);
@@ -42,18 +44,9 @@ export default function DaySelector({
                         setAnticipationError(false);
                       }}
                       disabled={isToday}
-                      style={{
-                        flex: '0 0 auto', minWidth: '60px', padding: '10px', borderRadius: '8px',
-                        border: isSelected ? '2px solid var(--brown)' : '1px solid var(--border)',
-                        background: isSelected ? '#fdf8f5' : '#fff',
-                        color: isSelected ? 'var(--brown)' : 'inherit',
-                        cursor: isToday ? 'not-allowed' : 'pointer',
-                        opacity: isToday ? 0.4 : 1,
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
-                      }}
                     >
-                      <span style={{ fontSize: '12px', fontWeight: 500 }}>{daysStr[d.getDay()]}</span>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{d.getDate()}</span>
+                      <span className="day-name-label">{daysStr[d.getDay()]}</span>
+                      <span className="day-num-label">{d.getDate()}</span>
                     </button>
                   );
                 })}
@@ -70,12 +63,12 @@ export default function DaySelector({
 
           <button
             type="button"
+            className="btn-show-calendar"
             onClick={() => setShowCalendar(true)}
-            style={{ marginTop: '10px', background: 'none', border: 'none', color: 'var(--brown)', fontWeight: 500, cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}
           >Elegir otra fecha →</button>
         </div>
       ) : (
-        <div style={{ marginTop: '5px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
+        <div className="calendar-wrapper">
           <DatePicker
             selected={parseLocalDate(fecha)}
             onChange={(date) => {
@@ -92,19 +85,19 @@ export default function DaySelector({
           />
           <button
             type="button"
+            className="btn-show-calendar"
             onClick={() => setShowCalendar(false)}
-            style={{ background: 'none', border: 'none', color: 'var(--brown)', fontWeight: 500, cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}
           >← Volver</button>
         </div>
       )}
 
       {fecha && (
-        <div style={{ marginTop: '10px', color: '#2E7D32', fontWeight: 500, fontSize: '14px' }}>
+        <div className="selected-date-feedback">
           {getSelectedDateText()}
         </div>
       )}
-      {dateError && <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>Debe seleccionar una fecha.</div>}
-      {anticipationError && <div style={{ color: 'red', fontSize: '12px', marginTop: '5px', fontWeight: 600 }}>Los pedidos deben realizarse con al menos 24hs de anticipación.</div>}
-    </>
+      {dateError && <div className="error-text">Debe seleccionar una fecha.</div>}
+      {anticipationError && <div className="error-text bold">Los pedidos deben realizarse con al menos 24hs de anticipación.</div>}
+    </div>
   );
 }

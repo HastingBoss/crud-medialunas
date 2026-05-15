@@ -1,0 +1,60 @@
+.stock-alert-floating {
+  position: fixed;
+  bottom: 30px;
+  right: 20px;
+  left: 20px;
+  max-width: 350px;
+  margin: 0 auto;
+  background: #fff;
+  border-left: 6px solid #d32f2f;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  padding: 20px;
+  z-index: 20000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: slideInStock 0.4s ease-out;
+}
+
+@keyframes slideInStock {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.stock-alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.stock-alert-icon {
+  font-size: 18px;
+}
+
+.stock-alert-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+}
+
+.stock-alert-title {
+  font-weight: 700;
+  color: #d32f2f;
+  font-size: 16px;
+}
+
+.stock-alert-body {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.stock-alert-footer {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}

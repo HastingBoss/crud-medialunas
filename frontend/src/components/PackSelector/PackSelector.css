@@ -1,0 +1,125 @@
+.pack-selector-container {
+  margin-top: 22px;
+}
+
+.check-mark {
+  color: #2E7D32;
+  margin-left: 8px;
+  font-size: 18px;
+}
+
+.packs-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+}
+
+.pack-row {
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
+  background: #fff; 
+  border: 1.5px solid var(--border); 
+  border-radius: 10px; 
+  padding: 12px 14px;
+  transition: border-color 0.2s;
+}
+
+.pack-row.active { 
+  border-color: var(--gold); 
+  background: #FFF8EC; 
+}
+
+.pack-info { 
+  flex: 1; 
+}
+
+.pack-name { 
+  font-size: 14px; 
+  font-weight: 500; 
+  color: var(--brown); 
+}
+
+.pack-price { 
+  font-size: 12px; 
+  color: var(--gold-dark); 
+  margin-top: 2px; 
+}
+
+.qty-control { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+}
+
+.qty-btn {
+  width: 30px; 
+  height: 30px; 
+  border-radius: 50%; 
+  border: 1.5px solid var(--border);
+  background: #fff; 
+  font-size: 16px; 
+  cursor: pointer; 
+  display: flex; 
+  align-items: center;
+  justify-content: center; 
+  color: var(--brown); 
+  transition: all 0.15s; 
+  line-height: 1; 
+  padding: 0;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.qty-btn:hover:not(:disabled) { 
+  border-color: var(--gold); 
+  background: #FFF8EC; 
+}
+
+.qty-btn:disabled { 
+  opacity: 0.3; 
+  cursor: default; 
+}
+
+.qty-num { 
+  font-size: 15px; 
+  font-weight: 500; 
+  min-width: 20px; 
+  text-align: center; 
+  color: var(--brown); 
+}
+
+.resumen {
+  background: #fff; 
+  border: 1.5px solid var(--border); 
+  border-radius: 10px;
+  padding: 14px; 
+  margin-bottom: 16px; 
+  display: none;
+}
+
+.resumen.visible { 
+  display: block; 
+}
+
+.resumen-title { 
+  font-size: 11px; 
+  text-transform: uppercase; 
+  letter-spacing: 0.5px; 
+  color: var(--muted); 
+  margin-bottom: 8px; 
+}
+
+.resumen-items { 
+  font-size: 13px; 
+  color: var(--brown-light); 
+  line-height: 1.8; 
+}
+
+.resumen-total { 
+  font-size: 15px; 
+  font-weight: 500; 
+  color: var(--brown); 
+  margin-top: 8px; 
+  padding-top: 8px; 
+  border-top: 1px solid var(--border); 
+}

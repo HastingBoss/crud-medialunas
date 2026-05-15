@@ -1,0 +1,79 @@
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--brown);
+  padding: 14px 20px;
+}
+
+.admin-header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: #F9F3E8;
+}
+
+.admin-header-title span {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.status-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-text {
+  font-size: 13px;
+  fontWeight: 600;
+  color: #F9F3E8;
+  white-space: nowrap;
+}
+
+.btn-close-now {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-close-now:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.btn-extend {
+  background: var(--gold);
+  color: var(--brown);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-extend:hover {
+  opacity: 0.9;
+}

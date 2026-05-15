@@ -38,62 +38,6 @@ input:focus, select:focus { border-color: var(--gold); }
   font-size: 13px; color: var(--muted); padding-bottom: 11px; text-align: center;
 }
 
-.packs-list { display: flex; flex-direction: column; gap: 10px; }
-.pack-row {
-  display: flex; align-items: center; justify-content: space-between;
-  background: #fff; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px;
-  transition: border-color 0.2s;
-}
-.pack-row.active { border-color: var(--gold); background: #FFF8EC; }
-.pack-info { flex: 1; }
-.pack-name { font-size: 14px; font-weight: 500; color: var(--brown); }
-.pack-price { font-size: 12px; color: var(--gold-dark); margin-top: 2px; }
-.qty-control { display: flex; align-items: center; gap: 10px; }
-.qty-btn {
-  width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border);
-  background: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center;
-  justify-content: center; color: var(--brown); transition: all 0.15s; line-height: 1; padding: 0;
-  font-family: 'DM Sans', sans-serif;
-}
-.qty-btn:hover:not(:disabled) { border-color: var(--gold); background: #FFF8EC; }
-.qty-btn:disabled { opacity: 0.3; cursor: default; }
-.qty-num { font-size: 15px; font-weight: 500; min-width: 20px; text-align: center; color: var(--brown); }
-
-.resumen {
-  background: #fff; border: 1.5px solid var(--border); border-radius: 10px;
-  padding: 14px; margin-bottom: 16px; display: none;
-}
-.resumen.visible { display: block; }
-.resumen-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px; }
-.resumen-items { font-size: 13px; color: var(--brown-light); line-height: 1.8; }
-.resumen-total { font-size: 15px; font-weight: 500; color: var(--brown); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
-
-.payment-options { display: flex; gap: 10px; }
-.pay-option {
-  flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 12px;
-  cursor: pointer; background: #fff; transition: all 0.2s; position: relative;
-}
-.pay-option:hover { border-color: var(--gold); }
-.pay-option.selected { border-color: var(--gold); background: #FFF8EC; box-shadow: 0 0 0 3px rgba(196,146,42,0.12); }
-.pay-icon { font-size: 20px; margin-bottom: 4px; }
-.pay-label { font-size: 13px; font-weight: 500; color: var(--brown); }
-.pay-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-.comprobante-field { margin-top: 14px; display: none; }
-.comprobante-field.visible { display: block; animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-.upload-area {
-  border: 2px dashed var(--border); border-radius: 10px; padding: 20px 16px;
-  text-align: center; cursor: pointer; background: #fff; transition: all 0.2s; position: relative;
-}
-.upload-area:hover { border-color: var(--gold); background: #FFFBF4; }
-.upload-area.has-file { border-color: var(--success); background: #F0FAF0; }
-.upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.upload-icon { font-size: 22px; margin-bottom: 6px; }
-.upload-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
-.upload-text strong { color: var(--gold-dark); font-weight: 500; }
-.file-name { font-size: 12px; color: var(--success); margin-top: 4px; font-weight: 500; display: none; }
-
 .submit-btn {
   width: 100%; padding: 14px; background: var(--brown); color: var(--cream); border: none;
   border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;

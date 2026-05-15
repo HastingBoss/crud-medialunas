@@ -1,0 +1,98 @@
+.order-summary-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.summary-card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid var(--gold);
+  text-align: left;
+  margin-bottom: 25px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.summary-card-title {
+  margin-top: 0;
+  color: var(--brown);
+  font-size: 18px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-family: "Playfair Display", serif;
+}
+
+.summary-line {
+  margin: 8px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.summary-line strong {
+  color: var(--brown);
+}
+
+.summary-divider {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed var(--border);
+}
+
+.summary-packs-label {
+  color: var(--brown);
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.summary-pack-item {
+  color: #555;
+  font-size: 15px;
+  margin: 4px 0;
+}
+
+.summary-total-row {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-total-label {
+  color: var(--brown);
+  font-size: 16px;
+}
+
+.summary-total-value {
+  color: var(--gold);
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.summary-payment-box {
+  margin-top: 15px;
+  color: #555;
+  font-size: 15px;
+  text-align: center;
+  background: #fdf8f5;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.final-contact-text {
+  font-weight: 500;
+  color: var(--brown);
+  text-align: center;
+  font-size: 16px;
+}

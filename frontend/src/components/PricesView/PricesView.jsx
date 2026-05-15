@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './PricesView.css';
 
 const PACKS = [
   { key: 'individual', label: 'Pack Individual', emoji: '🥐' },
@@ -16,7 +17,7 @@ export default function PricesView() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchPrices = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/prices`);
@@ -71,47 +72,29 @@ export default function PricesView() {
     }
   };
 
-  if (loading) return <div style={{ padding: '20px', color: 'var(--muted)' }}>Cargando precios...</div>;
+  if (loading) return <div className="prices-view-container" style={{ padding: '20px', color: 'var(--muted)' }}>Cargando precios...</div>;
 
   return (
-    <div style={{ fontFamily: '"DM Sans", sans-serif', width: '100%' }}>
-
-      <div style={{ marginBottom: '20px' }}>
-        <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--brown)', borderBottom: '2px solid #C4922A', paddingBottom: '6px', marginBottom: '6px' }}>
-          💰 Gestión de precios
-        </div>
-        <p style={{ fontSize: '12px', color: 'var(--muted)', margin: 0 }}>
+    <div className="prices-view-container">
+      <div className="prices-header">
+        <div className="prices-title">💰 Gestión de precios</div>
+        <p className="prices-subtitle">
           Los precios se guardan localmente en este dispositivo. Recargá la página del formulario para que los cambios tengan efecto.
         </p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+      <div className="prices-list">
         {PACKS.map(({ key, label, emoji }) => (
-          <div key={key} style={{ background: '#fff', borderRadius: '12px', padding: '14px 16px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--brown)' }}>{emoji} {label}</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '15px', color: '#888', fontWeight: 500 }}>$</span>
+          <div key={key} className="price-item-card">
+            <div className="price-item-label">{emoji} {label}</div>
+            <div className="price-input-group">
+              <span className="price-currency">$</span>
               <input
                 type="number"
+                className="price-input"
                 min="1"
                 value={prices[key]}
                 onChange={e => handleChange(key, e.target.value)}
-                style={{
-                  width: '100px',
-                  padding: '8px 10px',
-                  borderRadius: '8px',
-                  border: '1.5px solid var(--border)',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  color: 'var(--brown)',
-                  fontFamily: 'inherit',
-                  outline: 'none',
-                  textAlign: 'right',
-                }}
-                onFocus={e => e.target.style.borderColor = '#C4922A'}
-                onBlur={e => e.target.style.borderColor = 'var(--border)'}
               />
             </div>
           </div>
@@ -119,29 +102,20 @@ export default function PricesView() {
       </div>
 
       {error && (
-        <div style={{ color: '#B71C1C', fontSize: '13px', marginBottom: '12px', padding: '10px', background: '#FFF0F0', borderRadius: '8px', border: '1px solid #FFCDD2' }}>
-          ⚠️ {error}
-        </div>
+        <div className="price-error-msg">⚠️ {error}</div>
       )}
 
       {saved && (
-        <div style={{ color: '#2E7D32', fontSize: '13px', marginBottom: '12px', padding: '10px', background: '#e8f5e9', borderRadius: '8px', border: '1px solid #c8e6c9', fontWeight: 600 }}>
-          ✓ Precios guardados correctamente
-        </div>
+        <div className="price-success-msg">✓ Precios guardados correctamente</div>
       )}
 
-      <div style={{ display: 'flex', gap: '10px' }}>
-        <button
-          onClick={handleSave}
-          style={{ flex: 1, background: 'var(--brown)', color: '#fff', border: 'none', padding: '13px', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', fontFamily: 'inherit', transition: 'opacity 0.2s' }}
-          onMouseEnter={e => e.target.style.opacity = '0.85'}
-          onMouseLeave={e => e.target.style.opacity = '1'}
-        >
+      <div className="prices-actions">
+        <button className="btn-prices-save" onClick={handleSave}>
           Guardar precios
         </button>
         <button
+          className="btn-prices-reset"
           onClick={handleReset}
-          style={{ background: '#fff', color: 'var(--muted)', border: '1px solid var(--border)', padding: '13px 16px', borderRadius: '10px', fontWeight: 500, fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit' }}
           title="Restaurar precios originales"
         >
           Restablecer

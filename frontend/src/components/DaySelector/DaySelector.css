@@ -1,0 +1,107 @@
+.day-selector-card {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+}
+
+.day-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-arrow {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--brown);
+  transition: opacity 0.2s;
+}
+
+.days-scroll-container {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex: 1;
+}
+
+.days-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.day-btn {
+  flex: 0 0 auto;
+  min-width: 60px;
+  padding: 10px;
+  borderRadius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.day-btn.selected {
+  border: 2px solid var(--brown);
+  background: #fdf8f5;
+  color: var(--brown);
+}
+
+.day-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.day-name-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.day-num-label {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.btn-show-calendar {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: var(--brown);
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.calendar-wrapper {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.selected-date-feedback {
+  margin-top: 10px;
+  color: #2E7D32;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.error-text.bold {
+  font-weight: 600;
+}

@@ -1,0 +1,73 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  color: var(--brown);
+  margin-top: 0;
+}
+
+.modal-text {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.modal-select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 20px;
+  outline: none;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-modal {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.btn-secondary {
+  background: #f5f5f5;
+  color: var(--text);
+}
+
+.btn-primary {
+  background: var(--brown);
+  color: #fff;
+}
+
+.btn-danger {
+  background: #F44336;
+  color: #fff;
+}

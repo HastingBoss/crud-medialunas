@@ -1,11 +1,12 @@
 import React from 'react';
+import './PackSelector.css';
 
 export default function PackSelector({ qtys, cambiarQty, precios, nombres, resumenLineas, total, packsCompletos }) {
-  const CheckMark = () => <span style={{ color: '#2E7D32', marginLeft: '8px', fontSize: '18px' }}>✓</span>;
+  const CheckMark = () => <span className="check-mark">✓</span>;
 
   return (
-    <>
-      <p className="section-title" style={{ marginTop: '22px' }}>Elegí tus packs{packsCompletos && <CheckMark />}</p>
+    <div className="pack-selector-container">
+      <p className="section-title">Elegí tus packs{packsCompletos && <CheckMark />}</p>
 
       <div className="packs-list">
         {Object.keys(precios).map(packKey => {
@@ -27,7 +28,7 @@ export default function PackSelector({ qtys, cambiarQty, precios, nombres, resum
       </div>
 
       {resumenLineas.length > 0 && (
-        <div className="resumen visible" style={{ marginTop: '16px' }}>
+        <div className="resumen visible">
           <div className="resumen-title">Resumen del pedido</div>
           <div className="resumen-items">
             {Object.keys(qtys).map(k => qtys[k] > 0 && (
@@ -37,6 +38,6 @@ export default function PackSelector({ qtys, cambiarQty, precios, nombres, resum
           <div className="resumen-total">Total: ${total.toLocaleString('es-AR')}</div>
         </div>
       )}
-    </>
+    </div>
   );
 }

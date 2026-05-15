@@ -1,0 +1,158 @@
+.order-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.order-modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+.order-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--brown);
+}
+
+.order-modal-title {
+  color: var(--brown);
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 20px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.order-detail-line {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.order-detail-line strong {
+  color: var(--brown);
+}
+
+.view-proof-link {
+  color: var(--gold);
+  margin-left: 5px;
+  text-decoration: underline;
+}
+
+.status-summary-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  align-items: center;
+}
+
+.status-box {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.status-box.success {
+  border: 1px solid #2E7D32;
+  background: #e8f5e9;
+}
+
+.status-box.warning {
+  border: 1px solid #F57F17;
+  background: #fff3e0;
+}
+
+.status-label-success {
+  color: #2E7D32;
+}
+
+.status-label-warning {
+  color: #F57F17;
+}
+
+.action-buttons-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-whatsapp {
+  background: #25D366;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.btn-navigate {
+  background: #1976D2;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-toggle-status {
+  flex: 1;
+  background: #fff;
+  color: #333;
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn-archive {
+  margin-top: 10px;
+  width: 100%;
+  background: #FFF3E0;
+  color: #E65100;
+  border: 1px solid #FFCC80;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

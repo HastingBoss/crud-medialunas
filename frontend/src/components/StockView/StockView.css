@@ -1,0 +1,188 @@
+.stock-view-container {
+  font-family: "DM Sans", sans-serif;
+}
+
+.stock-section {
+  margin-bottom: 24px;
+}
+
+.stock-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--brown);
+  border-bottom: 2px solid #C4922A;
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+}
+
+.stock-cards-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stock-card-actual {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+.stock-value-large {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stock-value-large.low {
+  color: #d32f2f;
+}
+
+.stock-value-large.normal {
+  color: var(--brown);
+}
+
+.stock-unit-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.stock-card-config {
+  background: #fdf8f5;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  flex: 1 1 280px;
+}
+
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.config-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.config-label {
+  font-size: 13px;
+  color: var(--brown);
+  width: 120px;
+}
+
+.config-input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  outline: none;
+  font-size: 14px;
+}
+
+.btn-save-stock {
+  background: var(--brown);
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.sales-chart-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+
+.chart-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.chart-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 180px;
+  padding-bottom: 30px;
+  position: relative;
+}
+
+.chart-bar-container {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+}
+
+.chart-bar-value {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--brown);
+  margin-bottom: 4px;
+}
+
+.chart-bar {
+  width: 100%;
+  max-width: 35px;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-day-label {
+  position: absolute;
+  bottom: -22px;
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  width: 100%;
+}
+
+.forecast-tip {
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tip-icon {
+  font-size: 24px;
+}
+
+.tip-text {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
