@@ -11,7 +11,7 @@ export default function SystemClock() {
   const fetchServerTime = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/time`);
-      setServerTime(new Date(res.serverTime));
+      setServerTime(new Date(res.data.serverTime));
     } catch (err) {
       console.error('Error fetching server time:', err);
     }
@@ -21,11 +21,9 @@ export default function SystemClock() {
     fetchServerTime();
     const interval = setInterval(() => {
       setUserTime(new Date());
-      // Incrementamos el tiempo del servidor localmente para que sea fluido
       setServerTime(prev => prev ? new Date(prev.getTime() + 1000) : null);
     }, 1000);
 
-    // Re-sincronizamos con el servidor cada 30 segundos
     const syncInterval = setInterval(fetchServerTime, 30000);
 
     return () => {
@@ -35,8 +33,8 @@ export default function SystemClock() {
   }, []);
 
   const formatTime = (date) => {
-    if (!date) return '--:--:--';
-    return date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    if (!date) return '--:--';
+    return date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
   };
 
   const formatDate = (date) => {
