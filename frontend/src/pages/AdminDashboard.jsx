@@ -40,7 +40,7 @@ export default function AdminDashboard() {
     calcularTotal, reprogramarOrder, stock, threshold, updateStockAPI, calcularUnidades 
   } = useOrders();
 
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
+  const [filterDate, setFilterDate] = useState(new Date().toLocaleDateString('sv-SE'));
   const [filterStatus, setFilterStatus] = useState('');
   const [adminPos, setAdminPos] = useState({ lat: -34.6080, lng: -58.4620 });
   const [mapCenter, setMapCenter] = useState([-34.6080, -58.4620]);

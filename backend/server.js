@@ -69,6 +69,15 @@ app.put('/api/config/extender', (req, res) => {
   res.json({ message: 'Horario de cierre extendido', config: global.config });
 });
 
+app.get('/api/time', (req, res) => {
+  const now = new Date();
+  res.json({
+    serverTime: now.toISOString(),
+    formatted: now.toLocaleString('sv-SE'),
+    timezone: process.env.TZ
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

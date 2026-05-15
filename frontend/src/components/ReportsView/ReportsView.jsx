@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import './ReportsView.css';
 
 export default function ReportsView({ orders, calcularTotal }) {
-  const [reportDate, setReportDate] = useState(new Date().toISOString().split('T')[0]);
-  const [reportMonth, setReportMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [reportDate, setReportDate] = useState(new Date().toLocaleDateString('sv-SE'));
+  const [reportMonth, setReportMonth] = useState(new Date().toLocaleDateString('sv-SE').slice(0, 7));
 
   // Daily
   const dayOrders = orders.filter(o => o.fecha && String(o.fecha).split('T')[0] === reportDate);

@@ -1,4 +1,4 @@
-import React from 'react';
+import SystemClock from '../SystemClock/SystemClock.jsx';
 import './AdminHeader.css';
 
 export default function AdminHeader({ config, onOpenCloseConfirm, onOpenExtendModal }) {
@@ -9,6 +9,7 @@ export default function AdminHeader({ config, onOpenCloseConfirm, onOpenExtendMo
     <div className="admin-header">
       <div className="admin-header-title">🥐 <span>Admin</span> Medialunas</div>
       
+      <SystemClock />
       <div className="status-controls">
         <div className="status-badge">
           <div 
