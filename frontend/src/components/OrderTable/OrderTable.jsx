@@ -3,9 +3,18 @@ import './OrderTable.css';
 
 export default function OrderTable({ 
   filteredOrders, setSelectedOrder, setMapCenter, setMapZoom, 
-  renderPacks, safeDate, selectedForRoute, toggleOrderSelection, toggleSelectAll 
+  renderPacks, safeDate, selectedForRoute, toggleOrderSelection, toggleSelectAll,
+  sortByTime, setSortByTime, timeFrom, setTimeFrom, timeTo, setTimeTo
 }) {
   const allSelected = filteredOrders.length > 0 && filteredOrders.every(o => selectedForRoute.includes(o.id));
+
+  const timeOptions = [];
+  for (let hour = 8; hour <= 10; hour++) {
+    for (let min = 0; min < 60; min += 30) {
+      const time = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+      timeOptions.push(time);
+    }
+  }
 
   return (
     <div className="order-list">
@@ -16,6 +25,40 @@ export default function OrderTable({
         <button className="btn-toggle-select" onClick={toggleSelectAll}>
           {allSelected ? 'Desmarcar todos' : 'Marcar todos'}
         </button>
+      </div>
+
+      <div className="order-filters">
+        <select 
+          className="filter-select" 
+          value={sortByTime} 
+          onChange={e => setSortByTime(e.target.value)}
+        >
+          <option value="asc">Ordenar por horario ↑ (más temprano primero)</option>
+          <option value="desc">Ordenar por horario ↓ (más tarde primero)</option>
+          <option value="none">Sin ordenar</option>
+        </select>
+        
+        <select 
+          className="filter-select" 
+          value={timeFrom} 
+          onChange={e => setTimeFrom(e.target.value)}
+        >
+          <option value="">Desde</option>
+          {timeOptions.map(time => (
+            <option key={time} value={time}>{time}</option>
+          ))}
+        </select>
+        
+        <select 
+          className="filter-select" 
+          value={timeTo} 
+          onChange={e => setTimeTo(e.target.value)}
+        >
+          <option value="">Hasta</option>
+          {timeOptions.map(time => (
+            <option key={time} value={time}>{time}</option>
+          ))}
+        </select>
       </div>
 
       {!filteredOrders.length ? (
@@ -52,7 +95,7 @@ export default function OrderTable({
                   <div className="order-text-content">
                     <div className="order-name">{order.nombre}</div>
                     <div className="order-address">{order.direccion}</div>
-                    <div className="order-time-range">🕒 {order.desde} - {order.hasta}</div>
+                    <div className="order-time-range">⏰ <strong>{order.desde} - {order.hasta}</strong></div>
                   </div>
                   
                   <div className="order-badges">

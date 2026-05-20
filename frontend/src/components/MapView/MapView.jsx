@@ -3,13 +3,19 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import './MapView.css';
 
-export default function MapView({ filteredOrders, mapCenter, mapZoom, adminPos, renderPacks, safeDate, changeStatus, openDeleteConfirm, API_URL }) {
-  const getIcon = (estado) => {
+export default function MapView({ filteredOrders, mapCenter, mapZoom, adminPos, renderPacks, safeDate, changeStatus, openDeleteConfirm, API_URL, timeFrom, timeTo }) {
+  const getIcon = (estado, isDimmed) => {
     const color = estado === 'Entregado' ? '#2E7D32' : '#F57F17';
+    const opacity = isDimmed ? 0.3 : 1;
     return L.divIcon({
-      html: `<div style="width:16px;height:16px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.3)"></div>`,
+      html: `<div style="width:16px;height:16px;border-radius:50%;background:${color};border:2.5px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.3);opacity:${opacity}"></div>`,
       iconSize: [16, 16], iconAnchor: [8, 8], className: '',
     });
+  };
+
+  const matchesTimeFilter = (order) => {
+    if (!timeFrom || !timeTo || !order.desde) return true;
+    return order.desde >= timeFrom && order.desde <= timeTo;
   };
 
   const adminIcon = L.divIcon({
@@ -25,7 +31,7 @@ export default function MapView({ filteredOrders, mapCenter, mapZoom, adminPos, 
           <Popup><strong>Mi ubicación</strong></Popup>
         </Marker>
         {filteredOrders.map(p => (
-          <Marker key={p.id} position={[p.lat, p.lng]} icon={getIcon(p.estado)}>
+          <Marker key={p.id} position={[p.lat, p.lng]} icon={getIcon(p.estado, !matchesTimeFilter(p))}>
             <Popup>
               <div className="map-popup-content">
                 <strong className="map-popup-title">{p.nombre || 'Sin nombre'} ({renderPacks(p.paquete)})</strong><br />

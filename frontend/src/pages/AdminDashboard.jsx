@@ -42,6 +42,9 @@ export default function AdminDashboard() {
 
   const [filterDate, setFilterDate] = useState(new Date().toLocaleDateString('sv-SE'));
   const [filterStatus, setFilterStatus] = useState('');
+  const [sortByTime, setSortByTime] = useState('asc');
+  const [timeFrom, setTimeFrom] = useState('');
+  const [timeTo, setTimeTo] = useState('');
   const [adminPos, setAdminPos] = useState({ lat: -34.6080, lng: -58.4620 });
   const [mapCenter, setMapCenter] = useState([-34.6080, -58.4620]);
   const [mapZoom, setMapZoom] = useState(13);
@@ -202,6 +205,28 @@ export default function AdminDashboard() {
   const filteredOrders = orders.filter(p => {
     if (p.archivado) return false;
     const orderDate = p.fecha ? String(p.fecha).split('T')[0] : '';
+    const matchesDate = !filterDate || orderDate === filterDate;
+    const matchesStatus = !filterStatus || p.estado === filterStatus;
+    
+    let matchesTimeRange = true;
+    if (timeFrom && timeTo && p.desde) {
+      const orderTime = p.desde;
+      matchesTimeRange = orderTime >= timeFrom && orderTime <= timeTo;
+    }
+    
+    return matchesDate && matchesStatus && matchesTimeRange;
+  }).sort((a, b) => {
+    if (sortByTime === 'none') return 0;
+    if (!a.desde || !b.desde) return 0;
+    const timeA = a.desde;
+    const timeB = b.desde;
+    if (sortByTime === 'asc') return timeA.localeCompare(timeB);
+    return timeB.localeCompare(timeA);
+  });
+
+  const filteredOrdersForMap = orders.filter(p => {
+    if (p.archivado) return false;
+    const orderDate = p.fecha ? String(p.fecha).split('T')[0] : '';
     return (!filterDate || orderDate === filterDate) && (!filterStatus || p.estado === filterStatus);
   });
 
@@ -283,12 +308,14 @@ export default function AdminDashboard() {
           </div>
 
           <MapView
-            filteredOrders={filteredOrders}
+            filteredOrders={filteredOrdersForMap}
             mapCenter={mapCenter} mapZoom={mapZoom}
             adminPos={adminPos}
             renderPacks={renderPacks} safeDate={safeDate}
             changeStatus={changeStatus} openDeleteConfirm={openDeleteConfirm}
             API_URL={API_URL}
+            timeFrom={timeFrom}
+            timeTo={timeTo}
           />
 
           <div className="leyenda">
@@ -306,6 +333,12 @@ export default function AdminDashboard() {
             selectedForRoute={selectedForRoute}
             toggleOrderSelection={toggleOrderSelection}
             toggleSelectAll={toggleSelectAll}
+            sortByTime={sortByTime}
+            setSortByTime={setSortByTime}
+            timeFrom={timeFrom}
+            setTimeFrom={setTimeFrom}
+            timeTo={timeTo}
+            setTimeTo={setTimeTo}
           />
         </div>
       )}
