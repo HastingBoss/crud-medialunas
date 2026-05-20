@@ -4,7 +4,7 @@ import './OrderTable.css';
 export default function OrderTable({ 
   filteredOrders, setSelectedOrder, setMapCenter, setMapZoom, 
   renderPacks, safeDate, selectedForRoute, toggleOrderSelection, toggleSelectAll,
-  sortByTime, setSortByTime, timeFrom, setTimeFrom, timeTo, setTimeTo
+  timeFrom, setTimeFrom, timeTo, setTimeTo
 }) {
   const allSelected = filteredOrders.length > 0 && filteredOrders.every(o => selectedForRoute.includes(o.id));
 
@@ -28,37 +28,31 @@ export default function OrderTable({
       </div>
 
       <div className="order-filters">
-        <select 
-          className="filter-select" 
-          value={sortByTime} 
-          onChange={e => setSortByTime(e.target.value)}
-        >
-          <option value="asc">Ordenar por horario ↑ (más temprano primero)</option>
-          <option value="desc">Ordenar por horario ↓ (más tarde primero)</option>
-          <option value="none">Sin ordenar</option>
-        </select>
-        
-        <select 
-          className="filter-select" 
-          value={timeFrom} 
-          onChange={e => setTimeFrom(e.target.value)}
-        >
-          <option value="">Desde</option>
-          {timeOptions.map(time => (
-            <option key={time} value={time}>{time}</option>
-          ))}
-        </select>
-        
-        <select 
-          className="filter-select" 
-          value={timeTo} 
-          onChange={e => setTimeTo(e.target.value)}
-        >
-          <option value="">Hasta</option>
-          {timeOptions.map(time => (
-            <option key={time} value={time}>{time}</option>
-          ))}
-        </select>
+        <div className="time-range-filters">
+          <select 
+            className="filter-select" 
+            value={timeFrom} 
+            onChange={e => setTimeFrom(e.target.value)}
+          >
+            <option value="">Desde</option>
+            {timeOptions.map(time => (
+              <option key={time} value={time}>{time}</option>
+            ))}
+          </select>
+          
+          <span className="time-separator">→</span>
+          
+          <select 
+            className="filter-select" 
+            value={timeTo} 
+            onChange={e => setTimeTo(e.target.value)}
+          >
+            <option value="">Hasta</option>
+            {timeOptions.map(time => (
+              <option key={time} value={time}>{time}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {!filteredOrders.length ? (

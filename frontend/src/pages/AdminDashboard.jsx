@@ -42,7 +42,6 @@ export default function AdminDashboard() {
 
   const [filterDate, setFilterDate] = useState(new Date().toLocaleDateString('sv-SE'));
   const [filterStatus, setFilterStatus] = useState('');
-  const [sortByTime, setSortByTime] = useState('asc');
   const [timeFrom, setTimeFrom] = useState('');
   const [timeTo, setTimeTo] = useState('');
   const [adminPos, setAdminPos] = useState({ lat: -34.6080, lng: -58.4620 });
@@ -216,12 +215,8 @@ export default function AdminDashboard() {
     
     return matchesDate && matchesStatus && matchesTimeRange;
   }).sort((a, b) => {
-    if (sortByTime === 'none') return 0;
     if (!a.desde || !b.desde) return 0;
-    const timeA = a.desde;
-    const timeB = b.desde;
-    if (sortByTime === 'asc') return timeA.localeCompare(timeB);
-    return timeB.localeCompare(timeA);
+    return a.desde.localeCompare(b.desde);
   });
 
   const filteredOrdersForMap = orders.filter(p => {
@@ -333,8 +328,6 @@ export default function AdminDashboard() {
             selectedForRoute={selectedForRoute}
             toggleOrderSelection={toggleOrderSelection}
             toggleSelectAll={toggleSelectAll}
-            sortByTime={sortByTime}
-            setSortByTime={setSortByTime}
             timeFrom={timeFrom}
             setTimeFrom={setTimeFrom}
             timeTo={timeTo}
