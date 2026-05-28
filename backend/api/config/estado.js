@@ -32,7 +32,8 @@ module.exports = async (req, res) => {
     formularioAbierto = false;
   } else {
     const [closeHour] = config.horarioCierre.split(':').map(Number);
-    formularioAbierto = getArgentinaHour() >= 0 && getArgentinaHour() < closeHour;
+    const hora = getArgentinaHour();
+    formularioAbierto = hora < closeHour;
   }
 
   res.json({ formularioAbierto, horarioCierre: config.horarioCierre, forzadoCerrado: config.forzadoCerrado });
