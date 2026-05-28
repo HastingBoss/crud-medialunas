@@ -3,37 +3,51 @@ const prisma = new PrismaClient();
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'PUT,POST,OPTIONS',
+  'Access-Control-Allow-Methods': 'PUT,POST,DELETE,OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type'
 };
-
-function getArgentinaDate() {
-  return new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Argentina/Buenos_Aires' });
-}
 
 module.exports = async (req, res) => {
   Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  if (req.method === 'PUT') {
-    const { horaExtencion } = req.body;
-    if (!horaExtencion) return res.status(400).json({ message: 'Debe proveer horaExtencion (HH:MM)' });
-    const config = await prisma.config.upsert({
-      where: { id: 1 },
-      update: { horarioCierre: horaExtencion, forzadoCerrado: false, fechaForzado: null },
-      create: { id: 1, horarioCierre: horaExtencion, forzadoCerrado: false }
-    });
-    return res.json({ message: 'Horario de cierre actualizado', config });
-  }
+  try {
+    // PUT — cambiar horario de cierre (extender o recortar)
+    if (req.method === 'PUT') {
+      const { horarioCierre } = req.body;
+      if (!horarioCierre) return res.status(400).json({ message: 'Debe proveer horarioCierre (HH:MM)' });
+      const config = await prisma.config.upsert({
+        where: { id: 1 },
+        update: { horarioCierre },
+        create: { id: 1, horarioCierre, forzadoCerrado: false }
+      });
+      return res.json({ message: 'Horario de cierre actualizado', config });
+    }
 
-  if (req.method === 'POST') {
-    const config = await prisma.config.upsert({
-      where: { id: 1 },
-      update: { forzadoCerrado: true, fechaForzado: getArgentinaDate() },
-      create: { id: 1, horarioCierre: '05:00', forzadoCerrado: true, fechaForzado: getArgentinaDate() }
-    });
-    return res.json({ message: 'Formulario cerrado manualmente', config });
-  }
+    // POST — cierre por fecha (imprevisto)
+    if (req.method === 'POST') {
+      const { cierreHasta } = req.body;
+      if (!cierreHasta) return res.status(400).json({ message: 'Debe proveer cierreHasta (YYYY-MM-DD)' });
+      const config = await prisma.config.upsert({
+        where: { id: 1 },
+        update: { cierreHasta },
+        create: { id: 1, horarioCierre: '05:00', forzadoCerrado: false, cierreHasta }
+      });
+      return res.json({ message: 'Cierre por fecha configurado', config });
+    }
 
-  res.status(405).json({ message: 'Método no permitido' });
+    // DELETE — levantar cierre por fecha
+    if (req.method === 'DELETE') {
+      const config = await prisma.config.upsert({
+        where: { id: 1 },
+        update: { cierreHasta: null },
+        create: { id: 1, horarioCierre: '05:00', forzadoCerrado: false }
+      });
+      return res.json({ message: 'Cierre por fecha levantado', config });
+    }
+
+    res.status(405).json({ message: 'Método no permitido' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

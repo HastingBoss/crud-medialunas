@@ -22,10 +22,8 @@ async function isFormularioAbierto() {
     create: { id: 1, horarioCierre: '05:00', forzadoCerrado: false }
   });
   const hoy = getArgentinaDate();
-  if (config.forzadoCerrado && config.fechaForzado === hoy) return false;
-  const [closeHour] = config.horarioCierre.split(':').map(Number);
-  const hora = getArgentinaHour();
-  return hora < closeHour;
+  if (config.cierreHasta && config.cierreHasta >= hoy) return false;
+  return true;
 }
 
 module.exports = async (req, res) => {
