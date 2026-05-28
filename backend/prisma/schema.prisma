@@ -26,3 +26,17 @@ model Pedido {
   comprobante   String?
   createdAt     DateTime @default(now())
 }
+
+model Precios {
+  id         Int    @id @default(autoincrement())
+  individual Float
+  media      Float
+  clasico    Float
+  familiar   Float
+}
+
+model Stock {
+  id        Int @id @default(autoincrement())
+  stock     Int
+  threshold Int
+}
