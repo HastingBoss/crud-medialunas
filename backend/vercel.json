@@ -4,6 +4,15 @@
     { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
+    {
+      "src": "/(.*)",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization"
+      },
+      "continue": true
+    },
     { "src": "/api/orders/([^/]+)", "dest": "/api/orders/[id].js" },
     { "src": "/api/orders", "dest": "/api/orders.js" },
     { "src": "/api/prices", "dest": "/api/prices.js" },
