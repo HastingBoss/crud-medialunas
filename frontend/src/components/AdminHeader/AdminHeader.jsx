@@ -1,7 +1,7 @@
 import SystemClock from '../SystemClock/SystemClock.jsx';
 import './AdminHeader.css';
 
-export default function AdminHeader({ config, onOpenCloseConfirm, onOpenExtendModal, onOpenCierreHastaModal }) {
+export default function AdminHeader({ config, onOpenCloseConfirm, onOpenExtendModal, onOpenCierreHastaModal, onLevantarCierre }) {
   const isOpen = config.formularioAbierto;
   const statusColor = isOpen ? '#4CAF50' : '#F44336';
 
@@ -27,9 +27,23 @@ export default function AdminHeader({ config, onOpenCloseConfirm, onOpenExtendMo
           </button>
         )}
 
-        <button className="btn-close-now" style={{ background: '#856404', borderColor: '#856404' }} onClick={onOpenCierreHastaModal}>
-          📋 Cerrar hasta...
-        </button>
+        {config.cierreHasta ? (
+          <button 
+            className="btn-close-now" 
+            style={{ background: '#2E7D32', borderColor: '#2E7D32' }} 
+            onClick={onLevantarCierre}
+          >
+            ✓ Levantar cierre ({config.cierreHasta})
+          </button>
+        ) : (
+          <button 
+            className="btn-close-now" 
+            style={{ background: '#856404', borderColor: '#856404' }} 
+            onClick={onOpenCierreHastaModal}
+          >
+            📋 Cerrar hasta...
+          </button>
+        )}
       </div>
     </div>
   );

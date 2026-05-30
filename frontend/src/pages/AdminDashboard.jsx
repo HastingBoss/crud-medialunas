@@ -289,6 +289,7 @@ export default function AdminDashboard() {
         onOpenCloseConfirm={() => setShowCloseConfirm(true)} 
         onOpenExtendModal={() => setShowExtendModal(true)}
         onOpenCierreHastaModal={() => setShowCierreHastaModal(true)}
+        onLevantarCierre={handleLevantarCierre}
       />
 
       <AdminTabs 
