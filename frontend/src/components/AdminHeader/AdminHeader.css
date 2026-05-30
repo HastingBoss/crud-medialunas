@@ -81,11 +81,22 @@
   .admin-header {
     flex-direction: column;
     gap: 12px;
-    align-items: flex-start;
+    align-items: stretch;
+    padding: 14px 16px;
   }
   
   .status-controls {
     width: 100%;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+
+  .status-controls > * {
+    flex: 1 1 calc(50% - 8px);
+    text-align: center;
+    justify-content: center;
+    min-width: 110px;
+    box-sizing: border-box;
   }
 }
