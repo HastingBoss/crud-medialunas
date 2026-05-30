@@ -54,6 +54,8 @@ export default function AdminDashboard() {
   const [showExtendModal, setShowExtendModal] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [extendTime, setExtendTime] = useState('06:00');
+  const [showCierreHastaModal, setShowCierreHastaModal] = useState(false);
+  const [cierreHastaDate, setCierreHastaDate] = useState('');
 
   const fetchConfig = async () => {
     try {
@@ -65,12 +67,10 @@ export default function AdminDashboard() {
   };
 
   const handleCloseNow = async () => {
-    const now = new Date();
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mm = String(now.getMinutes()).padStart(2, '0');
-    const currentTime = `${hh}:${mm}`;
     try {
-      await axios.put(`${API_URL}/api/config/extender`, { horaExtencion: currentTime });
+      const today = new Date().toLocaleDateString('sv-SE');
+      await axios.post(`${API_URL}/api/config/extender`, { cierreHasta: today });
+      setShowCloseConfirm(false);
       fetchConfig();
     } catch (err) {
       console.error(err);
@@ -79,8 +79,28 @@ export default function AdminDashboard() {
 
   const handleExtend = async () => {
     try {
-      await axios.put(`${API_URL}/api/config/extender`, { horaExtencion: extendTime });
+      await axios.put(`${API_URL}/api/config/extender`, { horarioCierre: extendTime });
       setShowExtendModal(false);
+      fetchConfig();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCierreHasta = async () => {
+    if (!cierreHastaDate) return;
+    try {
+      await axios.post(`${API_URL}/api/config/extender`, { cierreHasta: cierreHastaDate });
+      setShowCierreHastaModal(false);
+      fetchConfig();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLevantarCierre = async () => {
+    try {
+      await axios.delete(`${API_URL}/api/config/extender`);
       fetchConfig();
     } catch (err) {
       console.error(err);
@@ -267,7 +287,8 @@ export default function AdminDashboard() {
       <AdminHeader 
         config={config} 
         onOpenCloseConfirm={() => setShowCloseConfirm(true)} 
-        onOpenExtendModal={() => setShowExtendModal(true)} 
+        onOpenExtendModal={() => setShowExtendModal(true)}
+        onOpenCierreHastaModal={() => setShowCierreHastaModal(true)}
       />
 
       <AdminTabs 
@@ -404,10 +425,17 @@ export default function AdminDashboard() {
         setShowExtendModal={setShowExtendModal}
         showCloseConfirm={showCloseConfirm}
         setShowCloseConfirm={setShowCloseConfirm}
+        showCierreHastaModal={showCierreHastaModal}
+        setShowCierreHastaModal={setShowCierreHastaModal}
         extendTime={extendTime}
         setExtendTime={setExtendTime}
+        cierreHastaDate={cierreHastaDate}
+        setCierreHastaDate={setCierreHastaDate}
         handleExtend={handleExtend}
         handleCloseNow={handleCloseNow}
+        handleCierreHasta={handleCierreHasta}
+        cierreHasta={config.cierreHasta}
+        handleLevantarCierre={handleLevantarCierre}
       />
     </div>
   );
