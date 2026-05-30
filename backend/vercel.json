@@ -14,6 +14,7 @@
       },
       "continue": true
     },
+    { "src": "/api/orders/([^/]+)/status", "dest": "/api/orders/[id].js" },
     { "src": "/api/orders/([^/]+)", "dest": "/api/orders/[id].js" },
     { "src": "/api/orders", "dest": "/api/orders.js" },
     { "src": "/api/prices", "dest": "/api/prices.js" },
