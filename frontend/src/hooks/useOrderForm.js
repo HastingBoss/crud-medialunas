@@ -122,7 +122,7 @@ export default function useOrderForm() {
   };
 
   const handleInputChange = (field, value) => {
-    if (field === 'pago') setComprobanteEnviado(false);
+    if (field === 'pago' && value !== formData.pago) setComprobanteEnviado(false);
     setFormData(prev => ({ ...prev, [field]: value }));
 
     if (field === 'direccion') {
@@ -206,21 +206,22 @@ export default function useOrderForm() {
     if (formData.desde >= formData.hasta) { alert('El horario "hasta" debe ser posterior al "desde".'); return; }
     if (!formData.pago) { alert('Elegí un método de pago.'); return; }
 
-    const data = new FormData();
-    data.append('nombre', formData.nombre);
-    data.append('telefono', formData.telefono);
-    data.append('direccion', formData.direccion);
-    data.append('fecha', formData.fecha);
-    data.append('desde', formData.desde);
-    data.append('hasta', formData.hasta);
-    data.append('pago', formData.pago);
-    data.append('paquete', resumenLineas.join(', '));
-    if (coords.lat) data.append('lat', coords.lat);
-    if (coords.lng) data.append('lng', coords.lng);
+    const payload = {
+      nombre: formData.nombre,
+      telefono: formData.telefono,
+      direccion: formData.direccion,
+      fecha: formData.fecha,
+      desde: formData.desde,
+      hasta: formData.hasta,
+      pago: formData.pago,
+      paquete: resumenLineas.join(', '),
+      lat: coords.lat || null,
+      lng: coords.lng || null,
+    };
 
     setIsSubmitting(true);
     try {
-      await axios.post(`${API_URL}/api/orders`, data);
+      await axios.post(`${API_URL}/api/orders`, payload);
       setSubmitted(true);
     } catch (err) {
       console.error(err);
