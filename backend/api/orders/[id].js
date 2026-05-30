@@ -8,8 +8,23 @@ const CORS = {
 };
 
 module.exports = async (req, res) => {
-  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  if (!req.body || typeof req.body === 'undefined') {
+    await new Promise((resolve, reject) => {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => {
+        try { req.body = JSON.parse(body); } catch { req.body = {}; }
+        resolve();
+      });
+      req.on('error', reject);
+    });
+  }
 
   const { id } = req.query;
 
