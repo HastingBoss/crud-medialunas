@@ -26,7 +26,9 @@ module.exports = async (req, res) => {
     });
   }
 
-  const { id } = req.query;
+  const urlParts = req.url.split('/');
+  const statusIndex = urlParts.indexOf('status');
+  const id = statusIndex > -1 ? urlParts[statusIndex - 1] : urlParts[urlParts.length - 1];
 
   if (req.method === 'PUT') {
     const updatedOrder = await prisma.pedido.update({
