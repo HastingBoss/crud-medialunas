@@ -79,7 +79,7 @@ export default function PricesView() {
       <div className="prices-header">
         <div className="prices-title">💰 Gestión de precios</div>
         <p className="prices-subtitle">
-          Los precios se guardan localmente en este dispositivo. Recargá la página del formulario para que los cambios tengan efecto.
+          Los precios se guardan en la base de datos y se aplican automáticamente al formulario.
         </p>
       </div>
 
