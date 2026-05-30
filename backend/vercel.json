@@ -6,6 +6,7 @@
   "routes": [
     {
       "src": "/(.*)",
+      "methods": ["OPTIONS"],
       "headers": {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
@@ -19,7 +20,6 @@
     { "src": "/api/stock", "dest": "/api/stock.js" },
     { "src": "/api/config/estado", "dest": "/api/config/estado.js" },
     { "src": "/api/config/extender", "dest": "/api/config/extender.js" },
-    { "src": "/api/time", "dest": "/api/time.js" },
     { "src": "/api/time", "dest": "/api/time.js" }
   ]
 }
