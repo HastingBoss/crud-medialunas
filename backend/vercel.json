@@ -19,6 +19,7 @@
     { "src": "/api/stock", "dest": "/api/stock.js" },
     { "src": "/api/config/estado", "dest": "/api/config/estado.js" },
     { "src": "/api/config/extender", "dest": "/api/config/extender.js" },
+    { "src": "/api/time", "dest": "/api/time.js" },
     { "src": "/api/time", "dest": "/api/time.js" }
   ]
 }
