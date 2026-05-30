@@ -9,7 +9,7 @@ export default function PackSelector({ qtys, cambiarQty, precios, nombres, resum
       <p className="section-title">Elegí tus packs{packsCompletos && <CheckMark />}</p>
 
       <div className="packs-list">
-        {Object.keys(precios).map(packKey => {
+        {Object.keys(precios).filter(k => k !== 'id').map(packKey => {
           const unidades = { individual: '3 unidades', media: '6 unidades', clasico: '12 unidades', familiar: '24 unidades' };
           return (
             <div key={packKey} className={`pack-row ${qtys[packKey] > 0 ? 'active' : ''}`}>
