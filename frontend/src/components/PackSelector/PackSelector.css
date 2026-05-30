@@ -93,6 +93,7 @@
   border: 1.5px solid var(--border); 
   border-radius: 10px;
   padding: 14px; 
+  margin-top: 12px;
   margin-bottom: 16px; 
   display: none;
 }

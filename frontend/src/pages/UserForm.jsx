@@ -26,7 +26,7 @@ export default function UserForm() {
     resumenLineas, total,
     packsCompletos, fechaCompleta, horarioCompleto, pagoCompleto, formValido, datosCompletos,
     handleSubmit, handleAddressBlur, selectSuggestion,
-    precios, nombres, addressSuggestions, isSearchingAddress,
+    precios, nombres, addressSuggestions, isSearchingAddress, setAddressSuggestions,
   } = useOrderForm();
 
   const [config, setConfig] = useState({ formularioAbierto: true, horarioCierre: '05:00' });

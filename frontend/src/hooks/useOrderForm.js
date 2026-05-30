@@ -245,6 +245,6 @@ export default function useOrderForm() {
     resumenLineas, total,
     packsCompletos, fechaCompleta, horarioCompleto, pagoCompleto, formValido, datosCompletos,
     handleSubmit, handleAddressBlur, selectSuggestion,
-    precios, nombres, addressSuggestions, isSearchingAddress,
+    precios, nombres, addressSuggestions, isSearchingAddress, setAddressSuggestions,
   };
 }
