@@ -8,6 +8,7 @@ import OrderSummary from '../components/OrderSummary/OrderSummary.jsx';
 import './UserForm.css';
 
 import axios from 'axios';
+import logoImg from '../../imgs/logo-etiqueta-pedido.jpeg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -101,7 +102,8 @@ export default function UserForm() {
         </div>
       ) : (
         <div className="hero">
-          <div className="hero-label">Pedidos online</div>
+          <img src={logoImg} alt="e-COMMER-ce Medialunas" style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--brown)', marginBottom: '16px', display: 'block', margin: '0 auto 16px auto', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+          <div className="hero-label" style={{ backgroundColor: 'var(--brand-green)', color: '#fff', border: 'none' }}>Pedidos online</div>
           <h1>Medialunas<br /><em>artesanales</em></h1>
           <p className="hero-desc">De manteca, hechas con amor. Pedí tu pack y las recibís en el día.</p>
           <div className="divider"><span>🥐</span></div>
