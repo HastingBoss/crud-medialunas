@@ -2,15 +2,17 @@ const emailService = require('../services/email.service');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// Crear un nuevo pedido del cliente en la base de datos
 exports.createOrder = async (req, res) => {
   try {
+    // Validar si el formulario está actualmente abierto para tomar pedidos
     if (!global.config.formularioAbierto) {
       return res.status(403).json({ message: 'El horario de pedidos está cerrado por hoy.' });
     }
     const { nombre, telefono, paquete, pago, direccion, lat, lng, desde, hasta, fecha } = req.body;
     
-    // Si no envían coords, podemos asignar unas por defecto o usar un geocoder
-    // Para simplificar, le ponemos unas random cerca de CABA si no hay
+    // Si el usuario no selecciona una sugerencia del mapa con coordenadas,
+    // se asignan coordenadas aleatorias en el área de CABA para visualización
     const defaultLat = -34.6 + (Math.random() * 0.05 - 0.025);
     const defaultLng = -58.4 + (Math.random() * 0.05 - 0.025);
 
@@ -25,14 +27,14 @@ exports.createOrder = async (req, res) => {
       desde: desde || '10:00',
       hasta: hasta || '12:00',
       fecha: fecha || new Date().toLocaleDateString('sv-SE'),
-      comprobante: req.file ? req.file.filename : null,
+      comprobante: req.file ? req.file.filename : null, // Nombre del archivo subido (si existe)
     };
 
     const newOrder = await prisma.pedido.create({
       data: newOrderData
     });
 
-    // Enviar email asíncronamente
+    // Enviar correo de notificación del pedido de manera asíncrona para no bloquear la respuesta HTTP
     emailService.sendOrderEmail(newOrder);
 
     res.status(201).json({ message: 'Pedido creado exitosamente', order: newOrder });
@@ -42,6 +44,7 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// Obtener la lista completa de pedidos ordenados por fecha de creación descendente
 exports.getOrders = async (req, res) => {
   try {
     const orders = await prisma.pedido.findMany({
@@ -54,6 +57,7 @@ exports.getOrders = async (req, res) => {
   }
 };
 
+// Actualizar campos específicos de un pedido (ej: estado de entrega, estado de pago o archivado)
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -71,6 +75,7 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
+// Eliminar permanentemente un pedido de la base de datos
 exports.deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;

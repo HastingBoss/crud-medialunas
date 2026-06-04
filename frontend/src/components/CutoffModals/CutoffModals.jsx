@@ -1,4 +1,3 @@
-import React from 'react';
 import './CutoffModals.css';
 
 export default function CutoffModals({ 

@@ -93,15 +93,6 @@ export default function useOrderForm() {
   const maxDateObj = new Date(today);
   maxDateObj.setDate(today.getDate() + 30);
 
-  useEffect(() => {
-    if (formData.fecha === todayISO) {
-      setFormData(prev => ({ ...prev, fecha: '' }));
-      setAnticipationError(true);
-    } else if (formData.fecha) {
-      setAnticipationError(false);
-    }
-  }, [formData.fecha, todayISO]);
-
   const parseLocalDate = (isoStr) => {
     if (!isoStr) return null;
     const [y, m, d] = isoStr.split('-');
@@ -126,6 +117,17 @@ export default function useOrderForm() {
 
   const handleInputChange = (field, value) => {
     if (field === 'pago' && value !== formData.pago) setComprobanteEnviado(false);
+    
+    if (field === 'fecha') {
+      if (value === todayISO) {
+        setFormData(prev => ({ ...prev, fecha: '' }));
+        setAnticipationError(true);
+        return;
+      } else {
+        setAnticipationError(false);
+      }
+    }
+
     setFormData(prev => ({ ...prev, [field]: value }));
 
     if (field === 'direccion') {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './ArchivedView.css';
 
 const TIME_OPTIONS = ['08:00', '08:30', '09:00', '09:30', '10:00'];

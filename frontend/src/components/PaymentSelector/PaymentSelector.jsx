@@ -1,4 +1,3 @@
-import React from 'react';
 import './PaymentSelector.css';
 
 export default function PaymentSelector({ pago, handleInputChange, comprobanteEnviado, setComprobanteEnviado, pagoCompleto }) {

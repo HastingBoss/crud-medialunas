@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './StockAlert.css';
 
 export default function StockAlert({ stock, threshold }) {
+  const [prevStock, setPrevStock] = useState(stock);
   const [closed, setClosed] = useState(false);
 
-  // Si el stock sube por encima del umbral, reseteamos el estado "cerrado"
-  // para que vuelva a aparecer si vuelve a bajar.
-  useEffect(() => {
+  // Si el stock cambia, actualizamos el stock anterior. Si sube por encima 
+  // del umbral, reseteamos el estado "cerrado" para que vuelva a aparecer 
+  // si vuelve a bajar de nuevo en el futuro.
+  if (stock !== prevStock) {
+    setPrevStock(stock);
     if (stock > threshold) {
       setClosed(false);
     }
-  }, [stock, threshold]);
+  }
 
   if (closed || stock > threshold) return null;
 

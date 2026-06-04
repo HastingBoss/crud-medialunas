@@ -1,4 +1,3 @@
-import React from 'react';
 import './AdminTabs.css';
 
 export default function AdminTabs({ tabs, activeTab, onTabChange }) {

@@ -1,9 +1,8 @@
-import React from 'react';
 import './OrderTable.css';
 
 export default function OrderTable({ 
-  filteredOrders, setSelectedOrder, setMapCenter, setMapZoom, 
-  renderPacks, safeDate, selectedForRoute, toggleOrderSelection, toggleSelectAll,
+  filteredOrders, setSelectedOrderId, setMapCenter, setMapZoom, 
+  selectedForRoute, toggleOrderSelection, toggleSelectAll,
   timeFrom, setTimeFrom, timeTo, setTimeTo
 }) {
   const allSelected = filteredOrders.length > 0 && filteredOrders.every(o => selectedForRoute.includes(o.id));
@@ -81,7 +80,7 @@ export default function OrderTable({
                 <div 
                   className="order-info-main"
                   onClick={() => {
-                    setSelectedOrder(order);
+                    setSelectedOrderId(order.id);
                     setMapCenter([order.lat, order.lng]);
                     setMapZoom(16);
                   }}

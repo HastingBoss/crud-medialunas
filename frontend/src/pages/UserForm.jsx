@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import useOrderForm from '../hooks/useOrderForm.js';
 import DaySelector from '../components/DaySelector/DaySelector.jsx';
 import PackSelector from '../components/PackSelector/PackSelector.jsx';
@@ -11,6 +11,8 @@ import axios from 'axios';
 import logoImg from '../assets/logo-etiqueta-pedido.jpg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+const CheckMark = () => <span style={{ color: '#2E7D32', marginLeft: '8px', fontSize: '18px' }}>✓</span>;
 
 export default function UserForm() {
   const {
@@ -31,7 +33,7 @@ export default function UserForm() {
   } = useOrderForm();
 
   const [config, setConfig] = useState({ formularioAbierto: true, horarioCierre: '05:00' });
-  const [showCutoffBanner, setShowCutoffBanner] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -45,16 +47,9 @@ export default function UserForm() {
     fetchConfig();
   }, []);
 
-  useEffect(() => {
-    const hour = new Date().getHours();
-    if (config.formularioAbierto && hour >= 0 && hour < 5) {
-      setShowCutoffBanner(true);
-    } else {
-      setShowCutoffBanner(false);
-    }
-  }, [config.formularioAbierto]);
-
   const isClosedForTomorrow = !config.formularioAbierto;
+  const currentHour = new Date().getHours();
+  const showCutoffBanner = config.formularioAbierto && currentHour >= 0 && currentHour < 5 && !bannerDismissed;
   
   // Calcular pasado mañana para el mensaje y la fecha mínima
   const pasadoManana = new Date();
@@ -70,9 +65,8 @@ export default function UserForm() {
         handleInputChange('fecha', pasadoMananaISO);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isClosedForTomorrow, formData.fecha, tomorrowObj]);
-
-  const CheckMark = () => <span style={{ color: '#2E7D32', marginLeft: '8px', fontSize: '18px' }}>✓</span>;
 
   if (submitted) {
     return <OrderSummary formData={formData} resumenLineas={resumenLineas} total={total} daysStr={daysStr} />;
@@ -129,7 +123,7 @@ export default function UserForm() {
             ⚠️ Los pedidos realizados después de las 00hs están sujetos a disponibilidad de stock. Te contactaremos para confirmar.
           </span>
           <button 
-            onClick={() => setShowCutoffBanner(false)}
+            onClick={() => setBannerDismissed(true)}
             style={{
               background: 'none',
               border: 'none',
@@ -209,7 +203,7 @@ export default function UserForm() {
               type="text" 
               value={formData.direccion} 
               onChange={e => handleInputChange('direccion', e.target.value)} 
-              onBlur={() => setTimeout(() => setAddressSuggestions([]), 200)}
+              onBlur={() => { handleAddressBlur(); setTimeout(() => setAddressSuggestions([]), 200); }}
               placeholder="Ej: Av. Corrientes 1234, CABA" 
               style={{ width: '100%' }}
             />

@@ -1,5 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './ReportsView.css';
+
+const MetricCard = ({ label, value, sub, isZero }) => (
+  <div className="metric-card">
+    <div className="metric-label">{label}</div>
+    <div className="metric-value">{value}</div>
+    {sub && <div className={`metric-sub ${isZero ? 'warning' : ''}`}>{sub}</div>}
+  </div>
+);
 
 export default function ReportsView({ orders, calcularTotal }) {
   const [reportDate, setReportDate] = useState(new Date().toLocaleDateString('sv-SE'));
@@ -47,14 +55,6 @@ export default function ReportsView({ orders, calcularTotal }) {
   });
   const maxBarVal = Math.max(...ordersPerDay, 1);
   const payTotal = dayEfectivo + dayTransferencia || 1;
-
-  const MetricCard = ({ label, value, sub, isZero }) => (
-    <div className="metric-card">
-      <div className="metric-label">{label}</div>
-      <div className="metric-value">{value}</div>
-      {sub && <div className={`metric-sub ${isZero ? 'warning' : ''}`}>{sub}</div>}
-    </div>
-  );
 
   return (
     <div className="reports-view-container">

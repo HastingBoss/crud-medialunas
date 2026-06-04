@@ -1,9 +1,8 @@
-import React from 'react';
 import './PackSelector.css';
 
-export default function PackSelector({ qtys, cambiarQty, precios, nombres, resumenLineas, total, packsCompletos }) {
-  const CheckMark = () => <span className="check-mark">✓</span>;
+const CheckMark = () => <span className="check-mark">✓</span>;
 
+export default function PackSelector({ qtys, cambiarQty, precios, nombres, resumenLineas, total, packsCompletos }) {
   const totalUnidades = (qtys.individual || 0) * 3 + 
                         (qtys.media || 0) * 6 + 
                         (qtys.clasico || 0) * 12 + 

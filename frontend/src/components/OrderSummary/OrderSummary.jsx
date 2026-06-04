@@ -1,7 +1,6 @@
-import React from 'react';
 import './OrderSummary.css';
 
-export default function OrderSummary({ formData, resumenLineas, total, daysStr }) {
+export default function OrderSummary({ formData, resumenLineas, total }) {
   return (
     <div className="order-summary-screen">
       <div className="success-icon">✓</div>

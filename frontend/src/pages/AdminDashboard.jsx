@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './AdminDashboard.css';
@@ -47,7 +47,8 @@ export default function AdminDashboard() {
   const [adminPos, setAdminPos] = useState({ lat: -34.6080, lng: -58.4620 });
   const [mapCenter, setMapCenter] = useState([-34.6080, -58.4620]);
   const [mapZoom, setMapZoom] = useState(13);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const selectedOrder = orders.find(o => o.id === selectedOrderId);
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [activeTab, setActiveTab] = useState('pedidos');
   const [config, setConfig] = useState({ formularioAbierto: true, horarioCierre: '05:00' });
@@ -112,17 +113,21 @@ export default function AdminDashboard() {
   const [clickedLegs, setClickedLegs] = useState([]);
 
   const toggleOrderSelection = (id) => {
-    setSelectedForRoute(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    setSelectedForRoute(prev => {
+      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
+      setClickedLegs([]);
+      return next;
+    });
   };
 
   const toggleSelectAll = () => {
     const allInViewIds = filteredOrders.map(o => o.id);
     const areAllSelected = allInViewIds.every(id => selectedForRoute.includes(id));
-    if (areAllSelected) {
-      setSelectedForRoute(prev => prev.filter(id => !allInViewIds.includes(id)));
-    } else {
-      setSelectedForRoute(prev => [...new Set([...prev, ...allInViewIds])]);
-    }
+    setSelectedForRoute(prev => {
+      const next = areAllSelected ? prev.filter(id => !allInViewIds.includes(id)) : [...new Set([...prev, ...allInViewIds])];
+      setClickedLegs([]);
+      return next;
+    });
   };
 
   const getOptimizedRoute = () => {
@@ -167,6 +172,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!isAuthenticated) return;
     fetchOrders();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchConfig();
     const intervalOrders = setInterval(fetchOrders, 30000);
     const intervalConfig = setInterval(fetchConfig, 60000);
@@ -174,21 +180,8 @@ export default function AdminDashboard() {
       clearInterval(intervalOrders);
       clearInterval(intervalConfig);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
-
-  // Sync selectedOrder state when changeStatus/changePaymentStatus mutate orders
-  useEffect(() => {
-    if (!selectedOrder) return;
-    const updated = orders.find(o => o.id === selectedOrder.id);
-    if (updated && (updated.estado !== selectedOrder.estado || updated.estadoPago !== selectedOrder.estadoPago)) {
-      setSelectedOrder(updated);
-    }
-  }, [orders]);
-
-  // Reset clicked legs when selection changes
-  useEffect(() => {
-    setClickedLegs([]);
-  }, [selectedForRoute]);
 
   const centrarEnMi = () => {
     if (navigator.geolocation) {
@@ -220,7 +213,7 @@ export default function AdminDashboard() {
 
   const openDeleteConfirm = (order) => {
     setOrderToDelete(order);
-    setSelectedOrder(null);
+    setSelectedOrderId(null);
   };
 
   const filteredOrders = orders.filter(p => {
@@ -360,7 +353,7 @@ export default function AdminDashboard() {
 
           <OrderTable
             filteredOrders={filteredOrders}
-            setSelectedOrder={setSelectedOrder}
+            setSelectedOrderId={setSelectedOrderId}
             setMapCenter={setMapCenter} setMapZoom={setMapZoom}
             renderPacks={renderPacks} safeDate={safeDate}
             selectedForRoute={selectedForRoute}
@@ -408,7 +401,7 @@ export default function AdminDashboard() {
 
       <OrderModal
         selectedOrder={selectedOrder}
-        onClose={() => setSelectedOrder(null)}
+        onClose={() => setSelectedOrderId(null)}
         changeStatus={changeStatus}
         changePaymentStatus={changePaymentStatus}
         archiveOrder={archiveOrder}
@@ -419,8 +412,8 @@ export default function AdminDashboard() {
 
       <DeleteConfirmModal
         orderToDelete={orderToDelete}
-        onCancel={() => { setOrderToDelete(null); setSelectedOrder(orderToDelete); }}
-        onConfirm={async (id) => { await deleteOrder(id); setOrderToDelete(null); setSelectedOrder(null); }}
+        onCancel={() => { setOrderToDelete(null); setSelectedOrderId(orderToDelete.id); }}
+        onConfirm={async (id) => { await deleteOrder(id); setOrderToDelete(null); setSelectedOrderId(null); }}
       />
 
       {archiveToast && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './StockView.css';
 
 export default function StockView({ orders, stock, threshold, updateStockAPI, calcularUnidades }) {

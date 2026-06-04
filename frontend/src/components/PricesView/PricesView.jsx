@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './PricesView.css';
 
@@ -67,7 +67,7 @@ export default function PricesView() {
       setSaved(true);
       setError('');
       setTimeout(() => setSaved(false), 3000);
-    } catch (err) {
+    } catch {
       setError('Error al restablecer los precios.');
     }
   };
