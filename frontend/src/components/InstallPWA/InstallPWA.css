@@ -1,0 +1,83 @@
+.install-pwa-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  width: 92%;
+  max-width: 480px;
+  background: rgba(255, 248, 236, 0.95);
+  border: 1.5px solid var(--border);
+  box-shadow: 0 10px 30px rgba(53, 32, 17, 0.15);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 9999;
+  backdrop-filter: blur(10px);
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.install-pwa-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.install-pwa-icon {
+  font-size: 26px;
+  background: var(--cream);
+  padding: 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+}
+
+.install-pwa-text h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--brown);
+  margin-bottom: 2px;
+}
+
+.install-pwa-text p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.install-pwa-button {
+  background: var(--brand-green);
+  color: #fff;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(36, 110, 58, 0.2);
+}
+
+.install-pwa-button:hover {
+  background: var(--brand-green-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(36, 110, 58, 0.3);
+}
+
+.install-pwa-button:active {
+  transform: translateY(0);
+}

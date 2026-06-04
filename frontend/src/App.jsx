@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import UserForm from './pages/UserForm';
 import AdminDashboard from './pages/AdminDashboard';
+import InstallPWA from './components/InstallPWA/InstallPWA';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<UserForm />} />
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
+      <InstallPWA />
     </Router>
   );
 }
