@@ -20,16 +20,41 @@ export default function TimeSelector({ desde, hasta, handleInputChange, horarioC
   };
 
   return (
-    <div className="time-selector-container">
-      <p className="section-title">Horario de entrega{horarioCompleto && <span className="check-mark">✓</span>}</p>
+    <div className="time-selector-container" style={{ marginTop: '22px' }}>
+      <p className="section-title">Horario de entrega{horarioCompleto && <span style={{ color: '#2E7D32', marginLeft: '8px', fontSize: '18px' }}>✓</span>}</p>
       <div className="field">
         <label className="field-label">¿En qué horario preferís recibir?</label>
-        <select value={currentValue} onChange={handleChange} style={{ width: '100%', padding: '14px 16px', borderRadius: '8px', border: '1.5px solid var(--border)' }}>
-          <option value="" disabled hidden>Seleccioná un horario...</option>
-          {RANGES.map(r => (
-            <option key={r.label} value={`${r.desde}-${r.hasta}`}>{r.label}</option>
-          ))}
-        </select>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', marginTop: '10px' }}>
+          {RANGES.map(r => {
+            const isSelected = currentValue === `${r.desde}-${r.hasta}`;
+            return (
+              <button
+                key={r.label}
+                type="button"
+                onClick={() => {
+                  handleInputChange('desde', r.desde);
+                  handleInputChange('hasta', r.hasta);
+                }}
+                style={{
+                  padding: '14px 10px',
+                  borderRadius: '12px',
+                  border: `1.5px solid ${isSelected ? 'var(--brand-green)' : 'var(--border)'}`,
+                  background: isSelected ? '#eaf1ec' : '#fff',
+                  color: isSelected ? 'var(--brand-green)' : 'var(--text)',
+                  fontWeight: isSelected ? '600' : '500',
+                  fontSize: '15px',
+                  fontFamily: '"DM Sans", sans-serif',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'center',
+                  boxShadow: isSelected ? '0 2px 8px rgba(36, 110, 58, 0.1)' : 'none'
+                }}
+              >
+                {r.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
