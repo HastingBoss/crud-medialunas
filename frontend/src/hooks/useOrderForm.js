@@ -81,11 +81,14 @@ export default function useOrderForm() {
   const todayISO = formatDateISO(today);
   const tomorrowObj = new Date(today);
   tomorrowObj.setDate(today.getDate() + 1);
-  const next7Days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    return d;
-  });
+  const next7Days = [];
+  let dIterator = new Date(today);
+  while (next7Days.length < 7) {
+    if (dIterator.getDay() !== 0 && dIterator.getDay() !== 6) {
+      next7Days.push(new Date(dIterator));
+    }
+    dIterator.setDate(dIterator.getDate() + 1);
+  }
   const daysStr = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   const maxDateObj = new Date(today);
   maxDateObj.setDate(today.getDate() + 30);

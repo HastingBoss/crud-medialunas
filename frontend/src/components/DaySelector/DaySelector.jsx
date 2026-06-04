@@ -79,6 +79,7 @@ export default function DaySelector({
             }}
             minDate={tomorrowObj}
             maxDate={maxDateObj}
+            filterDate={(date) => date.getDay() !== 0 && date.getDay() !== 6}
             locale={es}
             dateFormat="dd/MM/yyyy"
             inline
