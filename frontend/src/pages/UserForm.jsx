@@ -8,7 +8,7 @@ import OrderSummary from '../components/OrderSummary/OrderSummary.jsx';
 import './UserForm.css';
 
 import axios from 'axios';
-import logoImg from '../../imgs/logo-etiqueta-pedido.jpeg';
+import logoImg from '../assets/logo-etiqueta-pedido.jpeg';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
