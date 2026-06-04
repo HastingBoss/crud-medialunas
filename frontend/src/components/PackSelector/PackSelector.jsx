@@ -17,15 +17,21 @@ export default function PackSelector({ qtys, cambiarQty, precios, nombres, resum
         {Object.keys(precios).filter(k => k !== 'id').map(packKey => {
           const unidades = { individual: '3 unidades', media: '6 unidades', clasico: '12 unidades', familiar: '24 unidades' };
           return (
-            <div key={packKey} className={`pack-row ${qtys[packKey] > 0 ? 'active' : ''}`}>
-              <div className="pack-info">
-                <div className="pack-name">{nombres[packKey]} <span style={{ fontSize: '11px', fontWeight: 400, opacity: 0.7 }}>({unidades[packKey]})</span></div>
-                <div className="pack-price">${precios[packKey].toLocaleString('es-AR')}</div>
+            <div key={packKey} className={`pack-card ${qtys[packKey] > 0 ? 'active' : ''}`}>
+              <div className="pack-img-wrapper">
+                 <img src={`/packs/pack-${packKey}.png`} alt={nombres[packKey]} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+                 <div className="img-fallback">🥐</div>
               </div>
-              <div className="qty-control">
-                <button className="qty-btn" onClick={() => cambiarQty(packKey, -1)} disabled={qtys[packKey] === 0}>−</button>
-                <span className="qty-num">{qtys[packKey]}</span>
-                <button className="qty-btn" onClick={() => cambiarQty(packKey, 1)}>+</button>
+              
+              <div className="pack-name">{nombres[packKey]} <span style={{ fontSize: '12px', fontWeight: 400, opacity: 0.7 }}>({unidades[packKey]})</span></div>
+              
+              <div className="pack-footer">
+                <div className="pack-price">${precios[packKey].toLocaleString('es-AR')}</div>
+                <div className="qty-control">
+                  <button className="qty-btn" onClick={() => cambiarQty(packKey, -1)} disabled={qtys[packKey] === 0}>−</button>
+                  <span className="qty-num">{qtys[packKey]}</span>
+                  <button className="qty-btn" onClick={() => cambiarQty(packKey, 1)}>+</button>
+                </div>
               </div>
             </div>
           );

@@ -102,11 +102,13 @@ export default function UserForm() {
         </div>
       ) : (
         <div className="hero">
-          <img src={logoImg} alt="e-COMMER-ce Medialunas" style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--brown)', marginBottom: '16px', display: 'block', margin: '0 auto 16px auto', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-          <div className="hero-label" style={{ backgroundColor: 'var(--brand-green)', color: '#fff', border: 'none' }}>Pedidos online</div>
-          <h1>Medialunas<br /><em>artesanales</em></h1>
-          <p className="hero-desc">De manteca, hechas con amor. Pedí tu pack y las recibís en el día.</p>
-          <div className="divider"><span>🥐</span></div>
+          <img src={logoImg} alt="e-COMMER-ce Medialunas" style={{ width: '160px', height: '160px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.1)', marginBottom: '24px', display: 'block', margin: '0 auto 24px auto', boxShadow: '0 6px 20px rgba(0,0,0,0.2)' }} />
+          <p className="hero-desc" style={{ fontStyle: 'italic', fontFamily: '"Playfair Display", serif', fontSize: '15px' }}>De manteca, hechas con amor. Pedí tu pack y las recibís en el día. 🥐</p>
+          <div className="hero-label-container">
+            <span className="hero-label-line"></span>
+            <span className="hero-label-text">PEDIDOS ONLINE</span>
+            <span className="hero-label-line"></span>
+          </div>
         </div>
       )}
 
@@ -265,10 +267,10 @@ export default function UserForm() {
           {isSubmitting ? (
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <div style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid #fff', borderRadius: '50%', animation: 'userform-spinner 1s linear infinite' }} />
-              Enviando...
+              Procesando...
             </span>
           ) : (
-            <>Enviar pedido <span className="btn-gold">→</span></>
+            <>FINALIZAR PEDIDO</>
           )}
         </button>
 
