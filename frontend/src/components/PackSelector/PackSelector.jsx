@@ -4,6 +4,11 @@ import './PackSelector.css';
 export default function PackSelector({ qtys, cambiarQty, precios, nombres, resumenLineas, total, packsCompletos }) {
   const CheckMark = () => <span className="check-mark">✓</span>;
 
+  const totalUnidades = (qtys.individual || 0) * 3 + 
+                        (qtys.media || 0) * 6 + 
+                        (qtys.clasico || 0) * 12 + 
+                        (qtys.familiar || 0) * 24;
+
   return (
     <div className="pack-selector-container">
       <p className="section-title">Elegí tus packs{packsCompletos && <CheckMark />}</p>
@@ -26,6 +31,24 @@ export default function PackSelector({ qtys, cambiarQty, precios, nombres, resum
           );
         })}
       </div>
+
+      {totalUnidades > 48 && (
+        <div style={{
+          marginTop: '12px',
+          padding: '10px 14px',
+          backgroundColor: '#FFFBE6',
+          border: '1px solid #FF9800',
+          borderRadius: '8px',
+          fontSize: '13px',
+          color: '#856404',
+          display: 'flex',
+          gap: '8px',
+          alignItems: 'center'
+        }}>
+          <span>⚠️</span>
+          <span style={{ lineHeight: '1.4' }}><strong>Pedido grande:</strong> La confirmación de este pedido estará sujeta a disponibilidad de stock.</span>
+        </div>
+      )}
 
       {resumenLineas.length > 0 && (
         <div className="resumen visible">
