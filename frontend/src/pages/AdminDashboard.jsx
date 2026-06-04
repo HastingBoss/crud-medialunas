@@ -162,6 +162,7 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('adminAuth') === 'true');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -204,9 +205,10 @@ export default function AdminDashboard() {
 
   const safeDate = (fecha) => {
     if (!fecha) return 'Fecha no disponible';
-    const d = new Date(fecha);
-    if (isNaN(d.getTime())) return 'Fecha no disponible';
-    return d.toLocaleDateString('es-AR');
+    const str = String(fecha).split('T')[0];
+    const [y, m, d] = str.split('-');
+    if (!y || !m || !d) return 'Fecha no disponible';
+    return `${d}/${m}/${y}`;
   };
 
   const renderPacks = (paquete) => {
@@ -262,8 +264,22 @@ export default function AdminDashboard() {
         <div style={{ background: '#fff', padding: '30px', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', textAlign: 'center', width: '100%', maxWidth: '300px' }}>
           <h2 style={{ fontFamily: '"Playfair Display", serif', color: 'var(--brown)', marginBottom: '20px' }}>Admin Login</h2>
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <input type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)}
-              style={{ padding: '10px', borderRadius: '8px', border: '1.5px solid var(--border)', outline: 'none' }} />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Contraseña"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                style={{ padding: '10px', paddingRight: '40px', borderRadius: '8px', border: '1.5px solid var(--border)', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(p => !p)}
+                style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: 'var(--brown)', padding: 0 }}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
             {loginError && <div style={{ color: 'red', fontSize: '12px', marginTop: '-10px', textAlign: 'left' }}>Contraseña incorrecta</div>}
             <button type="submit" style={{ padding: '10px', borderRadius: '8px', background: 'var(--brown)', color: 'white', border: 'none', cursor: 'pointer', fontWeight: '500', fontSize: '15px', fontFamily: '"DM Sans", sans-serif' }}>
               Ingresar
