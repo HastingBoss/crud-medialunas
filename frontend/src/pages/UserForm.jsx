@@ -234,7 +234,7 @@ export default function UserForm() {
           </div>
           {outsideRadius && (
             <div style={{ marginTop: '8px', padding: '10px 12px', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: '8px', fontSize: '13px', color: '#991B1B' }}>
-              📍 Lo sentimos, por ahora solo entregamos dentro de un radio de 1km de Temperley. Verificá tu dirección.
+              📍 Lo sentimos, tu dirección está fuera de nuestra zona de entrega.
             </div>
           )}
         </div>
