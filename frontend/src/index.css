@@ -21,7 +21,7 @@
 }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Nunito', sans-serif;
   background: var(--cream);
   color: var(--text);
   min-height: 100vh;

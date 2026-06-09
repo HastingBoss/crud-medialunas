@@ -4,7 +4,7 @@ export default function OrderSummary({ formData, resumenLineas, total }) {
   return (
     <div className="order-summary-screen">
       <div className="success-icon">✓</div>
-      <h2 style={{ color: 'var(--brown)', marginBottom: '20px', textAlign: 'center', fontFamily: '"Playfair Display", serif' }}>
+      <h2 style={{ color: 'var(--brown)', marginBottom: '20px', textAlign: 'center', fontFamily: '"Lora", serif' }}>
         ¡Pedido recibido!
       </h2>
 

@@ -1,5 +1,5 @@
 .archived-view-container {
-  font-family: "DM Sans", sans-serif;
+  font-family: "Nunito", sans-serif;
 }
 
 .archived-header {
@@ -140,7 +140,7 @@
 .modal-title-reprogram {
   margin: 0 0 16px 0;
   color: var(--brown);
-  font-family: "Playfair Display", serif;
+  font-family: "Lora", serif;
 }
 
 .modal-subtitle-reprogram {

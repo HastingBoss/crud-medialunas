@@ -43,7 +43,7 @@
 }
 
 .install-pwa-text h3 {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 15px;
   font-weight: 700;
   color: var(--brown);
@@ -51,7 +51,7 @@
 }
 
 .install-pwa-text p {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 12px;
   color: var(--muted);
   line-height: 1.4;
@@ -61,7 +61,7 @@
   background: var(--brand-green);
   color: #fff;
   border: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-weight: 600;
   font-size: 14px;
   padding: 10px 18px;

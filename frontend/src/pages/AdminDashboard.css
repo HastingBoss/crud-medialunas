@@ -7,7 +7,7 @@
   background: var(--brown); padding: 14px 20px;
   display: flex; align-items: center; justify-content: space-between;
 }
-.header-title { font-family: 'Playfair Display', serif; font-size: 18px; color: #F9F3E8; }
+.header-title { font-family: 'Lora', serif; font-size: 18px; color: #F9F3E8; }
 .header-title span { color: var(--gold); font-style: italic; }
 
 .tabs { display: flex; background: var(--brown); padding: 0 20px; border-top: 1px solid rgba(255,255,255,0.08); }
@@ -20,11 +20,11 @@
 .filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
 .filter-select, .date-input {
   padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px;
-  background: #fff; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; cursor: pointer;
+  background: #fff; font-family: 'Nunito', sans-serif; font-size: 13px; color: var(--text); outline: none; cursor: pointer;
 }
 .mi-ubicacion-btn {
   padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px;
-  background: #fff; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--brown);
+  background: #fff; font-family: 'Nunito', sans-serif; font-size: 13px; color: var(--brown);
   cursor: pointer; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
 }
 .mi-ubicacion-btn:hover { border-color: var(--gold); background: var(--gold-bg); }

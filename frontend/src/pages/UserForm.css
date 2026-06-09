@@ -14,7 +14,7 @@
 .form-container { padding: 24px 20px 36px; max-width: 480px; margin: 0 auto; }
 
 .section-title {
-  font-family: 'Playfair Display', serif; font-size: 17px; color: var(--brown);
+  font-family: 'Lora', serif; font-size: 17px; color: var(--brown);
   margin-bottom: 14px; padding-bottom: 7px; border-bottom: 1.5px solid var(--border);
 }
 
@@ -25,7 +25,7 @@ label.field-label {
 }
 input[type="text"], input[type="tel"], input[type="time"], select {
   width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px;
-  background: #fff; font-family: 'DM Sans', sans-serif; font-size: 16px; color: var(--text);
+  background: #fff; font-family: 'Nunito', sans-serif; font-size: 16px; color: var(--text);
   transition: border-color 0.2s, box-shadow 0.2s; outline: none; appearance: none;
 }
 input:focus, select:focus { border-color: var(--brand-green); box-shadow: 0 0 0 3px rgba(36, 110, 58, 0.1); }
@@ -39,7 +39,7 @@ input:focus, select:focus { border-color: var(--brand-green); box-shadow: 0 0 0 
 
 .submit-btn {
   width: 100%; padding: 16px; background: var(--brand-green); color: #fff; border: none;
-  border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
+  border-radius: 50px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 600;
   letter-spacing: 0.5px;
   cursor: pointer; margin-top: 32px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(36, 110, 58, 0.2);
 }
@@ -49,5 +49,5 @@ input:focus, select:focus { border-color: var(--brand-green); box-shadow: 0 0 0 
 .success-screen { display: none; padding: 40px 24px; text-align: center; }
 .success-screen.visible { display: block; }
 .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #F0FAF0; border: 2px solid var(--success); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; }
-.success-screen h2 { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--brown); margin-bottom: 10px; }
+.success-screen h2 { font-family: 'Lora', serif; font-size: 26px; color: var(--brown); margin-bottom: 10px; }
 .success-screen p { font-size: 14px; color: var(--muted); line-height: 1.6; }

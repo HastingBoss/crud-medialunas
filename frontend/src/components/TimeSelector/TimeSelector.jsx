@@ -44,7 +44,7 @@ export default function TimeSelector({ desde, hasta, handleInputChange, horarioC
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              fontFamily: '"DM Sans", sans-serif',
+              fontFamily: '"Nunito", sans-serif',
               fontSize: '16px',
               color: currentValue ? 'var(--text)' : 'var(--muted)',
               transition: 'all 0.2s ease',
@@ -85,7 +85,7 @@ export default function TimeSelector({ desde, hasta, handleInputChange, horarioC
                     style={{
                       padding: '14px 16px',
                       cursor: 'pointer',
-                      fontFamily: '"DM Sans", sans-serif',
+                      fontFamily: '"Nunito", sans-serif',
                       fontSize: '16px',
                       color: isSelected ? 'var(--brand-green)' : 'var(--text)',
                       background: isSelected ? '#eaf1ec' : '#fff',
