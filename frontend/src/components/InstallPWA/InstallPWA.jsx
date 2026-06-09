@@ -45,7 +45,7 @@ export default function InstallPWA() {
         <div className="install-pwa-icon">🥐</div>
         <div className="install-pwa-text">
           <h3>¡Instalá la App!</h3>
-          <p>Gestioná tus pedidos y repartos rápido desde tu pantalla de inicio.</p>
+          <p>Pedí tus medialunas más rápido desde tu pantalla de inicio.</p>
         </div>
       </div>
       <button className="install-pwa-button" onClick={handleInstallClick}>
