@@ -1,7 +1,7 @@
 {
-  "short_name": "Reparto Medialunas",
-  "name": "Gestión de Reparto de Medialunas",
-  "description": "Aplicación para el control y reparto de medialunas artesanales.",
+  "short_name": "Medialunas",
+  "name": "Medialunas Artesanales",
+  "description": "Pedí tus medialunas artesanales de manteca y te las llevamos.",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -15,8 +15,8 @@
     }
   ],
   "start_url": "/",
-  "background_color": "#ffffff",
-  "theme_color": "#2E7D32",
+  "background_color": "#3d1f0d",
+  "theme_color": "#3d1f0d",
   "display": "standalone",
   "orientation": "portrait"
 }
