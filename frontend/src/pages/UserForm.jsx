@@ -97,7 +97,8 @@ export default function UserForm() {
       ) : (
         <div className="hero">
           <img src={logoImg} alt="e-COMMER-ce Medialunas" style={{ width: '160px', height: '160px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.1)', marginBottom: '24px', display: 'block', margin: '0 auto 24px auto', boxShadow: '0 6px 20px rgba(0,0,0,0.2)' }} />
-          <p className="hero-desc" style={{ fontStyle: 'italic', fontFamily: '"Playfair Display", serif', fontSize: '15px' }}>De manteca, hechas con amor. Pedí tu pack y las recibís en el día. 🥐</p>
+          <h1>Pedí tus medialunas<br /><em>recién horneadas</em></h1>
+          <p className="hero-desc">Elegí tu pack favorito y te lo llevamos. 🥐</p>
           <div className="hero-label-container">
             <span className="hero-label-line"></span>
             <span className="hero-label-text">PEDIDOS ONLINE</span>
