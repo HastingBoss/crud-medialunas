@@ -32,6 +32,25 @@ export default function useOrderForm() {
   const [isSearchingAddress, setIsSearchingAddress] = useState(false);
   const searchTimeoutRef = useRef(null);
 
+  const [outsideRadius, setOutsideRadius] = useState(false);
+
+  const ORIGEN = { lat: -34.7785456, lng: -58.3868270 };
+  const RADIO_KM = 1;
+
+  const haversineKm = (lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
+
+  const checkRadius = (lat, lng) => {
+    if (!lat || !lng) return;
+    const dist = haversineKm(ORIGEN.lat, ORIGEN.lng, parseFloat(lat), parseFloat(lng));
+    setOutsideRadius(dist > RADIO_KM);
+  };
+
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -131,6 +150,7 @@ export default function useOrderForm() {
     setFormData(prev => ({ ...prev, [field]: value }));
 
     if (field === 'direccion') {
+      setOutsideRadius(false);
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
       if (value.length < 4) {
         setAddressSuggestions([]);
@@ -160,6 +180,7 @@ export default function useOrderForm() {
     setFormData(prev => ({ ...prev, direccion: s.cleanName }));
     setCoords({ lat: s.lat, lng: s.lon });
     setAddressSuggestions([]);
+    checkRadius(s.lat, s.lon);
   };
 
   const cambiarQty = (pack, delta) => {
@@ -172,6 +193,7 @@ export default function useOrderForm() {
       const res = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(formData.direccion)}&countrycodes=ar&format=json&limit=1`);
       if (res.data && res.data.length > 0) {
         setCoords({ lat: res.data[0].lat, lng: res.data[0].lon });
+        checkRadius(res.data[0].lat, res.data[0].lon);
       } else {
         setCoords({ lat: null, lng: null });
       }
@@ -200,7 +222,7 @@ export default function useOrderForm() {
   const horarioCompleto = formData.desde && formData.hasta && formData.desde < formData.hasta;
   const pagoSeleccionado = !!formData.pago;
   const pagoCompleto = pagoSeleccionado && (formData.pago !== 'transferencia' || comprobanteEnviado);
-  const formValido = nombreValido && telefonoValido && direccionValida && packsCompletos && fechaCompleta && horarioCompleto && pagoCompleto;
+  const formValido = nombreValido && telefonoValido && direccionValida && !outsideRadius && packsCompletos && fechaCompleta && horarioCompleto && pagoCompleto;
   const datosCompletos = formData.nombre && formData.telefono && formData.direccion;
 
   const handleSubmit = async () => {
@@ -251,5 +273,6 @@ export default function useOrderForm() {
     packsCompletos, fechaCompleta, horarioCompleto, pagoCompleto, formValido, datosCompletos,
     handleSubmit, handleAddressBlur, selectSuggestion,
     precios, nombres, addressSuggestions, isSearchingAddress, setAddressSuggestions,
+    outsideRadius,
   };
 }

@@ -29,7 +29,7 @@ export default function UserForm() {
     resumenLineas, total,
     packsCompletos, fechaCompleta, horarioCompleto, pagoCompleto, formValido, datosCompletos,
     handleSubmit, handleAddressBlur, selectSuggestion,
-    precios, nombres, addressSuggestions, isSearchingAddress, setAddressSuggestions,
+    precios, nombres, addressSuggestions, isSearchingAddress, setAddressSuggestions, outsideRadius,
   } = useOrderForm();
 
   const [config, setConfig] = useState({ formularioAbierto: true, horarioCierre: '05:00' });
@@ -232,6 +232,11 @@ export default function UserForm() {
               </div>
             )}
           </div>
+          {outsideRadius && (
+            <div style={{ marginTop: '8px', padding: '10px 12px', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: '8px', fontSize: '13px', color: '#991B1B' }}>
+              📍 Lo sentimos, por ahora solo entregamos dentro de un radio de 1km de Temperley. Verificá tu dirección.
+            </div>
+          )}
         </div>
 
         <PackSelector qtys={qtys} cambiarQty={cambiarQty} precios={precios} nombres={nombres} resumenLineas={resumenLineas} total={total} packsCompletos={packsCompletos} />
