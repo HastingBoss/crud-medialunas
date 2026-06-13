@@ -12,7 +12,7 @@ import OrderTable from '../components/OrderTable/OrderTable.jsx';
 import OrderModal from '../components/OrderModal/OrderModal.jsx';
 import DeleteConfirmModal from '../components/DeleteConfirmModal/DeleteConfirmModal.jsx';
 import ReportsView from '../components/ReportsView/ReportsView.jsx';
-import PricesView from '../components/PricesView/PricesView.jsx';
+
 import ArchivedView from '../components/ArchivedView/ArchivedView.jsx';
 import StockView from '../components/StockView/StockView.jsx';
 import StockAlert from '../components/StockAlert/StockAlert.jsx';

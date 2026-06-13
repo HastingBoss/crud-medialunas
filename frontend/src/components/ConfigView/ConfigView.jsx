@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import PricesView from '../PricesView/PricesView.jsx';
 import './ConfigView.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+const PACKS = [
+  { key: 'individual', label: 'Pack Individual', emoji: '🥐' },
+  { key: 'media', label: 'Pack Media Docena', emoji: '🥐🥐' },
+  { key: 'clasico', label: 'Pack Clásico', emoji: '🥐🥐🥐' },
+  { key: 'familiar', label: 'Pack Familiar', emoji: '🥐🥐🥐🥐' },
+];
 
 export default function ConfigView({ config, onExtendTime, onCierreHasta, onLevantarCierre }) {
   const [horarioCierre, setHorarioCierre] = useState(config.horarioCierre || '05:00');
@@ -11,11 +17,18 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
   const [radioSaved, setRadioSaved] = useState(false);
   const [horarioSaved, setHorarioSaved] = useState(false);
   const [cierreHastaInput, setCierreHastaInput] = useState('');
+  const [prices, setPrices] = useState({ individual: 2200, media: 3800, clasico: 5500, familiar: 8000 });
+  const [pricesSaved, setPricesSaved] = useState(false);
+  const [pricesError, setPricesError] = useState('');
 
   useEffect(() => {
     setHorarioCierre(config.horarioCierre || '05:00');
     setRadioKm(config.radioKm ?? 1);
   }, [config]);
+
+  useEffect(() => {
+    axios.get(`${API_URL}/api/prices`).then(res => setPrices(res.data)).catch(console.error);
+  }, []);
 
   const handleSaveHorario = async () => {
     try {
@@ -41,6 +54,36 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
       onCierreHasta && onCierreHasta();
       setCierreHastaInput('');
     } catch (err) { console.error(err); }
+  };
+
+  const handleSavePrices = async () => {
+    const parsed = {};
+    for (const { key, label } of PACKS) {
+      const val = parseInt(prices[key], 10);
+      if (isNaN(val) || val <= 0) {
+        setPricesError(`El precio de "${label}" debe ser un número positivo.`);
+        return;
+      }
+      parsed[key] = val;
+    }
+    try {
+      await axios.put(`${API_URL}/api/prices`, parsed);
+      setPrices(parsed);
+      setPricesSaved(true);
+      setPricesError('');
+      setTimeout(() => setPricesSaved(false), 3000);
+    } catch { setPricesError('Error al guardar los precios.'); }
+  };
+
+  const handleResetPrices = async () => {
+    const defaults = { individual: 2200, media: 3800, clasico: 5500, familiar: 8000 };
+    try {
+      await axios.put(`${API_URL}/api/prices`, defaults);
+      setPrices(defaults);
+      setPricesSaved(true);
+      setPricesError('');
+      setTimeout(() => setPricesSaved(false), 3000);
+    } catch { setPricesError('Error al restablecer los precios.'); }
   };
 
   return (
@@ -117,8 +160,22 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
             <div className="config-group-desc">Los cambios se aplican automáticamente al formulario de pedidos.</div>
           </div>
         </div>
-        <div style={{ marginTop: '12px' }}>
-          <PricesView embedded />
+        <div className="prices-list">
+          {PACKS.map(({ key, label, emoji }) => (
+            <div key={key} className="price-item-card">
+              <div className="price-item-label">{emoji} {label}</div>
+              <div className="price-input-group">
+                <span className="price-currency">$</span>
+                <input type="number" className="price-input" min="1" value={prices[key]} onChange={e => setPrices(prev => ({ ...prev, [key]: e.target.value }))} />
+              </div>
+            </div>
+          ))}
+        </div>
+        {pricesError && <div className="price-error-msg">⚠️ {pricesError}</div>}
+        {pricesSaved && <div className="price-success-msg">✓ Precios guardados correctamente</div>}
+        <div className="prices-actions">
+          <button className="btn-prices-save" onClick={handleSavePrices}>Guardar precios</button>
+          <button className="btn-prices-reset" onClick={handleResetPrices}>Restablecer</button>
         </div>
       </div>
 
