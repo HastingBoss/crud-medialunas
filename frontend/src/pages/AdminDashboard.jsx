@@ -23,6 +23,7 @@ import AdminHeader from '../components/AdminHeader/AdminHeader.jsx';
 import AdminTabs from '../components/AdminTabs/AdminTabs.jsx';
 import RoutePlanner from '../components/RoutePlanner/RoutePlanner.jsx';
 import CutoffModals from '../components/CutoffModals/CutoffModals.jsx';
+import ConfigView from '../components/ConfigView/ConfigView.jsx';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -284,11 +285,11 @@ export default function AdminDashboard() {
   }
 
   const TABS = [
-    { id: 'pedidos', label: 'Mapa y Pedidos' },
-    { id: 'reportes', label: '📊 Reportes' },
-    { id: 'precios', label: '💰 Precios' },
+    { id: 'pedidos', label: '📋 Pedidos' },
     { id: 'stock', label: '📦 Stock' },
-    { id: 'archivados', label: '📦 Archivados' },
+    { id: 'reportes', label: '📊 Reportes' },
+    { id: 'archivados', label: '📁 Archivados' },
+    { id: 'configuracion', label: '⚙️ Configuración' },
   ];
 
   return (
@@ -380,7 +381,6 @@ export default function AdminDashboard() {
 
       <div className="content">
         {activeTab === 'reportes' && <ReportsView orders={orders} calcularTotal={calcularTotal} />}
-        {activeTab === 'precios' && <PricesView />}
         {activeTab === 'stock' && (
           <StockView 
             orders={orders} 
@@ -395,6 +395,14 @@ export default function AdminDashboard() {
             deleteOrder={deleteOrder} 
             reprogramarOrder={reprogramarOrder} 
             calcularTotal={calcularTotal} 
+          />
+        )}
+        {activeTab === 'configuracion' && (
+          <ConfigView
+            config={config}
+            onExtendTime={fetchConfig}
+            onCierreHasta={fetchConfig}
+            onLevantarCierre={fetchConfig}
           />
         )}
       </div>
