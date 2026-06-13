@@ -294,13 +294,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-body">
-      <AdminHeader 
-        config={config} 
-        onOpenCloseConfirm={() => setShowCloseConfirm(true)} 
-        onOpenExtendModal={() => setShowExtendModal(true)}
-        onOpenCierreHastaModal={() => setShowCierreHastaModal(true)}
-        onLevantarCierre={handleLevantarCierre}
-      />
+      <AdminHeader config={config} />
 
       <AdminTabs 
         tabs={TABS} 

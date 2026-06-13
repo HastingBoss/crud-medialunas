@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import PricesView from '../PricesView/PricesView.jsx';
+import './ConfigView.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -22,9 +23,7 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
       setHorarioSaved(true);
       onExtendTime && onExtendTime();
       setTimeout(() => setHorarioSaved(false), 3000);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const handleSaveRadio = async () => {
@@ -32,9 +31,7 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
       await axios.put(`${API_URL}/api/config/radio`, { radioKm });
       setRadioSaved(true);
       setTimeout(() => setRadioSaved(false), 3000);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const handleCierreHasta = async () => {
@@ -43,80 +40,87 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
       await axios.post(`${API_URL}/api/config/extender`, { cierreHasta: cierreHastaInput });
       onCierreHasta && onCierreHasta();
       setCierreHastaInput('');
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="config-view">
 
-      {/* Horario de corte */}
-      <div className="config-section">
-        <div className="config-section-title">⏰ Horario de corte de pedidos</div>
-        <p className="config-section-desc">Los pedidos se cierran automáticamente a esta hora.</p>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '10px' }}>
-          <select
-            value={horarioCierre}
-            onChange={e => setHorarioCierre(e.target.value)}
-            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid var(--border)', fontFamily: 'inherit', fontSize: '14px' }}
-          >
+      <div className="config-group">
+        <div className="config-group-header">
+          <span className="config-group-icon">⏰</span>
+          <div>
+            <div className="config-group-title">Horario de corte</div>
+            <div className="config-group-desc">Los pedidos se cierran automáticamente a esta hora.</div>
+          </div>
+        </div>
+        <div className="config-row">
+          <select className="config-select" value={horarioCierre} onChange={e => setHorarioCierre(e.target.value)}>
             {['03:00','04:00','05:00','06:00','07:00','07:30','08:00'].map(h => (
               <option key={h} value={h}>{h} hs</option>
             ))}
           </select>
           <button className="btn-config-save" onClick={handleSaveHorario}>Guardar</button>
-          {horarioSaved && <span style={{ color: 'var(--success)', fontSize: '13px' }}>✓ Guardado</span>}
+          {horarioSaved && <span className="config-saved-msg">✓ Guardado</span>}
         </div>
       </div>
 
-      {/* Cierre por fecha */}
-      <div className="config-section">
-        <div className="config-section-title">📋 Cierre por fecha</div>
-        <p className="config-section-desc">Cerrá los pedidos hasta una fecha específica (imprevistos, vacaciones).</p>
+      <div className="config-divider" />
+
+      <div className="config-group">
+        <div className="config-group-header">
+          <span className="config-group-icon">📋</span>
+          <div>
+            <div className="config-group-title">Cierre por fecha</div>
+            <div className="config-group-desc">Cerrá los pedidos hasta una fecha específica — imprevistos, vacaciones.</div>
+          </div>
+        </div>
         {config.cierreHasta && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px', padding: '10px 12px', background: '#FFF8EC', border: '1px solid var(--gold)', borderRadius: '8px', fontSize: '13px' }}>
+          <div className="config-alert">
             <span>⚠️ Cerrado hasta <strong>{config.cierreHasta}</strong></span>
-            <button
-              onClick={() => { axios.delete(`${API_URL}/api/config/extender`); onLevantarCierre && onLevantarCierre(); }}
-              style={{ marginLeft: 'auto', background: '#2E7D32', color: '#fff', border: 'none', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer', fontSize: '12px' }}
-            >Levantar cierre</button>
+            <button className="btn-config-lift" onClick={() => { axios.delete(`${API_URL}/api/config/extender`); onLevantarCierre && onLevantarCierre(); }}>
+              Levantar cierre
+            </button>
           </div>
         )}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '10px' }}>
-          <input
-            type="date"
-            value={cierreHastaInput}
-            onChange={e => setCierreHastaInput(e.target.value)}
-            min={new Date().toLocaleDateString('sv-SE')}
-            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid var(--border)', fontFamily: 'inherit', fontSize: '14px' }}
-          />
+        <div className="config-row">
+          <input type="date" className="config-input-date" value={cierreHastaInput} onChange={e => setCierreHastaInput(e.target.value)} min={new Date().toLocaleDateString('sv-SE')} />
           <button className="btn-config-save" onClick={handleCierreHasta}>Aplicar</button>
         </div>
       </div>
 
-      {/* Radio de entrega */}
-      <div className="config-section">
-        <div className="config-section-title">📍 Radio de entrega</div>
-        <p className="config-section-desc">Distancia máxima desde Albarracín 1241, Temperley.</p>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '10px' }}>
-          <input
-            type="number"
-            min="0.5"
-            max="10"
-            step="0.5"
-            value={radioKm}
-            onChange={e => setRadioKm(parseFloat(e.target.value))}
-            style={{ width: '80px', padding: '8px 12px', borderRadius: '8px', border: '1.5px solid var(--border)', fontFamily: 'inherit', fontSize: '14px' }}
-          />
-          <span style={{ fontSize: '14px', color: 'var(--muted)' }}>km</span>
+      <div className="config-divider" />
+
+      <div className="config-group">
+        <div className="config-group-header">
+          <span className="config-group-icon">📍</span>
+          <div>
+            <div className="config-group-title">Radio de entrega</div>
+            <div className="config-group-desc">Distancia máxima desde Albarracín 1241, Temperley.</div>
+          </div>
+        </div>
+        <div className="config-row">
+          <input type="number" className="config-input-number" min="0.5" max="10" step="0.5" value={radioKm} onChange={e => setRadioKm(parseFloat(e.target.value))} />
+          <span className="config-unit">km</span>
           <button className="btn-config-save" onClick={handleSaveRadio}>Guardar</button>
-          {radioSaved && <span style={{ color: 'var(--success)', fontSize: '13px' }}>✓ Guardado</span>}
+          {radioSaved && <span className="config-saved-msg">✓ Guardado</span>}
         </div>
       </div>
 
-      {/* Precios */}
-      <PricesView />
+      <div className="config-divider" />
+
+      <div className="config-group">
+        <div className="config-group-header">
+          <span className="config-group-icon">💰</span>
+          <div>
+            <div className="config-group-title">Precios de packs</div>
+            <div className="config-group-desc">Los cambios se aplican automáticamente al formulario de pedidos.</div>
+          </div>
+        </div>
+        <div style={{ marginTop: '12px' }}>
+          <PricesView embedded />
+        </div>
+      </div>
 
     </div>
   );

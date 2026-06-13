@@ -1,26 +1,93 @@
-.config-section {
-  background: #fff;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 18px;
+.config-view {
+  display: flex;
+  flex-direction: column;
 }
 
-.config-section-title {
+.config-group {
+  padding: 20px 4px;
+}
+
+.config-group-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.config-group-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.config-group-title {
   font-family: 'Lora', serif;
   font-size: 15px;
   font-weight: 600;
   color: var(--brown);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
-.config-section-desc {
+.config-group-desc {
   font-size: 13px;
   color: var(--muted);
   line-height: 1.4;
 }
 
+.config-divider {
+  height: 1px;
+  background: var(--border);
+  opacity: 0.5;
+  margin: 0 4px;
+}
+
+.config-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.config-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+}
+
+.config-input-date {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+}
+
+.config-input-number {
+  width: 75px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+}
+
+.config-unit {
+  font-size: 14px;
+  color: var(--muted);
+}
+
 .btn-config-save {
-  padding: 8px 16px;
+  padding: 8px 18px;
   background: var(--brown);
   color: #fff;
   border: none;
@@ -34,4 +101,36 @@
 
 .btn-config-save:hover {
   background: var(--brown-light);
+}
+
+.btn-config-lift {
+  margin-left: auto;
+  padding: 4px 12px;
+  background: #2E7D32;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.config-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #FFF8EC;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--brown);
+  margin-bottom: 10px;
+}
+
+.config-saved-msg {
+  font-size: 13px;
+  color: var(--success);
+  font-weight: 500;
 }
