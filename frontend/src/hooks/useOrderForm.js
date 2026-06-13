@@ -17,6 +17,12 @@ export default function useOrderForm() {
       } catch (err) {
         console.error('Error fetching prices:', err);
       }
+      try {
+        const configRes = await axios.get(`${API_URL}/api/config/estado`);
+        setRadioKm(configRes.data.radioKm ?? 1);
+      } catch (err) {
+        console.error('Error fetching config:', err);
+      }
     };
     fetchPrices();
   }, []);
@@ -35,7 +41,7 @@ export default function useOrderForm() {
   const [outsideRadius, setOutsideRadius] = useState(false);
 
   const ORIGEN = { lat: -34.7785456, lng: -58.3868270 };
-  const RADIO_KM = 1;
+  const [radioKm, setRadioKm] = useState(1);
 
   const haversineKm = (lat1, lon1, lat2, lon2) => {
     const R = 6371;
@@ -48,7 +54,7 @@ export default function useOrderForm() {
   const checkRadius = (lat, lng) => {
     if (!lat || !lng) return;
     const dist = haversineKm(ORIGEN.lat, ORIGEN.lng, parseFloat(lat), parseFloat(lng));
-    setOutsideRadius(dist > RADIO_KM);
+    setOutsideRadius(dist > radioKm);
   };
 
   const scrollRef = useRef(null);

@@ -8,27 +8,27 @@ datasource db {
 }
 
 model Pedido {
-  id            String   @id @default(uuid())
-  nombre        String
-  telefono      String
-  direccion     String
-  lat           Float?
-  lng           Float?
-  desde         String
-  hasta         String
-  fecha         String
-  paquete       String
-  pago          String
-  estadoPago    String   @default("Pendiente")
-  estado        String   @default("Pendiente")
-  archivado     Boolean  @default(false)
-  total         Float?
-  comprobante   String?
-  createdAt     DateTime @default(now())
+  id          String   @id @default(uuid())
+  nombre      String
+  telefono    String
+  direccion   String
+  lat         Float?
+  lng         Float?
+  desde       String
+  hasta       String
+  fecha       String
+  paquete     String
+  pago        String
+  estadoPago  String   @default("Pendiente")
+  estado      String   @default("Pendiente")
+  archivado   Boolean  @default(false)
+  total       Float?
+  comprobante String?
+  createdAt   DateTime @default(now())
 }
 
 model Precios {
-  id         Int    @id @default(autoincrement())
+  id         Int   @id @default(autoincrement())
   individual Float
   media      Float
   clasico    Float
@@ -42,9 +42,11 @@ model Stock {
 }
 
 model Config {
-  id              Int      @id @default(autoincrement())
-  horarioCierre   String   @default("05:00")
-  forzadoCerrado  Boolean  @default(false)
-  fechaForzado    String?
-  cierreHasta     String?
+  id             Int     @id @default(autoincrement())
+  horarioCierre  String  @default("05:00")
+  forzadoCerrado Boolean @default(false)
+  fechaForzado   String?
+  cierreHasta    String?
+  radioKm        Float   @default(1)
 }
+

@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
     const config = await prisma.config.upsert({
       where: { id: 1 },
       update: {},
-      create: { id: 1, horarioCierre: '05:00', forzadoCerrado: false }
+      create: { id: 1, horarioCierre: '05:00', forzadoCerrado: false, radioKm: 1 }
     });
 
     const hoy = getArgentinaDate();
@@ -53,7 +53,8 @@ module.exports = async (req, res) => {
       formularioAbierto,
       horarioCierre: config.horarioCierre,
       cierreHasta: config.cierreHasta || null,
-      fechaMinima
+      fechaMinima,
+      radioKm: config.radioKm ?? 1
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
