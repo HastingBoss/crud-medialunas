@@ -41,6 +41,13 @@ export default function InstallPWA() {
 
   return (
     <div className="install-pwa-banner">
+      <button 
+        className="install-pwa-close-button" 
+        onClick={() => setIsVisible(false)}
+        aria-label="Cerrar"
+      >
+        ✕
+      </button>
       <div className="install-pwa-content">
         <div className="install-pwa-icon">🥐</div>
         <div className="install-pwa-text">

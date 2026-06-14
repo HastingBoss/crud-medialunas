@@ -81,3 +81,32 @@
 .install-pwa-button:active {
   transform: translateY(0);
 }
+
+.install-pwa-close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--muted);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.install-pwa-close-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--brown);
+}
+
+.install-pwa-close-button:active {
+  background: rgba(0, 0, 0, 0.1);
+}
