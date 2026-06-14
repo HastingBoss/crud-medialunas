@@ -110,7 +110,7 @@ export default function UserForm() {
       {showCutoffBanner && (
         <div style={{
           maxWidth: '500px',
-          margin: '0 auto 20px auto',
+          margin: '24px auto 20px auto',
           padding: '12px 16px',
           backgroundColor: '#FFFBE6',
           border: '1px solid #FF9800',
