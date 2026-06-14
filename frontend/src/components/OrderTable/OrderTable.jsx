@@ -1,5 +1,12 @@
 import './OrderTable.css';
 
+const RANGES = [
+  { label: '8:00 - 8:30', desde: '08:00', hasta: '08:30' },
+  { label: '8:30 - 9:00', desde: '08:30', hasta: '09:00' },
+  { label: '9:00 - 9:30', desde: '09:00', hasta: '09:30' },
+  { label: '9:30 - 10:00', desde: '09:30', hasta: '10:00' }
+];
+
 export default function OrderTable({ 
   filteredOrders, setSelectedOrderId, setMapCenter, setMapZoom, 
   selectedForRoute, toggleOrderSelection, toggleSelectAll,
@@ -7,13 +14,19 @@ export default function OrderTable({
 }) {
   const allSelected = filteredOrders.length > 0 && filteredOrders.every(o => selectedForRoute.includes(o.id));
 
-  const timeOptions = [];
-  for (let hour = 8; hour <= 10; hour++) {
-    for (let min = 0; min < 60; min += 30) {
-      const time = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-      timeOptions.push(time);
+  const currentRangeValue = timeFrom && timeTo ? `${timeFrom}-${timeTo}` : '';
+
+  const handleRangeChange = (e) => {
+    const val = e.target.value;
+    if (!val) {
+      setTimeFrom('');
+      setTimeTo('');
+    } else {
+      const [from, to] = val.split('-');
+      setTimeFrom(from);
+      setTimeTo(to);
     }
-  }
+  };
 
   return (
     <div className="order-list">
@@ -30,25 +43,12 @@ export default function OrderTable({
         <div className="time-range-filters">
           <select 
             className="filter-select" 
-            value={timeFrom} 
-            onChange={e => setTimeFrom(e.target.value)}
+            value={currentRangeValue} 
+            onChange={handleRangeChange}
           >
-            <option value="">Desde</option>
-            {timeOptions.map(time => (
-              <option key={time} value={time}>{time}</option>
-            ))}
-          </select>
-          
-          <span className="time-separator">→</span>
-          
-          <select 
-            className="filter-select" 
-            value={timeTo} 
-            onChange={e => setTimeTo(e.target.value)}
-          >
-            <option value="">Hasta</option>
-            {timeOptions.map(time => (
-              <option key={time} value={time}>{time}</option>
+            <option value="">Todos los horarios</option>
+            {RANGES.map(r => (
+              <option key={`${r.desde}-${r.hasta}`} value={`${r.desde}-${r.hasta}`}>{r.label}</option>
             ))}
           </select>
         </div>

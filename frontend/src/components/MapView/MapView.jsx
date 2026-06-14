@@ -14,7 +14,7 @@ export default function MapView({ filteredOrders, mapCenter, mapZoom, adminPos, 
 
   const matchesTimeFilter = (order) => {
     if (!timeFrom || !timeTo || !order.desde) return true;
-    return order.desde >= timeFrom && order.desde <= timeTo;
+    return order.desde >= timeFrom && order.desde < timeTo;
   };
 
   const adminIcon = L.divIcon({

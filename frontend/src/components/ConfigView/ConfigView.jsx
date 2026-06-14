@@ -22,6 +22,7 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
   const [pricesError, setPricesError] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHorarioCierre(config.horarioCierre || '05:00');
     setRadioKm(config.radioKm ?? 1);
   }, [config]);

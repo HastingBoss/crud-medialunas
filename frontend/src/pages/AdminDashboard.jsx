@@ -226,7 +226,7 @@ export default function AdminDashboard() {
     let matchesTimeRange = true;
     if (timeFrom && timeTo && p.desde) {
       const orderTime = p.desde;
-      matchesTimeRange = orderTime >= timeFrom && orderTime <= timeTo;
+      matchesTimeRange = orderTime >= timeFrom && orderTime < timeTo;
     }
     
     return matchesDate && matchesStatus && matchesTimeRange;

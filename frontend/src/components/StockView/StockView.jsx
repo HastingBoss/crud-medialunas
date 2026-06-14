@@ -28,6 +28,14 @@ export default function StockView({ orders, stock, threshold, updateStockAPI, ca
     return { date, units };
   });
 
+  const weekdaysSales = salesData.filter(d => {
+    const day = new Date(d.date + 'T12:00:00').getDay();
+    return day !== 0 && day !== 6;
+  });
+  const averageWeekdaySales = weekdaysSales.length > 0
+    ? weekdaysSales.reduce((a, b) => a + b.units, 0) / weekdaysSales.length
+    : 0;
+
   const maxUnits = Math.max(...salesData.map(d => d.units), 1);
 
   return (
@@ -107,8 +115,8 @@ export default function StockView({ orders, stock, threshold, updateStockAPI, ca
       <div className="forecast-tip">
         <div className="tip-icon">💡</div>
         <div className="tip-text">
-          <strong>Tip de previsión:</strong> El promedio de venta diaria es de <strong>{(salesData.reduce((a, b) => a + b.units, 0) / 7).toFixed(1)}</strong> unidades. 
-          Asegúrate de tener stock suficiente para el fin de semana.
+          <strong>Tip de previsión:</strong> El promedio de venta diaria es de <strong>{averageWeekdaySales.toFixed(1)}</strong> unidades. 
+          No se hacen ventas los fines de semana.
         </div>
       </div>
     </div>

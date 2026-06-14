@@ -6,6 +6,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 export const nombres = { individual: 'Pack Individual', media: 'Pack Media Docena', clasico: 'Pack Clásico', familiar: 'Pack Familiar' };
 
 export default function useOrderForm() {
+  const ORIGEN = { lat: -34.7785456, lng: -58.3868270 };
+  const [radioKm, setRadioKm] = useState(1);
   const [precios, setPrecios] = useState({ individual: 2200, media: 3800, clasico: 6800, familiar: 12500 });
   const [formData, setFormData] = useState({ nombre: '', telefono: '', direccion: '', fecha: '', desde: '', hasta: '', pago: '' });
 
@@ -39,9 +41,6 @@ export default function useOrderForm() {
   const searchTimeoutRef = useRef(null);
 
   const [outsideRadius, setOutsideRadius] = useState(false);
-
-  const ORIGEN = { lat: -34.7785456, lng: -58.3868270 };
-  const [radioKm, setRadioKm] = useState(1);
 
   const haversineKm = (lat1, lon1, lat2, lon2) => {
     const R = 6371;
