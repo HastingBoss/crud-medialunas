@@ -14,12 +14,13 @@ module.exports = async (req, res) => {
   try {
     // PUT — cambiar horario de cierre (extender o recortar)
     if (req.method === 'PUT') {
+      const hoy = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Argentina/Buenos_Aires' });
       const { horarioCierre } = req.body;
       if (!horarioCierre) return res.status(400).json({ message: 'Debe proveer horarioCierre (HH:MM)' });
       const config = await prisma.config.upsert({
         where: { id: 1 },
-        update: { horarioCierre },
-        create: { id: 1, horarioCierre, forzadoCerrado: false }
+        update: { horarioCierre, horarioCierreFecha: hoy },
+        create: { id: 1, horarioCierre, horarioCierreFecha: hoy, forzadoCerrado: false }
       });
       return res.json({ message: 'Horario de cierre actualizado', config });
     }

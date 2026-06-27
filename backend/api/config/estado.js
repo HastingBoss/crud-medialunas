@@ -37,8 +37,9 @@ module.exports = async (req, res) => {
     });
 
     const hoy = getArgentinaDate();
+    const horarioEfectivo = (config.horarioCierreFecha === hoy) ? config.horarioCierre : '00:00';
     const hora = getArgentinaHour();
-    const [closeHour] = config.horarioCierre.split(':').map(Number);
+    const [closeHour] = horarioEfectivo.split(':').map(Number);
 
     // Cierre por fecha (imprevisto del repartidor)
     let formularioAbierto = true;
@@ -67,7 +68,7 @@ module.exports = async (req, res) => {
 
     res.json({
       formularioAbierto,
-      horarioCierre: config.horarioCierre,
+      horarioCierre: horarioEfectivo,
       cierreHasta: config.cierreHasta || null,
       fechaMinima,
       radioKm: config.radioKm ?? 1
