@@ -40,18 +40,45 @@ export default function PackSelector({ qtys, cambiarQty, precios, nombres, resum
       {totalUnidades > 48 && (
         <div style={{
           marginTop: '12px',
-          padding: '10px 14px',
+          padding: '12px 14px',
           backgroundColor: '#FFFBE6',
           border: '1px solid #FF9800',
           borderRadius: '8px',
           fontSize: '13px',
           color: '#856404',
           display: 'flex',
-          gap: '8px',
-          alignItems: 'center'
+          flexDirection: 'column',
+          gap: '10px'
         }}>
-          <span>⚠️</span>
-          <span style={{ lineHeight: '1.4' }}><strong>Pedido grande:</strong> La confirmación de este pedido estará sujeta a disponibilidad de stock.</span>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+            <span>⚠️</span>
+            <span style={{ lineHeight: '1.4' }}><strong>Pedido grande:</strong> Consultá la disponibilidad por WhatsApp antes de realizar el pedido.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const msg = `Quiero hacer un pedido de ${totalUnidades} medialunas, ¿hay stock para un pedido de este tamaño?`;
+              window.open(`https://wa.me/5491150593803?text=${encodeURIComponent(msg)}`, '_blank');
+            }}
+            style={{
+              width: '100%',
+              background: '#25D366',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              fontFamily: 'inherit'
+            }}
+          >
+            <span style={{ fontSize: '16px' }}>📱</span> Consultar por WhatsApp
+          </button>
         </div>
       )}
 
