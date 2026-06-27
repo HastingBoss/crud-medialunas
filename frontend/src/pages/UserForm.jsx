@@ -51,22 +51,53 @@ export default function UserForm() {
   const currentHour = new Date().getHours();
   const showCutoffBanner = config.formularioAbierto && currentHour >= 0 && currentHour < 5 && !bannerDismissed;
   
-  // Calcular pasado mañana para el mensaje y la fecha mínima
-  const pasadoManana = new Date();
-  pasadoManana.setDate(pasadoManana.getDate() + 2);
-  const pasadoMananaISO = formatDateISO(pasadoManana);
-  const pasadoMananaText = `${pasadoManana.getDate()}/${pasadoManana.getMonth() + 1}`;
+  // Calcular la primera fecha de entrega disponible
+  const getFirstAvailableDate = () => {
+    const deliveryDays = [];
+    let dIterator = new Date();
+    dIterator.setDate(dIterator.getDate() + 1); // Empezar desde mañana
 
-  // Ajustar fecha mínima si está cerrado para mañana
+    while (deliveryDays.length < 7) {
+      if (dIterator.getDay() !== 0 && dIterator.getDay() !== 6) {
+        deliveryDays.push(new Date(dIterator));
+      }
+      dIterator.setDate(dIterator.getDate() + 1);
+    }
+
+    if (isClosedForTomorrow) {
+      return deliveryDays[1];
+    }
+    return deliveryDays[0];
+  };
+
+  const firstAvailableDate = getFirstAvailableDate();
+  const firstAvailableDateText = `${firstAvailableDate.getDate()}/${firstAvailableDate.getMonth() + 1}`;
+
+  const getSelectableDays = () => {
+    if (!isClosedForTomorrow) {
+      return next7Days;
+    }
+    const selectable = [];
+    let dIterator = new Date(firstAvailableDate);
+    while (selectable.length < 7) {
+      if (dIterator.getDay() !== 0 && dIterator.getDay() !== 6) {
+        selectable.push(new Date(dIterator));
+      }
+      dIterator.setDate(dIterator.getDate() + 1);
+    }
+    return selectable;
+  };
+
+  // Ajustar fecha mínima si está cerrado para la próxima fecha
   useEffect(() => {
     if (isClosedForTomorrow && formData.fecha) {
-      const tomorrowISO = formatDateISO(tomorrowObj);
-      if (formData.fecha === tomorrowISO) {
-        handleInputChange('fecha', pasadoMananaISO);
+      const selectedDate = parseLocalDate(formData.fecha);
+      if (selectedDate && selectedDate < firstAvailableDate) {
+        handleInputChange('fecha', formatDateISO(firstAvailableDate));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClosedForTomorrow, formData.fecha, tomorrowObj]);
+  }, [isClosedForTomorrow, formData.fecha]);
 
   if (submitted) {
     return <OrderSummary formData={formData} resumenLineas={resumenLineas} total={total} daysStr={daysStr} />;
@@ -87,11 +118,11 @@ export default function UserForm() {
         }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
           <h2 style={{ color: '#856404', fontSize: '22px', marginBottom: '12px', fontWeight: 'bold' }}>
-            Pedidos para mañana cerrados
+            Pedidos cerrados por el momento
           </h2>
           <p style={{ color: '#856404', fontSize: '16px', lineHeight: '1.5', margin: 0 }}>
-            El horario de pedidos para mañana ya cerró.<br />
-            <strong>Podés reservar tu pedido para el {pasadoMananaText}.</strong>
+            No estamos recibiendo pedidos para la fecha más próxima.<br />
+            <strong>Podés reservar a partir del {firstAvailableDateText}.</strong>
           </p>
         </div>
       ) : (
@@ -244,11 +275,11 @@ export default function UserForm() {
 
         <p className="section-title" style={{ marginTop: '22px' }}>Fecha de entrega{fechaCompleta && <CheckMark />}</p>
         <DaySelector
-          next7Days={isClosedForTomorrow ? next7Days.slice(2) : next7Days} formatDateISO={formatDateISO} todayISO={todayISO} daysStr={daysStr}
+          next7Days={getSelectableDays()} formatDateISO={formatDateISO} todayISO={todayISO} daysStr={daysStr}
           fecha={formData.fecha} handleInputChange={handleInputChange}
           setDateError={setDateError} setAnticipationError={setAnticipationError}
           showCalendar={showCalendar} setShowCalendar={setShowCalendar}
-          parseLocalDate={parseLocalDate} tomorrowObj={isClosedForTomorrow ? pasadoManana : tomorrowObj} maxDateObj={maxDateObj}
+          parseLocalDate={parseLocalDate} tomorrowObj={isClosedForTomorrow ? firstAvailableDate : tomorrowObj} maxDateObj={maxDateObj}
           canScrollLeft={canScrollLeft} canScrollRight={canScrollRight}
           scrollRef={scrollRef} scrollByAmount={scrollByAmount} handleScroll={handleScroll}
           dateError={dateError} anticipationError={anticipationError} getSelectedDateText={getSelectedDateText}
