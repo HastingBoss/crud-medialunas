@@ -100,7 +100,7 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
         </div>
         <div className="config-row">
           <select className="config-select" value={horarioCierre} onChange={e => setHorarioCierre(e.target.value)}>
-            {['03:00','04:00','05:00','06:00','07:00','07:30','08:00'].map(h => (
+            {['20:00','21:00','22:00','23:00','00:00','01:00','02:00','03:00','04:00'].map(h => (
               <option key={h} value={h}>{h} hs</option>
             ))}
           </select>
