@@ -25,7 +25,7 @@ export default function PaymentSelector({ pago, handleInputChange, comprobanteEn
             className="btn-whatsapp-comprobante"
             onClick={() => {
               setComprobanteEnviado(true);
-              window.open('https://wa.me/5491126487393?text=Hola%2C%20realicé%20un%20pedido%20de%20medialunas%20y%20adjunto%20mi%20comprobante%20de%20transferencia%20🥐', '_blank');
+              window.open('https://wa.me/5491150593803?text=Hola%2C%20realicé%20un%20pedido%20de%20medialunas%20y%20adjunto%20mi%20comprobante%20de%20transferencia%20🥐', '_blank');
             }}
           >Enviar comprobante por WhatsApp 📎</button>
           {comprobanteEnviado && (
