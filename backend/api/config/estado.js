@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
     const config = await prisma.config.upsert({
       where: { id: 1 },
       update: {},
-      create: { id: 1, horarioCierre: '05:00', forzadoCerrado: false, radioKm: 1 }
+      create: { id: 1, horarioCierre: '00:00', forzadoCerrado: false, radioKm: 1 }
     });
 
     const hoy = getArgentinaDate();
@@ -46,8 +46,24 @@ module.exports = async (req, res) => {
       formularioAbierto = false;
     }
 
-    // Fecha mínima seleccionable: hoy si antes del horario de cierre, mañana si no
-    const fechaMinima = hora < closeHour ? hoy : addDays(hoy, 1);
+    let diaBase;
+    if (closeHour >= 0 && closeHour <= 4) {
+      diaBase = hora < closeHour ? hoy : addDays(hoy, 1);
+    } else if (closeHour >= 20 && closeHour <= 23) {
+      diaBase = hora >= closeHour ? addDays(hoy, 1) : hoy;
+    } else {
+      diaBase = hora < closeHour ? hoy : addDays(hoy, 1);
+    }
+
+    function siguienteDiaHabil(fechaStr) {
+      let d = new Date(fechaStr + 'T00:00:00');
+      while (d.getDay() === 0 || d.getDay() === 6) {
+        d.setDate(d.getDate() + 1);
+      }
+      return d.toLocaleDateString('sv-SE');
+    }
+
+    const fechaMinima = siguienteDiaHabil(diaBase);
 
     res.json({
       formularioAbierto,
