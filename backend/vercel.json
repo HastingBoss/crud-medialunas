@@ -22,6 +22,7 @@
     { "src": "/api/config/estado", "dest": "/api/config/estado.js" },
     { "src": "/api/config/extender", "dest": "/api/config/extender.js" },
     { "src": "/api/config/radio", "dest": "/api/config/radio.js" },
+    { "src": "/api/config/alias", "dest": "/api/config/alias.js" },
     { "src": "/api/time", "dest": "/api/time.js" }
   ]
 }

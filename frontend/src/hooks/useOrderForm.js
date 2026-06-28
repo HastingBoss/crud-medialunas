@@ -8,6 +8,7 @@ export const nombres = { individual: 'Pack Individual', media: 'Pack Media Docen
 export default function useOrderForm() {
   const ORIGEN = { lat: -34.7785456, lng: -58.3868270 };
   const [radioKm, setRadioKm] = useState(1);
+  const [alias, setAlias] = useState('');
   const [precios, setPrecios] = useState({ individual: 2200, media: 3800, clasico: 6800, familiar: 12500 });
   const [formData, setFormData] = useState({ nombre: '', telefono: '', direccion: '', fecha: '', desde: '', hasta: '', pago: '' });
 
@@ -22,6 +23,7 @@ export default function useOrderForm() {
       try {
         const configRes = await axios.get(`${API_URL}/api/config/estado`);
         setRadioKm(configRes.data.radioKm ?? 1);
+        setAlias(configRes.data.alias || '');
       } catch (err) {
         console.error('Error fetching config:', err);
       }
@@ -226,7 +228,7 @@ export default function useOrderForm() {
   const fechaCompleta = !!formData.fecha;
   const horarioCompleto = formData.desde && formData.hasta && formData.desde < formData.hasta;
   const pagoSeleccionado = !!formData.pago;
-  const pagoCompleto = pagoSeleccionado && (formData.pago !== 'transferencia' || comprobanteEnviado);
+  const pagoCompleto = pagoSeleccionado;
   const formValido = nombreValido && telefonoValido && direccionValida && !outsideRadius && packsCompletos && fechaCompleta && horarioCompleto && pagoCompleto;
   const datosCompletos = formData.nombre && formData.telefono && formData.direccion;
 
@@ -279,5 +281,6 @@ export default function useOrderForm() {
     handleSubmit, handleAddressBlur, selectSuggestion,
     precios, nombres, addressSuggestions, isSearchingAddress, setAddressSuggestions,
     outsideRadius,
+    alias,
   };
 }

@@ -42,12 +42,13 @@ model Stock {
 }
 
 model Config {
-  id             Int     @id @default(autoincrement())
+  id                 Int     @id @default(autoincrement())
   horarioCierre      String  @default("05:00")
   horarioCierreFecha String?
   forzadoCerrado     Boolean @default(false)
-  fechaForzado   String?
-  cierreHasta    String?
-  radioKm        Float   @default(1)
+  fechaForzado       String?
+  cierreHasta        String?
+  radioKm            Float   @default(1)
+  alias              String?
 }
 

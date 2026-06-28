@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import './PaymentSelector.css';
 
-export default function PaymentSelector({ pago, handleInputChange, comprobanteEnviado, setComprobanteEnviado, pagoCompleto }) {
+export default function PaymentSelector({ pago, handleInputChange, comprobanteEnviado, setComprobanteEnviado, pagoCompleto, alias }) {
+  const [copiado, setCopiado] = useState(false);
+
   return (
     <div className="payment-selector-container">
       <p className="section-title">Método de pago{pagoCompleto && <span className="check-mark">✓</span>}</p>
@@ -20,6 +23,25 @@ export default function PaymentSelector({ pago, handleInputChange, comprobanteEn
 
       {pago === 'transferencia' && (
         <div className="comprobante-field visible">
+          {alias && (
+            <div className="alias-box">
+              <div className="alias-label">Alias para transferir</div>
+              <div className="alias-row">
+                <span className="alias-value">{alias}</span>
+                <button
+                  type="button"
+                  className="btn-copy-alias"
+                  onClick={() => {
+                    navigator.clipboard.writeText(alias);
+                    setCopiado(true);
+                    setTimeout(() => setCopiado(false), 2000);
+                  }}
+                >
+                  {copiado ? '✓ Copiado' : '📋 Copiar'}
+                </button>
+              </div>
+            </div>
+          )}
           <button
             type="button"
             className="btn-whatsapp-comprobante"

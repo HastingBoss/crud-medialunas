@@ -15,6 +15,8 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
   const [horarioCierre, setHorarioCierre] = useState(config.horarioCierre || '05:00');
   const [radioKm, setRadioKm] = useState(config.radioKm ?? 1);
   const [radioSaved, setRadioSaved] = useState(false);
+  const [alias, setAlias] = useState(config.alias || '');
+  const [aliasSaved, setAliasSaved] = useState(false);
   const [horarioSaved, setHorarioSaved] = useState(false);
   const [cierreHastaInput, setCierreHastaInput] = useState('');
   const [prices, setPrices] = useState({ individual: 2200, media: 3800, clasico: 5500, familiar: 8000 });
@@ -25,6 +27,7 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setHorarioCierre(config.horarioCierre || '05:00');
     setRadioKm(config.radioKm ?? 1);
+    setAlias(config.alias || '');
   }, [config]);
 
   useEffect(() => {
@@ -45,6 +48,14 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
       await axios.put(`${API_URL}/api/config/radio`, { radioKm });
       setRadioSaved(true);
       setTimeout(() => setRadioSaved(false), 3000);
+    } catch (err) { console.error(err); }
+  };
+
+  const handleSaveAlias = async () => {
+    try {
+      await axios.put(`${API_URL}/api/config/alias`, { alias });
+      setAliasSaved(true);
+      setTimeout(() => setAliasSaved(false), 3000);
     } catch (err) { console.error(err); }
   };
 
@@ -148,6 +159,23 @@ export default function ConfigView({ config, onExtendTime, onCierreHasta, onLeva
           <span className="config-unit">km</span>
           <button className="btn-config-save" onClick={handleSaveRadio}>Guardar</button>
           {radioSaved && <span className="config-saved-msg">✓ Guardado</span>}
+        </div>
+      </div>
+
+      <div className="config-divider" />
+
+      <div className="config-group">
+        <div className="config-group-header">
+          <span className="config-group-icon">🏦</span>
+          <div>
+            <div className="config-group-title">Alias para transferencias</div>
+            <div className="config-group-desc">El alias bancario que verán los clientes al elegir pago por transferencia.</div>
+          </div>
+        </div>
+        <div className="config-row">
+          <input type="text" className="config-input-date" placeholder="Ej: medialunas.temperley" value={alias} onChange={e => setAlias(e.target.value)} />
+          <button className="btn-config-save" onClick={handleSaveAlias}>Guardar</button>
+          {aliasSaved && <span className="config-saved-msg">✓ Guardado</span>}
         </div>
       </div>
 

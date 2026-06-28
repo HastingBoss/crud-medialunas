@@ -79,3 +79,41 @@
   margin-left: 8px;
   font-size: 18px;
 }
+
+.alias-box {
+  margin-top: 15px;
+  padding: 14px;
+  background: #FFF8EC;
+  border: 1.5px solid var(--gold);
+  border-radius: 10px;
+}
+.alias-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.alias-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.alias-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--brown);
+}
+.btn-copy-alias {
+  background: var(--brown);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}

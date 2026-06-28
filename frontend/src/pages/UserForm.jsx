@@ -30,6 +30,7 @@ export default function UserForm() {
     packsCompletos, fechaCompleta, horarioCompleto, pagoCompleto, formValido, datosCompletos,
     handleSubmit, handleAddressBlur, selectSuggestion,
     precios, nombres, addressSuggestions, isSearchingAddress, setAddressSuggestions, outsideRadius,
+    alias,
   } = useOrderForm();
 
   const [config, setConfig] = useState({ formularioAbierto: true, horarioCierre: '05:00' });
@@ -287,7 +288,7 @@ export default function UserForm() {
 
         <TimeSelector desde={formData.desde} hasta={formData.hasta} handleInputChange={handleInputChange} horarioCompleto={horarioCompleto} />
 
-        <PaymentSelector pago={formData.pago} handleInputChange={handleInputChange} comprobanteEnviado={comprobanteEnviado} setComprobanteEnviado={setComprobanteEnviado} pagoCompleto={pagoCompleto} />
+        <PaymentSelector pago={formData.pago} handleInputChange={handleInputChange} comprobanteEnviado={comprobanteEnviado} setComprobanteEnviado={setComprobanteEnviado} pagoCompleto={pagoCompleto} alias={alias} />
 
         <button
           className="submit-btn"

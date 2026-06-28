@@ -71,7 +71,8 @@ module.exports = async (req, res) => {
       horarioCierre: horarioEfectivo,
       cierreHasta: config.cierreHasta || null,
       fechaMinima,
-      radioKm: config.radioKm ?? 1
+      radioKm: config.radioKm ?? 1,
+      alias: config.alias || null
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
