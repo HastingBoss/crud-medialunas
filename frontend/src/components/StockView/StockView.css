@@ -186,3 +186,17 @@
   color: var(--muted);
   line-height: 1.4;
 }
+
+@media (max-width: 480px) {
+  .config-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .config-label {
+    width: auto;
+  }
+  .config-input {
+    width: 100%;
+  }
+}
