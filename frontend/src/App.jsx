@@ -1,7 +1,25 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import UserForm from './pages/UserForm';
 import AdminDashboard from './pages/AdminDashboard';
 import InstallPWA from './components/InstallPWA/InstallPWA';
+
+function ManifestSwitcher() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const link = document.querySelector('link[rel="manifest"]');
+    if (link) {
+      if (location.pathname.startsWith('/admin')) {
+        link.setAttribute('href', '/admin-manifest.json');
+      } else {
+        link.setAttribute('href', '/manifest.json');
+      }
+    }
+  }, [location.pathname]);
+
+  return null;
+}
 
 function App() {
   return (
@@ -12,6 +30,7 @@ function App() {
           <Link to="/admin" style={{ color: 'white' }}>Admin</Link>
         </div>
       )}
+      <ManifestSwitcher />
       <Routes>
         <Route path="/" element={<UserForm />} />
         <Route path="/admin" element={<AdminDashboard />} />

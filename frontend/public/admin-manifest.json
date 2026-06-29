@@ -1,0 +1,22 @@
+{
+  "short_name": "Admin Medialunas",
+  "name": "Admin - Medialunas Artesanales",
+  "description": "Panel de administración de pedidos, stock y configuración.",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/admin",
+  "background_color": "#3d1f0d",
+  "theme_color": "#3d1f0d",
+  "display": "standalone",
+  "orientation": "portrait"
+}
