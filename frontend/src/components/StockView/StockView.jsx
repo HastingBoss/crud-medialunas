@@ -42,6 +42,8 @@ export default function StockView({ orders, stock, threshold, updateStockAPI, ca
 
   const maxUnits = Math.max(...salesData.map(d => d.units), 1);
 
+  console.log('threshold prop:', threshold);
+
   return (
     <div className="stock-view-container">
       <div className="stock-section">
