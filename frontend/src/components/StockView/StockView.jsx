@@ -53,6 +53,26 @@ export default function StockView({ orders, stock, threshold, updateStockAPI, ca
               {stock}
             </div>
             <div className="stock-unit-label">medialunas</div>
+            {threshold > 0 && (
+              <div className="stock-threshold-indicator">
+                <div className="stock-threshold-bar-bg">
+                  <div
+                    className="stock-threshold-bar-fill"
+                    style={{
+                      width: `${Math.min((stock / Math.max(threshold * 3, stock)) * 100, 100)}%`,
+                      background: stock < threshold ? '#d32f2f' : stock < threshold * 1.5 ? '#FF9800' : '#2E7D32'
+                    }}
+                  />
+                  <div
+                    className="stock-threshold-marker"
+                    style={{ left: `${Math.min((threshold / Math.max(threshold * 3, stock)) * 100, 100)}%` }}
+                  />
+                </div>
+                <div className="stock-threshold-label">
+                  Alerta en <strong>{threshold}</strong> unidades
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Card Actualizar Stock */}
