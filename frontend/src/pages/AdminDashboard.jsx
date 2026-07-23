@@ -45,8 +45,8 @@ export default function AdminDashboard() {
   const [filterStatus, setFilterStatus] = useState('');
   const [timeFrom, setTimeFrom] = useState('');
   const [timeTo, setTimeTo] = useState('');
-  const [adminPos, setAdminPos] = useState({ lat: -34.6080, lng: -58.4620 });
-  const [mapCenter, setMapCenter] = useState([-34.6080, -58.4620]);
+  const [adminPos, setAdminPos] = useState({ lat: -34.7785456, lng: -58.3868270 });
+  const [mapCenter, setMapCenter] = useState([-34.7785456, -58.3868270]);
   const [mapZoom, setMapZoom] = useState(13);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const selectedOrder = orders.find(o => o.id === selectedOrderId);
