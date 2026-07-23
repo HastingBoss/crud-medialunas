@@ -378,7 +378,8 @@ export default function AdminDashboard() {
         {activeTab === 'stock' && (
           <StockView 
             orders={orders} 
-            stock={stock} 
+            stock={stock}
+            threshold={threshold}
             updateStockAPI={updateStockAPI} 
             calcularUnidades={calcularUnidades} 
           />
