@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './StockView.css';
 
 export default function StockView({ orders, stock, threshold, updateStockAPI, calcularUnidades }) {
   const [newStockValue, setNewStockValue] = useState('');
   const [newThreshold, setNewThreshold] = useState(threshold);
+
+  useEffect(() => {
+    setNewThreshold(threshold);
+  }, [threshold]);
 
   const handleUpdate = () => {
     const val = newStockValue === '' ? undefined : parseInt(newStockValue, 10);
